@@ -271,7 +271,7 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ============ settings ============ */
 const LS='svl_gads_dash_v2';
 const HOTELS=['Bến Thành','Sakyo','Jolie','The Myst','Yen','Sil','Mây','Nhiều khách sạn','Chưa phân loại'];
-const MAIN=['Bến Thành','Sakyo','Jolie','The Myst'];
+const MAIN=['Bến Thành','Sakyo','Jolie'];
 const HIDDEN=['Nhiều khách sạn','Chưa phân loại'];
 const DEF={otaCommission:0.17,targetRoas:{'Bến Thành':15,'Sakyo':14,'Jolie':null,'The Myst':null},
   budgets:{'2026-11':{'Bến Thành':66.5e6,'Sakyo':27.5e6,'Jolie':19.9e6},'2026-12':{'Bến Thành':87.8e6,'Sakyo':37.4e6,'Jolie':19.8e6}},
@@ -468,7 +468,7 @@ const METRIC_COLS=()=>[MC('cost','Chi phí',F.tr),MC('share','% chi phí',F.pct)
 function render(anim=true){renderNav();renderTop();renderMain(anim)}
 function renderNav(){
   const counts={};
-  $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 4 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)&&!HIDDEN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===MAIN.length+1?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
+  $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 3 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)&&!HIDDEN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===MAIN.length+1?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
   $('#navSec').innerHTML=SECS.map(([k,t,p])=>`<li><button data-s="${k}" class="${SEC===k?'on':''}" ${HOTEL==='ALL'&&!['overview','market'].includes(k)?'title="Chọn một khách sạn để xem"':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>${t}</button></li>`).join('');
   $$('#navHotel [data-h]').forEach(b=>b.onclick=()=>{HOTEL=b.dataset.h;CSEL=null;VIEW.mktSel=null;Object.keys(TS).forEach(k=>delete TS[k]);render()});
   $$('#navSec [data-s]').forEach(b=>b.onclick=()=>{SEC=b.dataset.s;render();window.scrollTo({top:0,behavior:reduced?'auto':'smooth'})});
@@ -691,7 +691,7 @@ function secMarketAll(){
   const ks=[...keys.entries()].sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0]);
   const rows=ks.map(k=>{const o={name:geoName(k),_q:geoName(k)};per.forEach((p,i)=>{const r=p.rows.find(x=>x.k===k);o['s'+i]=r?r.share:null;o['c'+i]=r?r.cos:null;o['v'+i]=r?r.cost:null});return o});
   const cols=[MC('name','Thị trường (User location)',esc,{l:1}),...per.flatMap((p,i)=>[MC('s'+i,p.h+': % chi phí',F.pct),MC('v'+i,p.h+': chi phí',F.tr),MC('c'+i,p.h+': CP/DT',cosCell)])];
-  const n396=[M.noDimAccs.has('3965442048')?'Sakyo chưa gồm tài khoản 396-544-2048':'',M.noDimAccs.has('6233882444')?'The Myst (623-388-2444) chưa có số theo thị trường':''].filter(Boolean);const n396h=n396.length?`<p class="note ${A()}">${n396.join('. ')} trong snapshot. Có sau khi cài script và bấm Refresh.</p>`:'';
+  const n396=[M.noDimAccs.has('3965442048')?'Sakyo chưa gồm tài khoản 396-544-2048':'',''].filter(Boolean);const n396h=n396.length?`<p class="note ${A()}">${n396.join('. ')} trong snapshot. Có sau khi cài script và bấm Refresh.</p>`:'';
   return n396h+`<p class="note info ${A()}">Mỗi khách sạn tính tỷ trọng trên chi phí của chính khách sạn đó. Bảng đặt cạnh nhau để so sánh, không cộng gộp. Mở từng khách sạn để xem biểu đồ.</p>
    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${per.map(p=>`<div class="card ${A()}"><h3>${p.h}</h3><p class="q">${p.tot>0?'Tổng chi '+F.tr(p.tot):'Chưa có số thị trường (tài khoản đang lấy số theo tháng qua giao diện, có sau khi cài script)'}</p>${p.rows.sort((a,b)=>b.cost-a.cost).slice(0,6).map(r=>`<div style="margin:7px 0"><div class="small" style="display:flex;justify-content:space-between"><span>${esc(r.name)}</span><span class="num">${F.pct0(r.share)} | CP/DT ${ok(r.cos)?F.pct(r.cos):'-'}</span></div><div class="pace"><div class="bar" style="margin:3px 0;height:8px"><span style="width:${r.share*100}%;${ok(r.cos)&&r.cos<=S.otaCommission?'':'background:var(--s8)'}"></span></div></div></div>`).join('')}<button class="btn" data-goh="${p.h}" data-sec="market">Chi tiết ${p.h}</button></div>`).join('')}</div>
    <h2 class="sec">So sánh 25 thị trường lớn nhất</h2><div class="${A()}">${T('mktall',cols,rows,{sort:'s0',what:'thị trường',search:true})}</div>`;
