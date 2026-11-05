@@ -44,7 +44,7 @@ aside{background:var(--nav);color:var(--nav-ink);padding:18px 12px;position:stic
 .nav .badge{margin-left:auto;font-size:11px;color:#8d8a84}
 @keyframes grow{from{transform:scaleY(0)}to{transform:none}}
 /* topbar */
-.topbar{position:sticky;top:0;z-index:30;background:rgba(245,243,239,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(245,243,239,.97);border-bottom:1px solid var(--line);padding:12px 26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .topbar h1{margin:0;font-size:18px;font-weight:600;letter-spacing:-.2px}
 .topbar .crumb{color:var(--ink-3);font-weight:400}
 .sp{flex:1}
@@ -102,7 +102,8 @@ h2.sec small{font-weight:400;color:var(--ink-2);font-size:12px}
 .kpi canvas{position:absolute;right:10px;bottom:10px;width:90px!important;height:30px!important;opacity:.9}
 .chip{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
 .chip.good{background:var(--good-bg);color:var(--good)}.chip.bad{background:var(--bad-bg);color:var(--bad)}.chip.neu{background:#eeebe6;color:var(--ink-2)}
-.chartbox{position:relative;height:270px}
+.chartbox{position:relative;height:270px;contain:layout paint}
+.chartbox canvas{cursor:crosshair}
 .chartbox.sm{height:200px}.chartbox.lg{height:330px}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2);margin:0 0 8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
@@ -269,6 +270,7 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LS='svl_gads_dash_v2';
 const HOTELS=['Bến Thành','Sakyo','Jolie','Yen','Sil','Mây','Nhiều khách sạn','Chưa phân loại'];
 const MAIN=['Bến Thành','Sakyo','Jolie'];
+const HIDDEN=['Nhiều khách sạn','Chưa phân loại'];
 const DEF={otaCommission:0.17,targetRoas:{'Bến Thành':15,'Sakyo':14,'Jolie':null},
   budgets:{'2026-11':{'Bến Thành':66.5e6,'Sakyo':27.5e6,'Jolie':19.9e6},'2026-12':{'Bến Thành':87.8e6,'Sakyo':37.4e6,'Jolie':19.8e6}},
   rules:'Bến Thành = bến thành|ben thanh|\\bbt\\b\nSakyo = sakyo|little tokyo\nJolie = jolie\nYen = (^|[^a-z])yen([^a-z]|$)\nSil = (^|[^a-z])sil([^a-z]|$)\nMây = mây',
@@ -414,7 +416,13 @@ function delta(cur,prev,dir){
 /* ============ charts ============ */
 const CH={};const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const PAL=()=>['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css);
-function chart(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id]}const el=document.getElementById(id);if(!el||!window.Chart)return;cfg.options=cfg.options||{};cfg.options.animation=reduced?false:{duration:650,easing:'easeOutQuart'};CH[id]=new Chart(el,cfg)}
+function chart(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id]}const el=document.getElementById(id);if(!el||!window.Chart)return;cfg.options=cfg.options||{};const o=cfg.options;o.animation=reduced?false:{duration:550,easing:'easeOutQuart'};
+  o.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}},show:{animations:{}},hide:{animations:{}}};
+  o.hover=Object.assign({mode:o.interaction?o.interaction.mode:'nearest',intersect:o.interaction?o.interaction.intersect:true},o.hover||{});
+  o.plugins=o.plugins||{};const tp=o.plugins.tooltip=o.plugins.tooltip||{};
+  Object.assign(tp,{animation:{duration:90,easing:'easeOutCubic'},position:'nearest',caretPadding:8,caretSize:5,cornerRadius:8,padding:10,displayColors:tp.displayColors??true,backgroundColor:'rgba(29,31,38,.94)',titleFont:{weight:'600',size:12},bodyFont:{size:12},boxPadding:4},Object.fromEntries(Object.entries(tp).filter(([k])=>k==='callbacks'||k==='mode'||k==='enabled')));
+  o.events=['mousemove','mouseout','click','touchstart','touchmove'];
+  CH[id]=new Chart(el,cfg)}
 function opts(yf,yt,extra){return Object.assign({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
   plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',padding:10,cornerRadius:8,titleFont:{weight:'600'},callbacks:{label:c=>' '+c.dataset.label+': '+yf(c.parsed.y)}}},
   scales:{x:{grid:{display:false},ticks:{color:css('--ink-2'),maxRotation:0,autoSkip:true,maxTicksLimit:12,font:{size:11}}},y:{beginAtZero:true,grid:{color:'#eeeae3'},border:{display:false},title:{display:!!yt,text:yt,color:css('--ink-2'),font:{size:11}},ticks:{color:css('--ink-2'),font:{size:11},callback:v=>yf(v)}}}},extra||{})}
@@ -457,7 +465,7 @@ const METRIC_COLS=()=>[MC('cost','Chi phí',F.tr),MC('share','% chi phí',F.pct)
 function render(anim=true){renderNav();renderTop();renderMain(anim)}
 function renderNav(){
   const counts={};
-  $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 3 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===4?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
+  $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 3 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)&&!HIDDEN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===4?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
   $('#navSec').innerHTML=SECS.map(([k,t,p])=>`<li><button data-s="${k}" class="${SEC===k?'on':''}" ${HOTEL==='ALL'&&!['overview','market'].includes(k)?'title="Chọn một khách sạn để xem"':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>${t}</button></li>`).join('');
   $$('#navHotel [data-h]').forEach(b=>b.onclick=()=>{HOTEL=b.dataset.h;CSEL=null;Object.keys(TS).forEach(k=>delete TS[k]);render()});
   $$('#navSec [data-s]').forEach(b=>b.onclick=()=>{SEC=b.dataset.s;render();window.scrollTo({top:0,behavior:reduced?'auto':'smooth'})});
@@ -514,7 +522,7 @@ function secAll(){
   return `<p class="note info ${A()}">Mỗi khách sạn hiển thị số riêng, không cộng gộp. Chiến dịch gán khách sạn theo tên, tên không có khách sạn thì theo tài khoản. Sửa trong Cài đặt.</p>
    <div class="hotelcards">${cards}</div>
    <h2 class="sec">Khách sạn khác và chiến dịch chưa gán <small>trong 3 tài khoản</small></h2>
-   <div class="${A()}">${T('others',[MC('name','Nhóm',v=>`<a href="#" data-goh="${esc(v)}">${esc(v)}</a>`,{l:1}),MC('cost','Chi phí',F.tr),MC('conv','Lượt chuyển đổi',F.cv),MC('val','Doanh thu book date',F.tr),MC('cos','Chi phí / doanh thu book date',cosCell),MC('roas','ROAS',F.x),MC('cpa','CPA',F.tr)],rows,{search:false,sort:'cost'})}</div>`;
+   <div class="${A()}">${T('others',[MC('name','Nhóm',v=>HIDDEN.includes(v)?`${esc(v)} <span class="muted small">(gán lại trong Cài đặt)</span>`:`<a href="#" data-goh="${esc(v)}">${esc(v)}</a>`,{l:1}),MC('cost','Chi phí',F.tr),MC('conv','Lượt chuyển đổi',F.cv),MC('val','Doanh thu book date',F.tr),MC('cos','Chi phí / doanh thu book date',cosCell),MC('roas','ROAS',F.x),MC('cpa','CPA',F.tr)],rows,{search:false,sort:'cost'})}</div>`;
 }
 function paceInner(h){
   const [y,m,d]=ymd(M.lastDate),f=idxYMD(y,m,1),dim=new Date(Date.UTC(y,m+1,0)).getUTCDate();
@@ -610,8 +618,8 @@ function secCamp(){
     ...METRIC_COLS(),MC('proas','ROAS kỳ so sánh',F.x),MC('bk','Booking',F.cv),MC('is','IS',F.pct0),MC('lostB','Mất IS ngân sách',F.pct0),MC('lostR','Mất IS rank',F.pct0),MC('chk','Bắt đầu thanh toán',F.int)];
   const foot={name:'Tổng '+h,cost:F.tr(a.cost),share:'100%',impr:F.int(a.impr),clk:F.int(a.clk),ctr:F.pct(a.ctr),cpc:F.k(a.cpc),conv:F.cv(a.conv),cvr:F.pct(a.cvr),cpa:F.tr(a.cpa),val:F.tr(a.val),cos:F.pct(a.cos),roas:F.x(a.roas),proas:C?F.x(C.tot.roas):'',bk:F.cv(a.bk),chk:F.int(a.chk)};
   POST.push(()=>{const pts=rows.filter(r=>r.cost>0).map(r=>({x:r.cost,y:r.roas||0,n:r.name,cv:r.conv}));const mx=Math.max(1,...pts.map(p=>p.cv));
-    chart('cScat',{type:'bubble',data:{datasets:[{label:'Chiến dịch',data:pts.map(p=>Object.assign({r:4+10*Math.sqrt(p.cv/mx)},p)),backgroundColor:css('--s1')+'b0',borderColor:'#fff',borderWidth:1.5}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',callbacks:{label:x=>{const p=x.raw;return [p.n,`Chi phí ${F.tr(p.x)}, ROAS ${F.x(p.y)}, ${F.cv(p.cv)} chuyển đổi`]}}}},
+    chart('cScat',{type:'bubble',data:{datasets:[{label:'Chiến dịch',data:pts.map(p=>Object.assign({r:4+10*Math.sqrt(p.cv/mx)},p)),backgroundColor:css('--s1')+'b0',hoverBackgroundColor:css('--s2'),borderColor:'#fff',borderWidth:1.5,hoverBorderWidth:2}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false,axis:'xy'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',callbacks:{label:x=>{const p=x.raw;return [p.n,`Chi phí ${F.tr(p.x)}, ROAS ${F.x(p.y)}, ${F.cv(p.cv)} chuyển đổi`]}}}},
        scales:{x:{beginAtZero:true,title:{display:true,text:'Chi phí trong kỳ',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{beginAtZero:true,title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{color:css('--ink-2'),font:{size:11}}}}},plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]}])]});
     const top=[...rows].sort((x,y)=>y.cost-x.cost).slice(0,10);
     const capC=Math.max(S.otaCommission*200,...top.filter(r=>ok(r.cos)).map(r=>r.cos*100));chart('cTop',{type:'bar',data:{labels:top.map(r=>r.name.length>34?r.name.slice(0,33)+'…':r.name),datasets:[{label:'Chi phí / doanh thu book date',data:top.map(r=>ok(r.cos)?r.cos*100:capC),backgroundColor:top.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
