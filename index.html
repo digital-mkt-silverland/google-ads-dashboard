@@ -420,7 +420,8 @@ const CH={};const css=v=>getComputedStyle(document.documentElement).getPropertyV
 const PAL=()=>['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css);
 function chart(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id]}const el=document.getElementById(id);if(!el||!window.Chart)return;cfg.options=cfg.options||{};const o=cfg.options;o.animation=false;
   o.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}},show:{animations:{}},hide:{animations:{}}};
-  o.hover=Object.assign({mode:o.interaction?o.interaction.mode:'nearest',intersect:o.interaction?o.interaction.intersect:true},o.hover||{});
+  if(o.indexAxis==='y'){o.interaction={mode:'index',intersect:false,axis:'y'}}
+  o.hover=Object.assign({mode:o.interaction?o.interaction.mode:'nearest',intersect:o.interaction?o.interaction.intersect:true,axis:o.interaction&&o.interaction.axis?o.interaction.axis:undefined},o.hover||{});
   o.plugins=o.plugins||{};const tp=o.plugins.tooltip=o.plugins.tooltip||{};
   Object.assign(tp,{animation:false,position:'nearest',caretPadding:8,caretSize:5,cornerRadius:8,padding:10,displayColors:tp.displayColors??true,backgroundColor:'rgba(29,31,38,.94)',titleFont:{weight:'600',size:12},bodyFont:{size:12},boxPadding:4},Object.fromEntries(Object.entries(tp).filter(([k])=>k==='callbacks'||k==='mode'||k==='enabled')));
   o.events=['mousemove','mouseout','click','touchstart','touchmove'];
