@@ -13,7 +13,7 @@
 
 var CONFIG = {
   SPREADSHEET_URL: 'DAN_LINK_GOOGLE_SHEET_VAO_DAY',
-  ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048'],
+  ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048', '623-388-2444'],
   START_DATE: '2025-01-01',     // ngày bắt đầu lấy data
   DAILY_DIM_MONTHS: 3           // số tháng gần nhất lấy breakdown theo ngày (cũ hơn lấy theo tháng)
 };

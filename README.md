@@ -1,6 +1,6 @@
 # Google Ads Dashboard | Silverland Hospitality
 
-Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Bến Thành, Sakyo, Jolie (và Yen, Sil, Mây trong tài khoản dùng chung).
+Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Bến Thành, Sakyo, Jolie, The Myst Đồng Khởi (và Yen, Sil, Mây trong tài khoản dùng chung).
 
 - Xem online: https://digital-mkt-silverland.github.io/google-ads-dashboard/
 - `index.html`: dashboard 1 file, có sẵn snapshot data đến 04/11/2026.
