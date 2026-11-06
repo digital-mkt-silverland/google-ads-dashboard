@@ -313,7 +313,7 @@ function classify(){
 function parseCSV(text){const out=[];let row=[],f='',q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(f);f=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f=''}else f+=ch}if(f!==''||row.length){row.push(f);out.push(row)}return out.filter(r=>r.length>1)}
 const nn=v=>{if(v==null||v==='')return null;const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:null};
 function tableOf(text){const t=parseCSV(text.replace(/^﻿/,''));const h=t[0].map(x=>x.trim());return {h,rows:t.slice(1),ix:k=>h.indexOf(k)}}
-function kindOf(text){const h=text.replace(/^﻿/,'').slice(0,400).split(/\r?\n/)[0];if(/\bdim\b/.test(h)&&/k1/.test(h))return 'dims';if(/campaign_name/.test(h))return 'data';if(/canonical_name/.test(h))return 'geo';if(/^"?key"?,"?value/.test(h))return 'info';return null}
+function kindOf(text){const h=text.replace(/^﻿/,'').slice(0,400).split(/\r?\n/)[0];if(/\bdim\b/.test(h)&&/k1/.test(h))return 'dims';if(/campaign_name/.test(h))return 'data';if(/canonical_name/.test(h))return 'geo';if(/^"?key"?,"?value/.test(h))return 'info';if(/^"?kind"?,"?date/.test(h))return 'recon';return null}
 function importTables(T){
   if(!T.data)throw new Error('Thiếu bảng Data');
   const d=tableOf(T.data);const need=['date','account_id','campaign_id','campaign_name','cost','impressions','clicks','conversions','conv_value'];
@@ -363,9 +363,12 @@ async function refresh(manual){
   const id=sheetId(S.sheetUrl);if(!id){toast('Link Sheet không hợp lệ',1);return}
   document.body.classList.add('loading');$('#pRefresh').classList.add('spin');
   try{
-    const [data,dims,geo,info,rc]=await Promise.all(['Data','Dims','GeoNames','Info','Recon'].map(n=>fetchTab(id,n).catch(e=>n==='Data'?Promise.reject(e):'')));
-    const imp=importTables({data,dims,geo,info});M=merge(fromRaw(RAW),imp);if(rc){try{M.recon=importRecon(rc,M.recon)}catch(e){toast('Tab Recon lỗi: '+e.message,1)}}
-    M.stamp='Google Sheet, script chạy '+(imp.info.run_at||'?')+(imp.info.data_through?', data đến '+imp.info.data_through.split('-').reverse().join('/'):'');
+    const want={Data:'data',Dims:'dims',GeoNames:'geo',Info:'info',Recon:'recon'};let err=null;
+    const [data,dims,geo,info,rc]=await Promise.all(Object.keys(want).map(n=>fetchTab(id,n).then(t=>kindOf(t)===want[n]?t:'').catch(e=>{err=e;return ''})));
+    if(!data&&!rc)throw (err||new Error('Sheet chưa có tab Data hoặc Recon'));
+    if(data){const imp=importTables({data,dims,geo,info});M=merge(fromRaw(RAW),imp);M.stamp='Google Sheet, script chạy '+(imp.info.run_at||'?')+(imp.info.data_through?', data đến '+imp.info.data_through.split('-').reverse().join('/'):'')}
+    else{M=fromRaw(RAW);M.stamp+=', đối soát từ Google Sheet'}
+    if(rc){try{M.recon=importRecon(rc,M.recon)}catch(e){toast('Tab Recon lỗi: '+e.message,1)}}
     classify();applyPreset(PRE);render(true);toast('Đã cập nhật. Data đến '+dmy(M.lastDate)+'.');
   }catch(e){toast('Không tải được Sheet: '+e.message,1)}
   finally{document.body.classList.remove('loading');$('#pRefresh').classList.remove('spin')}
