@@ -16,7 +16,7 @@ Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Bế
 
 ## Đối soát tracking (làm 1 lần)
 1. Mở Google Sheet ở trên: Tiện ích mở rộng, Apps Script, dán `GoogleAds_Dashboard_Recon.gs`.
-2. Dịch vụ (+), thêm Google Analytics Data API. Project Settings: bật hiện appsscript.json, thay bằng file `appsscript.json` trong repo (giới hạn quyền chỉ đọc, tránh Google chặn với lỗi "This app is blocked").
+2. Dịch vụ (+), thêm Google Analytics Data API. Project Settings: bật hiện appsscript.json, thay bằng file `appsscript.json` trong repo (chỉ xin quyền Sheets, đọc GA4, chạy theo lịch). Nếu bị "This app is blocked": Project Settings, đổi GCP project sang project chuẩn có màn hình đồng ý OAuth ở chế độ Testing và thêm tài khoản chạy script làm test user (đang dùng silverland-ga4-mcp, số 548318208693).
 3. Chạy `runRecon`, cấp quyền. Sheet có tab Recon.
 4. Chạy `installTrigger` một lần: tự chạy hằng ngày 8 đến 9 giờ.
 5. Dashboard bấm Refresh, mục Đối soát tracking có số.
