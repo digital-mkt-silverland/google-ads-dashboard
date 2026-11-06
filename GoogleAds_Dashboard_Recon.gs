@@ -33,16 +33,18 @@ function runRecon() {
 
   // 1. Booking engine: cộng doanh thu mọi dòng phòng của cùng mã booking
   var sh = SpreadsheetApp.openById(RC.BOOKING_SHEET_ID).getSheetByName(RC.BOOKING_TAB);
-  var v = sh.getDataRange().getValues(), h = v[0].map(function (x) { return String(x).trim(); });
+  var last = sh.getLastRow(), h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim(); });
   var cD = h.indexOf('Booking Date'), cH = h.indexOf('Hotel'), cN = h.indexOf('Booking Number'), cR = h.indexOf('Total Revenue');
   if (cD < 0 || cH < 0 || cN < 0 || cR < 0) throw new Error('Sheet booking thiếu cột Booking Date, Hotel, Booking Number hoặc Total Revenue');
+  function col(c) { return sh.getRange(2, c + 1, last - 1, 1).getValues(); }
+  var VD = col(cD), VH = col(cH), VN = col(cN), VR = col(cR);
   var ibe = {}, through = '';
-  for (var i = 1; i < v.length; i++) {
-    var hotel = IBE_HOTEL[String(v[i][cH]).trim()]; if (!hotel) continue;
-    var d = toISO(v[i][cD], tz); if (!d || d < RC.START_DATE || d > END) continue;
-    var id = String(v[i][cN]).trim(); if (!id) continue;
+  for (var i = 0; i < VD.length; i++) {
+    var hotel = IBE_HOTEL[String(VH[i][0]).trim()]; if (!hotel) continue;
+    var d = toISO(VD[i][0], tz); if (!d || d < RC.START_DATE || d > END) continue;
+    var id = String(VN[i][0]).trim(); if (!id) continue;
     var b = ibe[id] || (ibe[id] = { d: d, h: hotel, rev: 0 });
-    b.rev += toNum(v[i][cR]); if (d > through) through = d;
+    b.rev += toNum(VR[i][0]); if (d > through) through = d;
   }
 
   // 2. GA4
