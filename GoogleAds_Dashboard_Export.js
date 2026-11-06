@@ -83,7 +83,7 @@ function pullCampaigns(accId, accName, start, end, out) {
     else c[2] += num(r.metrics.allConversions);
   }
   var main = CONFIG.MAIN_PURCHASE[accId], ca = {};
-  var q3 = 'SELECT segments.date, campaign.id, segments.conversion_action_name, metrics.all_conversions, metrics.all_conversions_value ' +
+  var q3 = 'SELECT segments.date, campaign.id, segments.conversion_action_name, segments.conversion_action_category, metrics.all_conversions, metrics.all_conversions_value ' +
     'FROM campaign WHERE segments.date BETWEEN "' + start + '" AND "' + end + '" AND segments.conversion_action_category = "PURCHASE"';
   var it3 = AdsApp.search(q3);
   while (it3.hasNext()) {
