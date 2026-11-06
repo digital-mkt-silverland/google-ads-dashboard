@@ -956,7 +956,7 @@ $('#pCamp').onclick=e=>{if(POP){closePop();return}
 $$('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 function openData(){$('#sheetUrl').value=S.sheetUrl||'';$('#dataState').textContent=`Đang dùng: ${M.stamp}. Data đến ${dmy(M.lastDate)}.`;$('#loadStatus').textContent='';$('#dlgData').showModal()}
 $('#btnData').onclick=openData;
-$('#btnSheet').onclick=async()=>{S.sheetUrl=$('#sheetUrl').value.trim();saveS();$('#loadStatus').textContent='Đang tải...';await refresh(true);$('#loadStatus').textContent=M.source==='sheet'?'Đã tải. '+M.stamp:'Chưa tải được, xem thông báo góc phải.'};
+$('#btnSheet').onclick=async()=>{S.sheetUrl=$('#sheetUrl').value.trim();saveS();$('#loadStatus').textContent='Đang tải...';await refresh(true);$('#loadStatus').textContent=/Google Sheet/.test(M.stamp)?'Đã tải. '+M.stamp:'Chưa tải được, xem thông báo góc phải.'};
 $('#btnReset').onclick=()=>{S.sheetUrl='';saveS();M=fromRaw(RAW);classify();DSTART=dstart();applyPreset(PRE);render();$('#dlgData').close();toast('Đã về snapshot gốc.')};
 $('#pRefresh').onclick=()=>refresh(true);
 const readFiles=async files=>{const T={};for(const f of files){const t=await f.text();const k=kindOf(t);if(k)T[k]=t}
