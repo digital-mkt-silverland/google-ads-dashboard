@@ -15,12 +15,18 @@ var CONFIG = {
   SPREADSHEET_URL: 'DAN_LINK_GOOGLE_SHEET_VAO_DAY',
   ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048', '623-388-2444'],
   START_DATE: '2025-01-01',     // ngày bắt đầu lấy data
-  DAILY_DIM_MONTHS: 3           // số tháng gần nhất lấy breakdown theo ngày (cũ hơn lấy theo tháng)
+  DAILY_DIM_MONTHS: 3,          // số tháng gần nhất lấy breakdown theo ngày (cũ hơn lấy theo tháng)
+  // Chuyển đổi booking chính của từng tài khoản. Từ ngày "from", bookings chỉ lấy đúng hành động này,
+  // tránh đếm trùng khi tài khoản có nhiều hành động mua hàng cùng là chuyển đổi chính (Bến Thành 08 đến 12/2025).
+  // Tài khoản không có trong danh sách: bookings = mọi chuyển đổi chính loại Mua hàng.
+  MAIN_PURCHASE: { '6453855576': { name: 'Lượt mua hàng BT', from: '2025-02-15' } },
+  // Chuyển đổi nhập từ GA4 (phụ), dùng cho phần Đối soát tracking
+  GA4_IMPORT_SUFFIX: '(web) purchase'
 };
 
 var DATA_HEADER = ['date', 'account_id', 'account_name', 'campaign_id', 'campaign_name', 'campaign_status', 'channel_type',
   'cost', 'impressions', 'clicks', 'conversions', 'conv_value', 'bookings', 'booking_value', 'checkouts',
-  'search_is', 'search_lost_is_budget', 'search_lost_is_rank'];
+  'search_is', 'search_lost_is_budget', 'search_lost_is_rank', 'ga4_import', 'ga4_import_value'];
 var DIMS_HEADER = ['dim', 'start', 'end', 'account_id', 'campaign_id', 'k1', 'k2', 'cost', 'impressions', 'clicks', 'conversions', 'conv_value'];
 
 function main() {
@@ -72,16 +78,27 @@ function pullCampaigns(accId, accName, start, end, out) {
     if (r.segments.conversionActionCategory === 'PURCHASE') { c[0] += num(r.metrics.conversions); c[1] += num(r.metrics.conversionsValue); }
     else c[2] += num(r.metrics.allConversions);
   }
+  var main = CONFIG.MAIN_PURCHASE[accId], ca = {};
+  var q3 = 'SELECT segments.date, campaign.id, segments.conversion_action_name, metrics.all_conversions, metrics.all_conversions_value ' +
+    'FROM campaign WHERE segments.date BETWEEN "' + start + '" AND "' + end + '" AND segments.conversion_action_category = "PURCHASE"';
+  var it3 = AdsApp.search(q3);
+  while (it3.hasNext()) {
+    var r3 = it3.next(), k3 = r3.segments.date + '|' + r3.campaign.id, n3 = r3.segments.conversionActionName;
+    var x = ca[k3] || (ca[k3] = [0, 0, 0, 0]);
+    if (main && n3 === main.name) { x[0] += num(r3.metrics.allConversions); x[1] += num(r3.metrics.allConversionsValue); }
+    if (n3.slice(-CONFIG.GA4_IMPORT_SUFFIX.length) === CONFIG.GA4_IMPORT_SUFFIX) { x[2] += num(r3.metrics.allConversions); x[3] += num(r3.metrics.allConversionsValue); }
+  }
   var q = 'SELECT segments.date, campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, ' +
     'metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions, metrics.conversions_value, ' +
     'metrics.search_impression_share, metrics.search_budget_lost_impression_share, metrics.search_rank_lost_impression_share ' +
     'FROM campaign WHERE segments.date BETWEEN "' + start + '" AND "' + end + '" AND metrics.impressions > 0';
   var it = AdsApp.search(q);
   while (it.hasNext()) {
-    var r = it.next(), m = r.metrics, c = conv[r.segments.date + '|' + r.campaign.id] || [0, 0, 0];
+    var r = it.next(), m = r.metrics, key = r.segments.date + '|' + r.campaign.id, c = (conv[key] || [0, 0, 0]).slice(), x = ca[key] || [0, 0, 0, 0];
+    if (main && r.segments.date >= main.from) { c[0] = x[0]; c[1] = x[1]; }
     out.push([r.segments.date, accId, accName, String(r.campaign.id), r.campaign.name, r.campaign.status, r.campaign.advertisingChannelType,
       Math.round(num(m.costMicros) / 1e6), num(m.impressions), num(m.clicks), round(num(m.conversions), 3), Math.round(num(m.conversionsValue)),
-      round(c[0], 3), Math.round(c[1]), round(c[2], 2), opt(m.searchImpressionShare), opt(m.searchBudgetLostImpressionShare), opt(m.searchRankLostImpressionShare)]);
+      round(c[0], 3), Math.round(c[1]), round(c[2], 2), opt(m.searchImpressionShare), opt(m.searchBudgetLostImpressionShare), opt(m.searchRankLostImpressionShare), round(x[2], 3), Math.round(x[3])]);
   }
 }
 
