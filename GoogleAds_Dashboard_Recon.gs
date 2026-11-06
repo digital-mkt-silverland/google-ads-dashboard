@@ -123,6 +123,7 @@ function gaDate(s) { return s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(
 function toNum(x) { if (typeof x === 'number') return x; var n = Number(String(x).replace(/,/g, '')); return isFinite(n) ? n : 0; }
 function round(v, d) { var p = Math.pow(10, d); return Math.round(v * p) / p; }
 function installTrigger() {
-  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'runRecon') ScriptApp.deleteTrigger(t); });
+  ScriptApp.getProjectTriggers().forEach(function (t) { var f = t.getHandlerFunction(); if (f === 'runRecon' || f === 'runAds') ScriptApp.deleteTrigger(t); });
+  if (typeof runAds === 'function') ScriptApp.newTrigger('runAds').timeBased().everyDays(1).atHour(6).inTimezone('Asia/Ho_Chi_Minh').create();
   ScriptApp.newTrigger('runRecon').timeBased().everyDays(1).atHour(8).inTimezone('Asia/Ho_Chi_Minh').create();
 }

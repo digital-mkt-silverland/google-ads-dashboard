@@ -349,12 +349,32 @@ function importRecon(text,base){
   const nb=buckets.indexOf('Không có trong GA4');if(nb>=0&&nb!==buckets.length-1)throw new Error('thứ tự nhóm nguồn sai');
   if(!out.through)out.through=toStr(Math.max(...out.ibe.map(r=>r[0])));return out}
 function merge(base,imp){
+  const cut=imp.info&&imp.info.data_from?toIdx(imp.info.data_from):null;
+  if(cut==null){
   const remap=new Map(),camps=[];base.camps.forEach((c,i)=>{if(!imp.accs.has(c.acc)){remap.set(i,camps.length);camps.push(c)}});
   const off=camps.length;imp.camps.forEach(c=>camps.push(c));
   const rows=base.rows.filter(r=>remap.has(r.c)).map(r=>Object.assign({},r,{c:remap.get(r.c)}));imp.rows.forEach(r=>rows.push(Object.assign({},r,{c:r.c+off})));
   const dims={};for(const k in base.dims){dims[k]=base.dims[k].filter(r=>remap.has(r[2])).map(r=>{const o=r.slice();o[2]=remap.get(r[2]);return o});(imp.dims[k]||[]).forEach(r=>{const o=r.slice();o[2]+=off;dims[k].push(o)})}
   const noDim=new Set([...base.noDimAccs].filter(a=>!imp.dimAccs.has(a)));
   return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:imp.last,accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:new Set([...base.monthlyAccs].filter(a=>!imp.accs.has(a))),noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
+  }
+  // Sheet chi co so tu ngay cut: giu snapshot truoc cut, thay tu cut tro di
+  const camps=base.camps.map(c=>Object.assign({},c));const k2i=new Map(camps.map((c,i)=>[c.key,i]));
+  const n2i=new Map();camps.forEach((c,i)=>{if(/:ui-/.test(c.key))n2i.set(c.acc+'|'+c.name,i)});
+  const map=imp.camps.map(c=>{if(k2i.has(c.key)){const i=k2i.get(c.key);Object.assign(camps[i],{name:c.name,status:c.status||camps[i].status,type:c.type||camps[i].type});return i}
+    const ni=n2i.get(c.acc+'|'+c.name);if(ni!=null){Object.assign(camps[ni],{status:c.status||camps[ni].status});return ni}
+    camps.push(Object.assign({},c));k2i.set(c.key,camps.length-1);return camps.length-1});
+  const MK=['cost','impr','clk','conv','val','bk','bval','chk','gi','gv'];
+  const rows=[];
+  for(const r of base.rows){const acc=camps[r.c].acc;if(!imp.accs.has(acc)||r.e<cut){rows.push(r);continue}if(r.s>=cut)continue;
+    const f=(cut-r.s)/(r.e-r.s+1),o=Object.assign({},r,{e:cut-1});MK.forEach(k=>{if(o[k]!=null)o[k]*=f});rows.push(o)}
+  imp.rows.forEach(r=>rows.push(Object.assign({},r,{c:map[r.c]})));
+  const dims={};
+  for(const k in base.dims){dims[k]=[];for(const r of base.dims[k]){const acc=camps[r[2]].acc;if(!imp.dimAccs.has(acc)||r[1]<cut){dims[k].push(r);continue}if(r[0]>=cut)continue;
+      const f=(cut-r[0])/(r[1]-r[0]+1),o=r.slice();o[1]=cut-1;for(let j=4;j<9;j++)o[j]*=f;dims[k].push(o)}
+    (imp.dims[k]||[]).forEach(r=>{const o=r.slice();o[2]=map[r[2]];dims[k].push(o)})}
+  const noDim=new Set([...base.noDimAccs].filter(a=>!imp.dimAccs.has(a)));
+  return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:Math.max(base.lastDate,imp.last),accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:base.monthlyAccs,noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
 }
 function sheetId(u){const m=String(u).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null}
 async function fetchTab(id,name){const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(/<html/i.test(t.slice(0,300)))throw new Error('Sheet chưa chia sẻ cho người có link');return t}
