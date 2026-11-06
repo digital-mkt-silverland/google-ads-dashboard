@@ -34,14 +34,18 @@ function runRecon() {
   // 1. Booking engine: cộng doanh thu mọi dòng phòng của cùng mã booking
   var sh = SpreadsheetApp.openById(RC.BOOKING_SHEET_ID).getSheetByName(RC.BOOKING_TAB);
   var last = sh.getLastRow(), h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim(); });
-  var cD = h.indexOf('Booking Date'), cH = h.indexOf('Hotel'), cN = h.indexOf('Booking Number'), cR = h.indexOf('Total Revenue');
-  if (cD < 0 || cH < 0 || cN < 0 || cR < 0) throw new Error('Sheet booking thiếu cột Booking Date, Hotel, Booking Number hoặc Total Revenue');
-  function col(c) { return sh.getRange(2, c + 1, last - 1, 1).getValues(); }
-  var VD = col(cD), VH = col(cH), VN = col(cN), VR = col(cR);
+  // Ngày đặt lấy từ 3 cột Book day, Book Month, Book Year để không bị nhầm ngày/tháng khi ô Booking Date là kiểu Date
+  var cDd = h.indexOf('Book day'), cDm = h.indexOf('Book Month'), cDy = h.indexOf('Book Year');
+  var cH = h.indexOf('Hotel'), cN = h.indexOf('Booking Number'), cR = h.indexOf('Total Revenue');
+  if (cDd < 0 || cDm < 0 || cDy < 0 || cH < 0 || cN < 0 || cR < 0) throw new Error('Sheet booking thiếu cột Book day, Book Month, Book Year, Hotel, Booking Number hoặc Total Revenue');
+  function col(c) { return sh.getRange(2, c + 1, last - 1, 1).getDisplayValues(); }
+  var VDd = col(cDd), VDm = col(cDm), VDy = col(cDy), VH = col(cH), VN = col(cN), VR = col(cR);
   var ibe = {}, through = '';
-  for (var i = 0; i < VD.length; i++) {
+  for (var i = 0; i < VH.length; i++) {
     var hotel = IBE_HOTEL[String(VH[i][0]).trim()]; if (!hotel) continue;
-    var d = toISO(VD[i][0], tz); if (!d || d < RC.START_DATE || d > END) continue;
+    var dd = Number(VDd[i][0]), mm = Number(VDm[i][0]), yy = Number(VDy[i][0]);
+    if (!dd || !mm || !yy) continue;
+    var d = yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2); if (d < RC.START_DATE || d > END) continue;
     var id = String(VN[i][0]).trim(); if (!id) continue;
     var b = ibe[id] || (ibe[id] = { d: d, h: hotel, rev: 0 });
     b.rev += toNum(VR[i][0]); if (d > through) through = d;
