@@ -13,7 +13,7 @@
 
 var CONFIG = {
   SPREADSHEET_URL: 'DAN_LINK_GOOGLE_SHEET_VAO_DAY',
-  ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048', '623-388-2444'],
+  ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048'],   // chỉ Bến Thành, Jolie, Sakyo (The Myst 623-388-2444 thêm lại khi cần)
   START_DATE: '2025-01-01',     // ngày bắt đầu lấy data
   DAILY_DIM_MONTHS: 3,          // số tháng gần nhất lấy breakdown theo ngày (cũ hơn lấy theo tháng)
   // Chuyển đổi booking chính của từng tài khoản. Từ ngày "from", bookings chỉ lấy đúng hành động này,
@@ -21,8 +21,12 @@ var CONFIG = {
   // Tài khoản không có trong danh sách: bookings = mọi chuyển đổi chính loại Mua hàng.
   MAIN_PURCHASE: { '6453855576': { name: 'Lượt mua hàng BT', from: '2025-02-15' } },
   // Chuyển đổi nhập từ GA4 (phụ), dùng cho phần Đối soát tracking
-  GA4_IMPORT_SUFFIX: '(web) purchase'
+  GA4_IMPORT_SUFFIX: '(web) purchase',
+  // Bỏ chiến dịch của khách sạn khác trong tài khoản dùng chung (Yen, Sil, Mây), trừ khi tên có cả Bến Thành, Sakyo hoặc Jolie
+  EXCLUDE_CAMPAIGN: /(^|[^a-z])(yen|sil)([^a-z]|$)|mây|(^|[^a-z])may([^a-z]|$)|myst/i,
+  KEEP_CAMPAIGN: /sakyo|little tokyo|jolie|bến thành|ben thanh|(^|[^a-z])bt([^a-z]|$)/i
 };
+var SKIP = {};   // campaign.id bị loại, dùng chung cho Data và Dims
 
 var DATA_HEADER = ['date', 'account_id', 'account_name', 'campaign_id', 'campaign_name', 'campaign_status', 'channel_type',
   'cost', 'impressions', 'clicks', 'conversions', 'conv_value', 'bookings', 'booking_value', 'checkouts',
@@ -94,7 +98,9 @@ function pullCampaigns(accId, accName, start, end, out) {
     'FROM campaign WHERE segments.date BETWEEN "' + start + '" AND "' + end + '" AND metrics.impressions > 0';
   var it = AdsApp.search(q);
   while (it.hasNext()) {
-    var r = it.next(), m = r.metrics, key = r.segments.date + '|' + r.campaign.id, c = (conv[key] || [0, 0, 0]).slice(), x = ca[key] || [0, 0, 0, 0];
+    var r = it.next();
+    if (CONFIG.EXCLUDE_CAMPAIGN.test(r.campaign.name) && !CONFIG.KEEP_CAMPAIGN.test(r.campaign.name)) { SKIP[accId + ':' + r.campaign.id] = 1; continue; }
+    var m = r.metrics, key = r.segments.date + '|' + r.campaign.id, c = (conv[key] || [0, 0, 0]).slice(), x = ca[key] || [0, 0, 0, 0];
     if (main && r.segments.date >= main.from) { c[0] = x[0]; c[1] = x[1]; }
     out.push([r.segments.date, accId, accName, String(r.campaign.id), r.campaign.name, r.campaign.status, r.campaign.advertisingChannelType,
       Math.round(num(m.costMicros) / 1e6), num(m.impressions), num(m.clicks), round(num(m.conversions), 3), Math.round(num(m.conversionsValue)),
@@ -132,6 +138,7 @@ function pullDims(accId, start, beforeCut, cut, end, out, geoIds) {
       try { it = AdsApp.search(q); } catch (e) { Logger.log('Bỏ qua ' + d.dim + ': ' + e); return; }
       while (it.hasNext()) {
         var r = it.next(), seg = r.segments[p.seg], s, e;
+        if (SKIP[accId + ':' + r.campaign.id]) continue;
         if (p.seg === 'month') { s = seg; e = monthEnd(seg); if (e > p.e) e = p.e; }
         else if (p.seg === 'week') { s = seg < p.s ? p.s : seg; e = addDays(seg, 6); if (e > p.e) e = p.e; }
         else { s = e = seg; }

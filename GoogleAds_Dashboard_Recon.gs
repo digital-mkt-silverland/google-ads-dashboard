@@ -21,10 +21,9 @@ var RC = {
   START_DATE: '2025-01-01',
   OUT_TAB: 'Recon'
 };
-var IBE_HOTEL = { 'Silverland Ben Thanh': 'Bến Thành', 'Silverland Sakyo': 'Sakyo', 'Silverland Jolie': 'Jolie', 'Silverland May': 'Mây',
-  'Silverland Yen': 'Yen', 'Silverland Sil': 'Sil', 'Silverland Min': 'Min', 'The Myst': 'The Myst' };
-var GA_HOTEL = { 'Silverland Ben Thanh': 'Bến Thành', 'Silverland Sakyo Hotel and Spa': 'Sakyo', 'Silverland Jolie Hotel and Spa': 'Jolie',
-  'Silverland May Hotel': 'Mây', 'Silverland Yen Hotel': 'Yen', 'Silverland Sil Hotel and Spa': 'Sil', 'Silverland Min Hotel': 'Min', 'The Myst Dong Khoi': 'The Myst' };
+// Chỉ đối soát Bến Thành, Sakyo, Jolie. Thêm khách sạn khác vào 2 bảng dưới khi cần.
+var IBE_HOTEL = { 'Silverland Ben Thanh': 'Bến Thành', 'Silverland Sakyo': 'Sakyo', 'Silverland Jolie': 'Jolie' };
+var GA_HOTEL = { 'Silverland Ben Thanh': 'Bến Thành', 'Silverland Sakyo Hotel and Spa': 'Sakyo', 'Silverland Jolie Hotel and Spa': 'Jolie' };
 var BUCKETS = ['Google Ads', 'Tìm kiếm tự nhiên', 'Trực tiếp', 'Tự giới thiệu (mất nguồn)', 'Trợ lý AI', 'Google Hotel Ads', 'Khác', 'Không có trong GA4'];
 var HOSTS = ['booking.silverlandhotels.com', 'reservation.travelanium.net', 'khác'];
 
