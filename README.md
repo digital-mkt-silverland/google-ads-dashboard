@@ -9,7 +9,7 @@ Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Saky
   - 753-421-2327 TK chung: chỉ chiến dịch có chữ Sakyo hoặc Little Tokyo
   - 623-388-2444 The Myst: mọi chiến dịch
 
-  Lần đầu (hoặc khi đổi danh sách tài khoản) lấy lại từ 01/01/2024: chiến dịch theo ngày, chi tiết (thị trường, độ tuổi, vị trí, từ khoá, headline) theo tháng cho phần cũ. Các lần sau chỉ lấy lại từ ngày 1 tháng trước đến hôm qua, giữ số cũ hơn. Ghi 4 tab Data, Dims, GeoNames, Info.
+  Lần đầu (hoặc khi đổi danh sách tài khoản) lấy lại từ 01/01/2025: chiến dịch theo ngày, chi tiết (thị trường, độ tuổi, vị trí, từ khoá, headline) theo tháng cho phần cũ. Các lần sau chỉ lấy lại từ ngày 1 tháng trước đến hôm qua, giữ số cũ hơn. Ghi 4 tab Data, Dims, GeoNames, Info.
 - `GoogleAds_Dashboard_Recon.gs`: đọc booking engine (sheet Data) và GA4 property 340245620, ghi tab Recon cho phần Đối soát tracking. Hiện chỉ đối soát Sakyo. The Myst dùng booking engine và GA4 riêng, chưa nối vào. Chỉ ghi số tổng hợp, không có thông tin khách.
 - `Code_combined.gs`: gộp 2 file trên, dán vào Code.gs của project Apps Script.
 - `GoogleAds_Dashboard_Export.js`: bản Google Ads Script chạy ở MCC (không dùng nữa vì lỗi uỷ quyền), giữ để tham khảo.
