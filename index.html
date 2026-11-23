@@ -846,8 +846,8 @@ const RC_ACC={
     '"Bắt đầu quy trình thanh toán" và "Android installs (all other apps)" đang là chuyển đổi chính và tính vào cột Conversions. Chiến dịch đặt giá thầu theo Conversions sẽ tối ưu cả lượt bắt đầu thanh toán (Suy luận). Đề xuất chuyển 2 hành động này sang phụ.',
     '"Silverland (web) purchase" nhập từ GA4 là chuyển đổi phụ.'],
   '3965442048':['TK 396-544-2048 (Sakyo): snapshot lấy theo tháng qua giao diện nên chưa đọc cấu hình chuyển đổi. Booking theo ngày trong snapshot là Ước tính, có số theo ngày sau khi script runAds chạy.'],
-  '6233882444':['TK 623-388-2444 (The Myst): The Myst dùng booking engine và GA4 riêng (secure.themystdongkhoihotel.com), chưa nối vào phần đối soát. Đối soát tracking hiện chỉ có Sakyo.']};
-const RC_GEN=['GA4 dùng: property 340245620 (www.silverlandhotels.com). Property 340242788 nhận cùng sự kiện purchase (T10/2026 cả hai ghi 349 purchase trên booking.silverlandhotels.com), nên chỉ đọc một property để tránh đếm đôi.',
+  '6233882444':['TK 623-388-2444 (The Myst): booking và doanh thu book date là các chuyển đổi chính loại Mua hàng của tài khoản. The Myst dùng booking engine secure.themystdongkhoihotel.com và GA4 riêng (property 340232784, The Myst Dong Khoi Hotel - GA4).']};
+const RC_GEN=['GA4 The Myst: property 340232784 (The Myst Dong Khoi Hotel - GA4), mọi purchase tính cho The Myst Đồng Khởi, bỏ purchase có item_brand chứa chữ Sapa. GA4 Sakyo: property 340245620 (www.silverlandhotels.com). Property 340242788 nhận cùng sự kiện purchase (T10/2026 cả hai ghi 349 purchase trên booking.silverlandhotels.com), nên chỉ đọc một property để tránh đếm đôi.',
   'Khớp GA4 với booking engine theo mã booking (transaction_id = Booking Number). Khách sạn của từng purchase lấy theo item_brand trong GA4, khớp 100% với khách sạn trên booking engine.',
   'Booking engine: sheet Data của file "Booking Website SVL & The Myst", chỉ có booking trạng thái Confirmed và Confirmed (Modified). Doanh thu book date = Total Revenue, cộng mọi phòng trong booking.'];
 
@@ -900,7 +900,6 @@ function rcLadder(a){
 function secRecon(){
   IX=0;const h=HOTEL,R=M.recon;
   if(!R)return `<div class="card anim empty">Chưa có dữ liệu đối soát trên bản này. Bản công khai không chứa số booking engine. Cài <code>GoogleAds_Dashboard_Recon.gs</code> vào Google Sheet của dashboard (mục Nguồn data, phần Đối soát tracking), sau đó bấm Refresh.</div>`;
-  if(h==='The Myst')return `<div class="card anim empty">${RC_ACC['6233882444'][0]}</div>`;
   if(R.hotels.indexOf(h)<0)return `<div class="card anim empty">${esc(h)} không có booking trên booking engine Silverland để đối soát.</div>`;
   const thr=toIdx(R.through),to=Math.min(TO,thr);
   const {tot:a}=rcAgg(h,FROM,to);const gran=(to-FROM)>62?'month':(to-FROM)>31?'week':'day';const {ser}=rcAgg(h,FROM,to,gran);const bs=bucketsIn(FROM,to,gran);const g=b=>ser.get(b)||rcZ(R.buckets.length);
@@ -949,7 +948,7 @@ function secRecon(){
 }
 function secReconAll(){
   IX=0;const R=M.recon;if(!R)return `<div class="card anim empty">Chưa có dữ liệu đối soát trên bản này. Bản công khai không chứa số booking engine. Cài <code>GoogleAds_Dashboard_Recon.gs</code> vào Google Sheet của dashboard (mục Nguồn data, phần Đối soát tracking), sau đó bấm Refresh.</div>`;const thr=toIdx(R.through),to=Math.min(TO,thr);
-  const cards=MAIN.filter(h=>h!=='The Myst'&&R.hotels.includes(h)).map(h=>{const {tot:a}=rcAgg(h,FROM,to);
+  const cards=MAIN.filter(h=>R.hotels.includes(h)).map(h=>{const {tot:a}=rcAgg(h,FROM,to);
     return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}" data-sec="recon">Chi tiết</button></h3>
       <div class="small muted">Booking engine, doanh thu book date</div><div class="big num">${F.tr(a.rev)}</div><div class="small muted">${F.int(a.n)} booking</div>
       <dl class="num"><dt>GA4 ghi nhận (booking)</dt><dd>${F.pct0(div(a.gn,a.n))}</dd>
@@ -959,7 +958,7 @@ function secReconAll(){
       <dt>Tự giới thiệu (mất nguồn)</dt><dd>${F.pct0(div(a.bk[3],a.rev))}</dd>
       <dt>GA4 không có trong IBE</dt><dd>${F.int(a.on)} purchase</dd></dl>${rcLadder(a)}</div>`}).join('');
   return `<p class="note info ${A()}">Mỗi khách sạn đối soát trên booking engine và GA4 của chính khách sạn đó, không cộng gộp. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Google Ads tag / IBE không phải tỷ lệ tracking, vì booking engine gồm cả booking không đến từ quảng cáo. Mở từng khách sạn để xem cách đọc.</p>
-   <div class="hotelcards">${cards}<div class="card hc ${A()}"><h3>The Myst</h3><p class="small">${RC_ACC['6233882444'][0]}</p></div></div>`;
+   <div class="hotelcards">${cards}</div>`;
 }
 
 /* ============ popovers ============ */
@@ -1037,7 +1036,7 @@ function dstart(){let m=1e9;for(const r of M.rows)if(r.s<m)m=r.s;return m}
 (function init(){
   if(window.Chart){Chart.defaults.font.family='"Be Vietnam Pro","Segoe UI",Arial,sans-serif';Chart.defaults.color='#55555a'}
   M=scope(fromRaw(RAW));classify();DSTART=dstart();applyPreset('l30');render();
-  $('#srcLine').textContent='Nguồn snapshot: Google Ads API (TK 753-421-2327, chiến dịch Sakyo) và giao diện Google Ads (TK 396-544-2048 Sakyo, TK 623-388-2444 The Myst, số theo tháng). Dashboard chỉ lấy số Sakyo và The Myst, '+'lấy ngày '+RAW.generated.split('-').reverse().join('/')+'. Sau khi cài script: Google Sheet do Apps Script (runAds) ghi hằng ngày. Chuyển đổi và doanh thu là số tag Google Ads chính, chưa loại huỷ. Đối soát tracking (Sakyo) dùng booking engine (sheet Data, file Booking Website SVL & The Myst) và GA4 property 340245620.';
+  $('#srcLine').textContent='Nguồn snapshot: Google Ads API (TK 753-421-2327, chiến dịch Sakyo) và giao diện Google Ads (TK 396-544-2048 Sakyo, TK 623-388-2444 The Myst, số theo tháng). Dashboard chỉ lấy số Sakyo và The Myst, '+'lấy ngày '+RAW.generated.split('-').reverse().join('/')+'. Sau khi cài script: Google Sheet do Apps Script (runAds) ghi hằng ngày. Chuyển đổi và doanh thu là số tag Google Ads chính, chưa loại huỷ. Đối soát tracking dùng booking engine (sheet Data, file Booking Website SVL & The Myst), GA4 property 340245620 (Sakyo) và 340232784 (The Myst).';
   if(S.sheetUrl)refresh(false);
 })();
 </script>
