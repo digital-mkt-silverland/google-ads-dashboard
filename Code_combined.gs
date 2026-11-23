@@ -17,14 +17,20 @@
 var RC = {
   BOOKING_SHEET_ID: '1pgn8Ujr843USchxY9RV198jLoCt6Mg7ihq78tygiByk',
   BOOKING_TAB: 'Data',
-  GA4_PROPERTY: 'properties/340245620',
+  GA4_PROPERTY: 'properties/340245620',   // Silverland (www.silverlandhotels.com - GA4)
   START_DATE: '2025-01-01',
   OUT_TAB: 'Recon'
 };
-// Phạm vi 23/11/2026: chỉ đối soát Sakyo. The Myst dùng booking engine và GA4 riêng, chưa nối vào đây.
-// Thêm khách sạn khác vào 2 bảng dưới khi cần, ví dụ 'Silverland Ben Thanh': 'Bến Thành'.
-var IBE_HOTEL = { 'Silverland Sakyo': 'Sakyo' };
-var GA_HOTEL = { 'Silverland Sakyo Hotel and Spa': 'Sakyo' };
+// Phạm vi 23/11/2026: đối soát Sakyo và The Myst Đồng Khởi.
+// Thêm khách sạn khác vào bảng dưới khi cần, ví dụ 'Silverland Ben Thanh': 'Bến Thành'.
+var IBE_HOTEL = { 'Silverland Sakyo': 'Sakyo', 'The Myst': 'The Myst' };
+var GA_HOTEL = { 'Silverland Sakyo Hotel and Spa': 'Sakyo' };   // item_brand trong GA4 Silverland -> khách sạn
+// Mỗi property GA4: brand = dùng item_brand để gán khách sạn; hotel = mọi purchase của property thuộc 1 khách sạn
+// (bỏ purchase có item_brand chứa chữ trong exclude, ví dụ The Myst Sapa Resort).
+var GA_SOURCES = [
+  { property: RC.GA4_PROPERTY, brand: true },
+  { property: 'properties/340232784', hotel: 'The Myst', exclude: /sapa/i }   // The Myst Dong Khoi Hotel - GA4
+];
 var BUCKETS = ['Google Ads', 'Tìm kiếm tự nhiên', 'Trực tiếp', 'Tự giới thiệu (mất nguồn)', 'Trợ lý AI', 'Google Hotel Ads', 'Khác', 'Không có trong GA4'];
 var HOSTS = ['booking.silverlandhotels.com', 'reservation.travelanium.net', 'khác'];
 
@@ -52,13 +58,24 @@ function runRecon() {
     b.rev += toNum(VR[i][0]); if (d > through) through = d;
   }
 
-  // 2. GA4
-  var sess = ga(['date', 'transactionId', 'sessionSourceMedium', 'sessionCampaignId', 'hostName'], ['purchaseRevenue', 'transactions'], END);
-  var attr = ga(['date', 'transactionId', 'sourceMedium', 'campaignId'], ['keyEvents:purchase', 'totalRevenue'], END);
-  var brandRows = ga(['transactionId', 'itemBrand'], ['itemRevenue'], END);
-  var brand = {};
-  brandRows.forEach(function (r) { var c = brand[r[0]] || (brand[r[0]] = {}); c[r[1]] = (c[r[1]] || 0) + 1; });
-  function hotelOf(tid) { var c = brand[tid]; if (!c) return null; var best = null; for (var k in c) if (!best || c[k] > c[best]) best = k; return GA_HOTEL[best] || null; }
+  // 2. GA4: gộp các property, gán khách sạn cho từng transaction
+  var sess = [], attr = [], tHotel = {};
+  GA_SOURCES.forEach(function (src) {
+    var se = ga(src.property, ['date', 'transactionId', 'sessionSourceMedium', 'sessionCampaignId', 'hostName'], ['purchaseRevenue', 'transactions'], END);
+    var at = ga(src.property, ['date', 'transactionId', 'sourceMedium', 'campaignId'], ['keyEvents:purchase', 'totalRevenue'], END);
+    var br = ga(src.property, ['transactionId', 'itemBrand'], ['itemRevenue'], END), cnt = {};
+    br.forEach(function (r) { var c = cnt[r[0]] || (cnt[r[0]] = {}); c[r[1]] = (c[r[1]] || 0) + 1; });
+    function top(tid) { var c = cnt[tid]; if (!c) return null; var best = null; for (var k in c) if (!best || c[k] > c[best]) best = k; return best; }
+    function hotelOf(tid) {
+      var b = top(tid);
+      if (src.brand) return b ? (GA_HOTEL[b] || null) : null;
+      if (b && src.exclude && src.exclude.test(b)) return null;
+      return src.hotel;
+    }
+    se.forEach(function (r) { if (!(r[1] in tHotel)) tHotel[r[1]] = hotelOf(r[1]); sess.push(r); });
+    at.forEach(function (r) { if (!(r[1] in tHotel)) tHotel[r[1]] = hotelOf(r[1]); attr.push(r); });
+  });
+  function hotelOf(tid) { return tHotel[tid] || null; }
   var gaTx = {};
   sess.forEach(function (r) {
     var t = gaTx[r[1]] || (gaTx[r[1]] = { d: gaDate(r[0]), sm: r[2], cid: r[3], rev: 0 });
@@ -93,13 +110,13 @@ function runRecon() {
   Logger.log('Recon: ' + (out.length - 1) + ' dòng, booking engine đến ' + through + ', GA4 ' + Object.keys(gaTx).length + ' purchase');
 }
 
-function ga(dims, mets, end) {
+function ga(property, dims, mets, end) {
   var rows = [], offset = 0, limit = 100000;
   while (true) {
     var res = AnalyticsData.Properties.runReport({
       dateRanges: [{ startDate: RC.START_DATE, endDate: end }],
       dimensions: dims.map(function (d) { return { name: d }; }), metrics: mets.map(function (m) { return { name: m }; }),
-      limit: limit, offset: offset }, RC.GA4_PROPERTY);
+      limit: limit, offset: offset }, property);
     (res.rows || []).forEach(function (r) { rows.push(r.dimensionValues.map(function (x) { return x.value; }).concat(r.metricValues.map(function (x) { return x.value; }))); });
     offset += limit; if (!res.rowCount || offset >= res.rowCount) break;
   }
