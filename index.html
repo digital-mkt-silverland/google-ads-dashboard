@@ -379,7 +379,7 @@ function merge0(base,imp){
   const camps=base.camps.map(c=>Object.assign({},c));const k2i=new Map(camps.map((c,i)=>[c.key,i]));
   const n2i=new Map();camps.forEach((c,i)=>{if(/:ui-/.test(c.key))n2i.set(c.acc+'|'+c.name,i)});
   const map=imp.camps.map(c=>{if(k2i.has(c.key)){const i=k2i.get(c.key);Object.assign(camps[i],{name:c.name,status:c.status||camps[i].status,type:c.type||camps[i].type});return i}
-    const ni=n2i.get(c.acc+'|'+c.name);if(ni!=null){Object.assign(camps[ni],{status:c.status||camps[ni].status});return ni}
+    const ni=n2i.get(c.acc+'|'+c.name);if(ni!=null){Object.assign(camps[ni],{key:c.key,status:c.status||camps[ni].status,type:c.type||camps[ni].type});k2i.set(c.key,ni);return ni}
     camps.push(Object.assign({},c));k2i.set(c.key,camps.length-1);return camps.length-1});
   const MK=['cost','impr','clk','conv','val','bk','bval','chk','gi','gv'];
   const rows=[];
@@ -425,7 +425,7 @@ function toast(msg,err){const t=document.createElement('div');t.className='toast
 
 /* ============ state ============ */
 let HOTEL='ALL',SEC='overview',PRE='l30',FROM,TO,CMP='yoy',GRAN='week',TYPE='ALL',STATUS='ALL',CSEL=null;// CSEL: Set of camp keys or null=all
-const SECS=[['overview','Tổng quan','M3 12h4l3 8 4-16 3 8h4'],['camp','Chiến dịch','M4 6h16M4 12h16M4 18h10'],['market','Thị trường','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20'],['age','Độ tuổi','M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'],['tloc','Vị trí target','M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'],['kw','Từ khoá','M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'],['asset','Headline & Description','M4 7V4h16v3M9 20h6M12 4v16'],['recon','Đối soát tracking','M9 11l3 3 8-8M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9']];
+const SECS=[['overview','Tổng quan','M3 12h4l3 8 4-16 3 8h4'],['real','Hiệu quả thực','M3 3v18h18M7 15l4-4 3 3 5-6'],['camp','Chiến dịch','M4 6h16M4 12h16M4 18h10'],['market','Thị trường','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20'],['age','Độ tuổi','M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'],['tloc','Vị trí target','M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'],['kw','Từ khoá','M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'],['asset','Headline & Description','M4 7V4h16v3M9 20h6M12 4v16'],['recon','Đối soát tracking','M9 11l3 3 8-8M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9']];
 
 /* ============ aggregation ============ */
 const E=()=>({cost:0,impr:0,clk:0,conv:0,val:0,bk:0,bval:0,chk:0,gi:0,gv:0,el:0,elB:0,elR:0,isImpr:0,pr:0});
@@ -558,7 +558,7 @@ function render(anim=true){renderNav();renderTop();renderMain(anim)}
 function renderNav(){
   const counts={};
   $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 2 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)&&!HIDDEN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===MAIN.length+1?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
-  $('#navSec').innerHTML=SECS.map(([k,t,p])=>`<li><button data-s="${k}" class="${SEC===k?'on':''}" ${HOTEL==='ALL'&&!['overview','market','recon'].includes(k)?'title="Chọn một khách sạn để xem"':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>${t}</button></li>`).join('');
+  $('#navSec').innerHTML=SECS.map(([k,t,p])=>`<li><button data-s="${k}" class="${SEC===k?'on':''}" ${HOTEL==='ALL'&&!['overview','market','recon','real'].includes(k)?'title="Chọn một khách sạn để xem"':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>${t}</button></li>`).join('');
   $$('#navHotel [data-h]').forEach(b=>b.onclick=()=>{HOTEL=b.dataset.h;CSEL=null;VIEW.mktSel=null;Object.keys(TS).forEach(k=>delete TS[k]);render()});
   $$('#navSec [data-s]').forEach(b=>b.onclick=()=>{SEC=b.dataset.s;render();window.scrollTo({top:0,behavior:reduced?'auto':'smooth'})});
 }
@@ -572,8 +572,8 @@ function renderTop(){
 function renderMain(anim){
   const el=$('#main');Object.keys(TBL).forEach(k=>delete TBL[k]);
   let html='';
-  if(HOTEL==='ALL'){html=SEC==='market'?secMarketAll():SEC==='overview'?secAll():SEC==='recon'?secReconAll():`<div class="card anim empty">Phần này phân tích riêng từng khách sạn. Chọn Sakyo hoặc The Myst ở cột trái.<div class="cta" style="justify-content:center">${MAIN.map(h=>`<button class="btn dark" data-goh="${h}">${h}</button>`).join('')}</div></div>`}
-  else html=({overview:secOverview,camp:secCamp,market:secMarket,age:secAge,tloc:secTloc,kw:secKw,asset:secAsset,recon:secRecon}[SEC])();
+  if(HOTEL==='ALL'){html=SEC==='market'?secMarketAll():SEC==='overview'?secAll():SEC==='recon'?secReconAll():SEC==='real'?secRealAll():`<div class="card anim empty">Phần này phân tích riêng từng khách sạn. Chọn Sakyo hoặc The Myst ở cột trái.<div class="cta" style="justify-content:center">${MAIN.map(h=>`<button class="btn dark" data-goh="${h}">${h}</button>`).join('')}</div></div>`}
+  else html=({overview:secOverview,camp:secCamp,market:secMarket,age:secAge,tloc:secTloc,kw:secKw,asset:secAsset,recon:secRecon,real:secReal}[SEC])();
   el.innerHTML=html;
   if(!anim)el.querySelectorAll('.anim').forEach(x=>x.style.animation='none');
   $$('[data-goh]').forEach(b=>b.onclick=e=>{e.preventDefault();HOTEL=b.dataset.goh;if(b.dataset.sec)SEC=b.dataset.sec;CSEL=null;render();window.scrollTo(0,0)});
@@ -976,6 +976,107 @@ function secReconAll(){
       <dt>Tự giới thiệu (mất nguồn)</dt><dd>${F.pct0(div(a.bk[3],a.rev))}</dd>
       <dt>GA4 không có trong IBE</dt><dd>${F.int(a.on)} purchase</dd></dl>${rcLadder(a)}</div>`}).join('');
   return `<p class="note info ${A()}">Mỗi khách sạn đối soát trên booking engine và GA4 của chính khách sạn đó, không cộng gộp. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Google Ads tag / IBE không phải tỷ lệ tracking, vì booking engine gồm cả booking không đến từ quảng cáo. Mở từng khách sạn để xem cách đọc.</p>
+   <div class="hotelcards">${cards}</div>`;
+}
+
+/* ---------- Hiệu quả thực: booking engine so với chi phí Google Ads ---------- */
+const NO_RC=`<div class="card anim empty">Phần này cần số booking engine và GA4 trong Google Sheet của dashboard. Bản công khai không chứa số booking engine. Mở bằng link cá nhân hoặc file gửi riêng, sau đó bấm Refresh.</div>`;
+function realAgg(h,f,t,gran){
+  const R=M.recon,H=R.hotels.indexOf(h),nb=R.buckets.length,MISS=nb-1;
+  const Z=()=>({rev:0,n:0,ar:0,an:0,gr:0,mr:0,cost:0,adsv:0,ads:0});
+  const tot=Z(),ser=new Map(),byC=new Map();
+  const at=d=>{const b=bucketOf(d,gran);if(!ser.has(b))ser.set(b,Z());return ser.get(b)};
+  for(const [d,hi,b,cid,n,rev] of R.ibe){if(d<f||d>t||hi!==H)continue;
+    const add=a=>{a.rev+=rev;a.n+=n;if(b===0){a.ar+=rev;a.an+=n}if(b!==MISS)a.gr+=rev;else a.mr+=rev};
+    add(tot);if(gran)add(at(d));
+    if(b===0){const k=cid||'';const x=byC.get(k)||{rn:0,rr:0};x.rn+=n;x.rr+=rev;byC.set(k,x)}}
+  const X=agg(campMask(h,false,true),f,t,gran||'day');
+  Object.assign(tot,{cost:X.tot.cost,adsv:X.tot.bval,ads:X.tot.bk});
+  if(gran)X.ser.forEach((v,b)=>{const a=ser.has(b)?ser.get(b):(ser.set(b,Z()),ser.get(b));Object.assign(a,{cost:v.cost,adsv:v.bval,ads:v.bk})});
+  const fin=a=>{a.cov=div(a.gr,a.rev);a.est=a.cov?a.ar/a.cov:null;a.rFloor=div(a.ar,a.cost);a.rEst=div(a.est,a.cost);a.rAds=div(a.adsv,a.cost);a.rWeb=div(a.rev,a.cost);a.adsShare=div(a.ar,a.rev);return a};
+  fin(tot);ser.forEach(fin);
+  return {tot,ser,byC,X};
+}
+function realLevels(a){return [
+  ['Mức sàn',a.rFloor,a.ar,'--s3','booking thực có phiên Google Ads'],
+  ['Ước tính',a.rEst,a.est,'--s7','bù phần GA4 không ghi'],
+  ['Mức trần',a.rAds,a.adsv,'--s2','Google Ads tự ghi'],
+  ['Web / Cost',a.rWeb,a.rev,'--other','toàn bộ web revenue']]}
+function realFind(h,a,rows){
+  const L=[],tr=S.targetRoas[h],be=1/S.otaCommission;
+  L.push(['',`Web revenue ${F.tr(a.rev)} từ ${F.int(a.n)} booking. Booking có phiên Google Ads chiếm ${F.pct0(a.adsShare)} web revenue (${F.tr(a.ar)}).`]);
+  if(tr&&ok(a.rEst))L.push([a.rEst>=tr?'g':'w',`Real ROAS ước tính ${F.x(a.rEst)} đạt ${F.pct0(a.rEst/tr)} Target ROAS ${F.x(tr)}. Mức sàn ${F.x(a.rFloor)} đạt ${F.pct0(a.rFloor/tr)}, Google Ads tự ghi ${F.x(a.rAds)} đạt ${F.pct0(a.rAds/tr)}.`]);
+  if(ok(a.rFloor))L.push([a.rFloor>=be?'g':'b',`Real ROAS mức sàn ${F.x(a.rFloor)} ${a.rFloor>=be?'cao hơn':'thấp hơn'} mức hoà vốn so với OTA ${F.x(be)} (hoa hồng ${F.pct0(S.otaCommission)}).`]);
+  if(ok(a.rAds)&&ok(a.rEst)&&a.rEst>0)L.push(['',`Google Ads tự ghi bằng ${nf1.format(a.rAds/a.rEst)} lần Real ROAS ước tính. Phần chênh gồm booking huỷ hoặc đổi, chuyển đổi xem quảng cáo, đặt trên thiết bị khác và cách ghi công DDA (Suy luận). Google Ads tính theo ngày click, booking engine theo ngày đặt.`]);
+  const zero=rows.filter(r=>r.cost>=Math.max(500000,a.cost*0.05)&&!r.rn);
+  if(zero.length)L.push(['b',`${zero.length} chiến dịch chi từ 5% Cost mà không có booking thực có phiên GA4: ${zero.slice(0,4).map(r=>`${esc(r.name)} (${F.tr(r.cost)})`).join(', ')}.`]);
+  return L;
+}
+function secReal(){
+  IX=0;const h=HOTEL,R=M.recon;if(!R)return NO_RC;
+  if(R.hotels.indexOf(h)<0)return `<div class="card anim empty">${esc(h)} không có số booking engine để đo.</div>`;
+  const thr=toIdx(R.through),to=Math.min(TO,thr);const gran=(to-FROM)>62?'month':(to-FROM)>13?'week':'day';
+  const {tot:a,ser,byC,X}=realAgg(h,FROM,to,gran);const bs=bucketsIn(FROM,to,gran);const g=b=>ser.get(b)||{};
+  const tr=S.targetRoas[h],be=1/S.otaCommission,lv=realLevels(a);
+  const rows=[],seen=new Set();
+  X.byC.forEach((x,i)=>{const c=M.camps[i],cid=c.key.split(':').pop(),r=byC.get(cid)||{rn:0,rr:0};seen.add(cid);
+    rows.push({name:c.name,_q:c.name,cost:x.cost,rn:r.rn,rr:r.rr,rroas:div(r.rr,x.cost),rcir:r.rr?x.cost/r.rr:null,bk:x.bk,val:x.val,roas:div(x.val,x.cost),ratio:r.rr?x.val/r.rr:null})});
+  byC.forEach((r,cid)=>{if(seen.has(cid))return;const i=rcMap()[cid];
+    rows.push({name:cid===''?'Google Ads, GA4 không rõ chiến dịch':(i!=null?M.camps[i].name+' (ngoài bộ lọc hoặc khách sạn khác)':'Chiến dịch ID '+cid),_q:'',cost:0,rn:r.rn,rr:r.rr,rroas:null,rcir:null,bk:null,val:null,roas:null,ratio:null})});
+  const rs=rows.filter(r=>r.cost>0||r.rn>0);
+  const cols=[MC('name','Chiến dịch',esc,{l:1,cls:'t'}),MC('cost','Cost',F.tr,{tip:'Chi phí'}),
+    MC('rr','Real revenue',F.tr,{tip:'Doanh thu book date trên booking engine của booking có phiên GA4 đến từ chiến dịch (mức sàn)'}),
+    MC('rroas','Real ROAS',v=>`<b>${F.x(v)}</b>`,{tip:'Real revenue / Cost'}),MC('rcir','Real CIR',cosCell,{cls:'num',tip:'Cost / Real revenue'}),
+    MC('rn','Real bookings',F.cv,{tip:'Booking trên booking engine có phiên GA4 đến từ chiến dịch'}),
+    MC('val','Ads conv. value',F.tr,{tip:'Conv. value Google Ads tự ghi'}),MC('roas','Ads ROAS',F.x,{tip:'Ads conv. value / Cost'}),MC('bk','Ads bookings',F.cv,{tip:'Booking Google Ads tự ghi'}),
+    MC('ratio','Ads / Real',v=>ok(v)?nf1.format(v)+' lần':'-',{tip:'Ads conv. value / Real revenue'})];
+  const S0=k=>rs.reduce((s,r)=>s+(ok(r[k])?r[k]:0),0);const fc=S0('cost'),frr=S0('rr'),fval=S0('val');
+  const foot={name:`<b>Tổng</b> <span class="muted small">${rs.length} dòng</span>`,cost:'<b>'+F.tr(fc)+'</b>',rr:'<b>'+F.tr(frr)+'</b>',rroas:'<b>'+F.x(div(frr,fc))+'</b>',rcir:F.pct(div(fc,frr)),rn:'<b>'+F.cv(S0('rn'))+'</b>',val:'<b>'+F.tr(fval)+'</b>',roas:'<b>'+F.x(div(fval,fc))+'</b>',bk:'<b>'+F.cv(S0('bk'))+'</b>',ratio:frr?nf1.format(fval/frr)+' lần':'-'};
+  POST.push(()=>{const labels=bs.map(b=>lab(b,gran));const mx=Math.max(...lv.map(x=>x[1]||0),tr||0,be)*1.1;
+    chart('rlLv',{type:'bar',data:{labels:lv.map(x=>x[0]),datasets:[{label:'ROAS',data:lv.map(x=>x[1]),backgroundColor:lv.map(x=>css(x[3])),borderRadius:4,maxBarThickness:26}]},
+      options:opts(F.x,'',{indexAxis:'y',scales:{x:{beginAtZero:true,suggestedMax:mx,grid:{color:'#eeeae3'},title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},ticks:{color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>lv[x[0].dataIndex][0]+': '+lv[x[0].dataIndex][4],label:x=>` ROAS ${F.x(x.parsed.x)}, CIR ${F.pct(div(1,x.parsed.x))}, doanh thu ${F.tr(lv[x.dataIndex][2])}`}}}}),
+      plugins:[hl([{v:be,c:css('--s8'),t:'Hoà vốn '+F.x(be),dash:[3,3]},...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[])],'x')]});
+    const ln=(lb,k,c,dash)=>({label:lb,data:bs.map(b=>ok(g(b)[k])?g(b)[k]:null),borderColor:css(c),backgroundColor:css(c),borderWidth:2.2,borderDash:dash||[],pointRadius:gran==='day'?0:3,pointHoverRadius:5,tension:.3,spanGaps:true});
+    chart('rlTr',{type:'line',data:{labels,datasets:[ln('Mức trần: Google Ads tự ghi','rAds','--s2'),ln('Ước tính','rEst','--s7',[5,4]),ln('Mức sàn','rFloor','--s3')]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[]),{v:be,c:css('--s8'),t:'Hoà vốn',dash:[3,3]}])]});
+    const st=(lb,f,c)=>({label:lb,data:bs.map(b=>f(g(b))||0),backgroundColor:css(c),borderColor:'#fff',borderWidth:1});
+    chart('rlMix',{type:'bar',data:{labels,datasets:[st('Google Ads (phiên GA4)',x=>x.ar,'--s2'),st('Nguồn khác trong GA4',x=>(x.gr||0)-(x.ar||0),'--s5'),st('Không có trong GA4',x=>x.mr,'--other')]},
+      options:opts(F.tr,'Web revenue (triệu đồng)',{scales:{x:{stacked:true,grid:{display:false},ticks:{color:css('--ink-2'),font:{size:11},maxRotation:0,autoSkip:true}},y:{stacked:true,beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}}}})});
+  });
+  const kp=(lb,v,ex,cls)=>`<div class="card kpi ${cls||''} ${A()}"><div class="lb"><span>${lb}</span></div><div class="v num">${v}</div><div class="d">${ex}</div></div>`;
+  const fl=realFind(h,a,rs);
+  return `${TO>thr?`<p class="note ${A()}">Booking engine có số đến ${dmy(thr)}, phần này tính đến ngày đó.</p>`:''}
+   <p class="note info ${A()}">Số thực lấy từ booking engine (booking xác nhận, doanh thu book date). Real ROAS có 3 mức. <b>Mức sàn</b>: chỉ booking thực có phiên GA4 đến từ Google Ads, bỏ sót booking GA4 không ghi được. <b>Ước tính</b>: mức sàn chia cho tỷ lệ doanh thu GA4 ghi được, giả định phần GA4 sót có cùng tỷ trọng nguồn (Ước tính). <b>Mức trần</b>: số Google Ads tự ghi, gồm cả booking huỷ, đặt trên thiết bị khác và ghi công DDA. Hiệu quả thực nằm trong khoảng mức sàn đến mức trần. Web revenue / Cost là tỷ lệ tổng thể, tính cả booking không đến từ quảng cáo.</p>
+   <div class="kpis">
+     ${kp('Web revenue <span class="muted">(booking engine)</span>',F.tr(a.rev),`${F.int(a.n)} booking, Cost ${F.tr(a.cost)}, Web revenue / Cost ${F.x(a.rWeb)}`,'hero')}
+     ${kp('Real ROAS mức sàn',F.x(a.rFloor),`${F.tr(a.ar)} từ ${F.int(a.an)} booking có phiên Google Ads, CIR ${F.pct(div(a.cost,a.ar))}`,'hero')}
+     ${kp('Real ROAS ước tính',F.x(a.rEst),`bù ${F.pct0(1-(a.cov||0))} web revenue GA4 không ghi, CIR ${F.pct(div(a.cost,a.est))} (Ước tính)`,'hero')}
+     ${kp('Ads ROAS <span class="muted">(Google Ads tự ghi)</span>',F.x(a.rAds),`${F.tr(a.adsv)}, ${F.cv(a.ads)} booking, CIR ${F.pct(div(a.cost,a.adsv))}`,'hero')}
+   </div>
+   <div class="grid g12" style="margin-top:14px">
+     <div class="card ${A()}"><h3>4 cách tính ROAS trong kỳ</h3><p class="q">Kỳ ${dmy(FROM)} đến ${dmy(to)}. Mức sàn: booking thực có phiên Google Ads. Ước tính: bù phần GA4 không ghi. Mức trần: Google Ads tự ghi. Web / Cost: toàn bộ web revenue. Vạch đỏ: hoà vốn so với hoa hồng OTA${tr?'. Vạch đen: Target ROAS':''}.</p><div class="chartbox" style="height:240px"><canvas id="rlLv"></canvas></div></div>
+     <div class="card ${A()}"><h3>Phát hiện</h3><p class="q">Tự động tạo từ số trong kỳ. Nhận định nguyên nhân gắn nhãn Suy luận.</p><ul class="ins">${fl.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Tốt':x[0]==='b'?'Cần xem':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
+   </div>
+   <div class="grid g2" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Real ROAS theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày'}</h3><p class="q">Khoảng giữa mức sàn và mức trần là vùng hiệu quả thực.</p>
+       <div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Mức trần: Google Ads tự ghi</span><span><i class="dash" style="border-top-color:var(--s7)"></i>Ước tính</span><span><i class="ln" style="background:var(--s3)"></i>Mức sàn</span></div><div class="chartbox"><canvas id="rlTr"></canvas></div></div>
+     <div class="card ${A()}"><h3>Web revenue theo nguồn</h3><p class="q">Doanh thu book date trên booking engine, tách theo nguồn phiên GA4.</p>
+       <div class="legend"><span><i style="background:var(--s2)"></i>Google Ads (phiên GA4)</span><span><i style="background:var(--s5)"></i>Nguồn khác trong GA4</span><span><i style="background:var(--other)"></i>Không có trong GA4</span></div><div class="chartbox"><canvas id="rlMix"></canvas></div></div>
+   </div>
+   <h2 class="sec">Real ROAS từng chiến dịch <small>Real revenue là mức sàn: booking thực có phiên GA4 đến từ chiến dịch. Chiến dịch Display, Demand Gen thường có Ads / Real cao vì phần lớn chuyển đổi là xem quảng cáo hoặc đặt sau (Suy luận).</small></h2>
+   <div class="${A()}">${T('real_'+h,cols,rs,{sort:'cost',what:'chiến dịch',foot})}</div>`;
+}
+function secRealAll(){
+  IX=0;const R=M.recon;if(!R)return NO_RC;const thr=toIdx(R.through),to=Math.min(TO,thr);
+  const cards=MAIN.filter(h=>R.hotels.includes(h)).map(h=>{const {tot:a}=realAgg(h,FROM,to);const tr=S.targetRoas[h];
+    return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}" data-sec="real">Chi tiết</button></h3>
+      <div class="small muted">Web revenue (booking engine, doanh thu book date)</div><div class="big num">${F.tr(a.rev)}</div><div class="small muted">${F.int(a.n)} booking, Cost ${F.tr(a.cost)}</div>
+      <dl class="num"><dt>Real ROAS mức sàn</dt><dd><b>${F.x(a.rFloor)}</b></dd>
+      <dt>Real ROAS ước tính</dt><dd><b>${F.x(a.rEst)}</b>${tr&&ok(a.rEst)?` <span class="muted small">đạt ${F.pct0(a.rEst/tr)} Target ${F.x(tr)}</span>`:''}</dd>
+      <dt>Ads ROAS (Google Ads tự ghi)</dt><dd>${F.x(a.rAds)}</dd>
+      <dt>Web revenue / Cost</dt><dd>${F.x(a.rWeb)}</dd>
+      <dt>Web revenue từ Google Ads</dt><dd>${F.pct0(a.adsShare)} <span class="muted small">(mức sàn)</span></dd></dl></div>`}).join('');
+  return `<p class="note info ${A()}">Mỗi khách sạn đo trên booking engine và chi phí Google Ads của chính khách sạn đó. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Real ROAS mức sàn đến mức trần là vùng hiệu quả thực. Mở từng khách sạn để xem theo chiến dịch.</p>
    <div class="hotelcards">${cards}</div>`;
 }
 
