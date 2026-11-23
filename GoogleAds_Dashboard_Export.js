@@ -13,18 +13,17 @@
 
 var CONFIG = {
   SPREADSHEET_URL: 'DAN_LINK_GOOGLE_SHEET_VAO_DAY',
-  ACCOUNT_IDS: ['645-385-5576', '753-421-2327', '396-544-2048'],   // chỉ Bến Thành, Jolie, Sakyo (The Myst 623-388-2444 thêm lại khi cần)
+  ACCOUNT_IDS: ['396-544-2048', '753-421-2327', '623-388-2444'],   // Sakyo, TK chung (chỉ chiến dịch Sakyo), The Myst (23/11/2026)
   START_DATE: '2025-01-01',     // ngày bắt đầu lấy data
   DAILY_DIM_MONTHS: 3,          // số tháng gần nhất lấy breakdown theo ngày (cũ hơn lấy theo tháng)
   // Chuyển đổi booking chính của từng tài khoản. Từ ngày "from", bookings chỉ lấy đúng hành động này,
   // tránh đếm trùng khi tài khoản có nhiều hành động mua hàng cùng là chuyển đổi chính (Bến Thành 08 đến 12/2025).
   // Tài khoản không có trong danh sách: bookings = mọi chuyển đổi chính loại Mua hàng.
-  MAIN_PURCHASE: { '6453855576': { name: 'Lượt mua hàng BT', from: '2025-02-15' } },
+  MAIN_PURCHASE: {},
   // Chuyển đổi nhập từ GA4 (phụ), dùng cho phần Đối soát tracking
   GA4_IMPORT_SUFFIX: '(web) purchase',
-  // Bỏ chiến dịch của khách sạn khác trong tài khoản dùng chung (Yen, Sil, Mây), trừ khi tên có cả Bến Thành, Sakyo hoặc Jolie
-  EXCLUDE_CAMPAIGN: /(^|[^a-z])(yen|sil)([^a-z]|$)|mây|(^|[^a-z])may([^a-z]|$)|myst/i,
-  KEEP_CAMPAIGN: /sakyo|little tokyo|jolie|bến thành|ben thanh|(^|[^a-z])bt([^a-z]|$)/i
+  // Tài khoản dùng chung: chỉ giữ chiến dịch khớp biểu thức (753-421-2327 có cả Jolie, Yen, Sil)
+  ONLY_CAMPAIGN: { '7534212327': /sakyo|little tokyo/i }
 };
 var SKIP = {};   // campaign.id bị loại, dùng chung cho Data và Dims
 
@@ -99,7 +98,8 @@ function pullCampaigns(accId, accName, start, end, out) {
   var it = AdsApp.search(q);
   while (it.hasNext()) {
     var r = it.next();
-    if (CONFIG.EXCLUDE_CAMPAIGN.test(r.campaign.name) && !CONFIG.KEEP_CAMPAIGN.test(r.campaign.name)) { SKIP[accId + ':' + r.campaign.id] = 1; continue; }
+    var only = CONFIG.ONLY_CAMPAIGN[String(accId).replace(/-/g, '')];
+    if (only && !only.test(r.campaign.name)) { SKIP[accId + ':' + r.campaign.id] = 1; continue; }
     var m = r.metrics, key = r.segments.date + '|' + r.campaign.id, c = (conv[key] || [0, 0, 0]).slice(), x = ca[key] || [0, 0, 0, 0];
     if (main && r.segments.date >= main.from) { c[0] = x[0]; c[1] = x[1]; }
     out.push([r.segments.date, accId, accName, String(r.campaign.id), r.campaign.name, r.campaign.status, r.campaign.advertisingChannelType,

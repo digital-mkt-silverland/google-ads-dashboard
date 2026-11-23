@@ -1,24 +1,28 @@
 # Google Ads Dashboard | Silverland Hospitality
 
-Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Bến Thành, Sakyo, Jolie. Từ 06/11/2026 chỉ kéo số 3 khách sạn này (bỏ The Myst, Yen, Sil, Mây cho đến khi cần).
+Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Sakyo và The Myst Đồng Khởi. Từ 23/11/2026 chỉ kéo số 2 khách sạn này (bỏ Bến Thành, Jolie, Yen, Sil, Mây cho đến khi cần).
 
 - Xem online: https://digital-mkt-silverland.github.io/google-ads-dashboard/
 - `index.html`: dashboard 1 file, có sẵn snapshot Google Ads đến 05/11/2026. Bản công khai không chứa số booking engine.
-- `GoogleAds_Dashboard_Export.js`: Google Ads Script chạy ở MCC 140-788-0633, chỉ đọc data, ghi Google Sheet hằng ngày để nút Refresh lấy data đến hôm qua. Booking của TK Bến Thành chỉ lấy chuyển đổi chính "Lượt mua hàng BT" từ 15/02/2025, tránh đếm trùng với "Mua hàng" giai đoạn 08 đến 12/2025.
-- `GoogleAds_Dashboard_Recon.gs`: Apps Script gắn vào cùng Google Sheet, đọc booking engine (sheet Data) và GA4 property 340245620, ghi tab Recon cho phần Đối soát tracking. Chỉ ghi số tổng hợp, không có thông tin khách.
+- `GoogleAds_Dashboard_AdsAPI.gs`: Apps Script gọi Google Ads API (chỉ đọc) cho 3 tài khoản:
+  - 396-544-2048 Sakyo: mọi chiến dịch
+  - 753-421-2327 TK chung: chỉ chiến dịch có chữ Sakyo hoặc Little Tokyo
+  - 623-388-2444 The Myst: mọi chiến dịch
 
-## Cập nhật tự động (làm 1 lần)
-1. Tạo Google Sheet mới, chia sẻ "Bất kỳ ai có đường liên kết: Người xem".
-2. Google Ads MCC: Công cụ, Hành động hàng loạt, Tập lệnh, dấu +. Dán `GoogleAds_Dashboard_Export.js`, thay `DAN_LINK_GOOGLE_SHEET_VAO_DAY` bằng link Sheet.
-3. Uỷ quyền, Chạy, kiểm tra 4 tab Data, Dims, GeoNames, Info.
-4. Tần suất: Hằng ngày 6:00.
-5. Mở dashboard, mục Nguồn data, dán link Sheet, Lưu và tải. Từ đó bấm Refresh là có data đến hôm qua.
+  Lần đầu (hoặc khi đổi danh sách tài khoản) lấy lại từ 01/01/2025: chiến dịch theo ngày, chi tiết (thị trường, độ tuổi, vị trí, từ khoá, headline) theo tháng cho phần cũ. Các lần sau chỉ lấy lại từ ngày 1 tháng trước đến hôm qua, giữ số cũ hơn. Ghi 4 tab Data, Dims, GeoNames, Info.
+- `GoogleAds_Dashboard_Recon.gs`: đọc booking engine (sheet Data) và GA4 property 340245620, ghi tab Recon cho phần Đối soát tracking. Hiện chỉ đối soát Sakyo. The Myst dùng booking engine và GA4 riêng, chưa nối vào. Chỉ ghi số tổng hợp, không có thông tin khách.
+- `Code_combined.gs`: gộp 2 file trên, dán vào Code.gs của project Apps Script.
+- `GoogleAds_Dashboard_Export.js`: bản Google Ads Script chạy ở MCC (không dùng nữa vì lỗi uỷ quyền), giữ để tham khảo.
 
-## Đối soát tracking (làm 1 lần)
-1. Mở Google Sheet ở trên: Tiện ích mở rộng, Apps Script, dán `GoogleAds_Dashboard_Recon.gs`.
-2. Dịch vụ (+), thêm Google Analytics Data API. Project Settings: bật hiện appsscript.json, thay bằng file `appsscript.json` trong repo (chỉ xin quyền Sheets, đọc GA4, chạy theo lịch). Nếu bị "This app is blocked": Project Settings, đổi GCP project sang project chuẩn có màn hình đồng ý OAuth ở chế độ Testing và thêm tài khoản chạy script làm test user (đang dùng silverland-ga4-mcp, số 548318208693).
-3. Chạy `runRecon`, cấp quyền. Sheet có tab Recon.
-4. Chạy `installTrigger` một lần: tự chạy hằng ngày 8 đến 9 giờ.
-5. Dashboard bấm Refresh, mục Đối soát tracking có số.
+## Cài đặt (làm 1 lần)
+1. Google Sheet của dashboard, chia sẻ "Bất kỳ ai có đường liên kết: Người xem".
+2. Tiện ích mở rộng, Apps Script: dán `Code_combined.gs` vào Code.gs và `appsscript.json` vào manifest. Dịch vụ (+): Google Analytics Data API.
+3. Project Settings: GCP project silverland-ga4-mcp (số 548318208693), đã bật Google Ads API, màn hình đồng ý OAuth ở trạng thái In production (quyền không hết hạn sau 7 ngày như chế độ Testing).
+4. Project Settings, Script Properties: `DEVELOPER_TOKEN` = developer token của MCC 140-788-0633 (Admin, API Center). Không dán token vào code.
+5. Chạy `runAds`, cấp quyền (màn hình "Google hasn't verified this app": Advanced, Go to, Continue). Chạy `runRecon`.
+6. Chạy `installTrigger` một lần: runAds 6 đến 7 giờ, runRecon 8 đến 9 giờ mỗi ngày.
+7. Dashboard, mục Nguồn data, dán link Sheet, Lưu và tải. Từ đó bấm Refresh là có data đến hôm qua.
+
+Muốn lấy lại toàn bộ từ 01/01/2025: chạy `runAdsFull`.
 
 Lưu ý: repo public, ai có link đều xem được số chi phí và doanh thu book date. Trang có thẻ noindex để hạn chế công cụ tìm kiếm.
