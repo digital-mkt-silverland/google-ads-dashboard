@@ -601,22 +601,22 @@ function notes(a,mask,dimKind){
 function secAll(){
   IX=0;const cr=cmpRange(),cOK=cmpOK(cr);
   const cards=MAIN.map((h,i)=>{const mk=campMask(h);const a=agg(mk,FROM,TO,'day').tot,c=cOK?agg(mk,cr[0],cr[1]).tot:null;const tr=S.targetRoas[h];
-    const ser=agg(mk,FROM,TO,'day').ser;const bs=bucketsIn(FROM,TO,'day');POST.push(()=>{chart('hs'+i,{type:'bar',data:{labels:bs.map(dm),datasets:[{label:'Chi phí',data:bs.map(b=>(ser.get(b)||{}).cost||0),backgroundColor:css('--s1'),borderRadius:3,maxBarThickness:12}]},options:opts(F.tr,'',{scales:{x:{display:false},y:{display:false,beginAtZero:true}}})})});
+    const ser=agg(mk,FROM,TO,'day').ser;const bs=bucketsIn(FROM,TO,'day');POST.push(()=>{chart('hs'+i,{type:'bar',data:{labels:bs.map(dm),datasets:[{label:'Cost',data:bs.map(b=>(ser.get(b)||{}).cost||0),backgroundColor:css('--s1'),borderRadius:3,maxBarThickness:12}]},options:opts(F.tr,'',{scales:{x:{display:false},y:{display:false,beginAtZero:true}}})})});
     return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}">Chi tiết</button></h3>
-      <div class="small muted">Doanh thu book date (tag Google Ads)</div><div class="big num">${cu(a.val,'tr')}</div><div class="small">${delta(a.val,c&&c.val,1)}</div>
-      <dl class="num"><dt>ROAS</dt><dd><b>${F.x(a.roas)}</b>${tr?` <span class="muted small">đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}</span>`:''}<br><span class="small">${delta(a.roas,c&&c.roas,1)}</span></dd>
-      <dt>Chi phí</dt><dd>${F.tr(a.cost)}<br><span class="small">${delta(a.cost,c&&c.cost,0)}</span></dd>
-      <dt>Chi phí / doanh thu book date</dt><dd>${cosCell(a.cos)}</dd>
-      <dt>Lượt chuyển đổi</dt><dd>${F.cv(a.conv)} <span class="muted small">(booking ${F.cv(a.bk)})</span><br><span class="small">${delta(a.conv,c&&c.conv,1)}</span></dd>
+      <div class="small muted">Conv. value (doanh thu book date, tag Google Ads)</div><div class="big num">${cu(a.val,'tr')}</div><div class="small">${delta(a.val,c&&c.val,1)}</div>
+      <dl class="num"><dt>Cost</dt><dd>${F.tr(a.cost)}<br><span class="small">${delta(a.cost,c&&c.cost,0)}</span></dd>
+      <dt>ROAS</dt><dd><b>${F.x(a.roas)}</b>${tr?` <span class="muted small">đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}</span>`:''}<br><span class="small">${delta(a.roas,c&&c.roas,1)}</span></dd>
+      <dt>COS</dt><dd>${cosCell(a.cos)}</dd>
+      <dt>Conv.</dt><dd>${F.cv(a.conv)} <span class="muted small">(Bookings ${F.cv(a.bk)})</span><br><span class="small">${delta(a.conv,c&&c.conv,1)}</span></dd>
       <dt>CPA</dt><dd>${F.tr(a.cpa)}</dd></dl>
       <div class="pace" style="margin-top:12px">${paceInner(h)}</div>
-      <div class="chartbox" style="height:90px;margin-top:6px"><canvas id="hs${i}"></canvas></div><div class="small muted">Chi phí theo ngày trong kỳ</div>
+      <div class="chartbox" style="height:90px;margin-top:6px"><canvas id="hs${i}"></canvas></div><div class="small muted">Cost theo ngày trong kỳ</div>
       ${a.pr>0?`<div class="small" style="color:var(--warn)">Có ${F.tr(a.pr)} chi phí trong snapshot lấy theo tháng qua giao diện, chia đều theo ngày (Ước tính). Có số theo ngày sau khi script runAds chạy.</div>`:''}</div>`}).join('');
   const rows=HOTELS.filter(h=>!MAIN.includes(h)).map(h=>{const x=agg(campMask(h),FROM,TO).tot;return Object.assign({name:h,_q:h},x)}).filter(x=>x.cost>0);
   return `<p class="note info ${A()}">Mỗi khách sạn hiển thị số riêng, không cộng gộp. Chiến dịch gán khách sạn theo tên, tên không có khách sạn thì theo tài khoản. Sửa trong Cài đặt.</p>
    <div class="hotelcards">${cards}</div>
    <h2 class="sec">Khách sạn khác và chiến dịch chưa gán <small>trong các tài khoản</small></h2>
-   <div class="${A()}">${T('others',[MC('name','Nhóm',v=>HIDDEN.includes(v)?`${esc(v)} <span class="muted small">(gán lại trong Cài đặt)</span>`:`<a href="#" data-goh="${esc(v)}">${esc(v)}</a>`,{l:1}),MC('cost','Chi phí',F.tr),MC('conv','Lượt chuyển đổi',F.cv),MC('val','Doanh thu book date',F.tr),MC('cos','Chi phí / doanh thu book date',cosCell),MC('roas','ROAS',F.x),MC('cpa','CPA',F.tr)],rows,{search:false,sort:'cost'})}</div>`;
+   <div class="${A()}">${T('others',[MC('name','Nhóm',v=>HIDDEN.includes(v)?`${esc(v)} <span class="muted small">(gán lại trong Cài đặt)</span>`:`<a href="#" data-goh="${esc(v)}">${esc(v)}</a>`,{l:1}),...METRIC_COLS().filter(c=>c.k!=='share')],rows,{search:false,sort:'cost'})}</div>`;
 }
 function paceInner(h){
   const [y,m,d]=ymd(M.lastDate),f=idxYMD(y,m,1),dim=new Date(Date.UTC(y,m+1,0)).getUTCDate();
@@ -631,7 +631,7 @@ function paceInner(h){
 function signals(a,p,hot,h){
   const out=[],be=1/S.otaCommission,tr=S.targetRoas[h];if(a.cost<300000)return out;
   if(a.conv<0.5&&hot.cpa&&a.cost>=2*hot.cpa)out.push(['b',`Chi ${F.tr(a.cost)}, 0 chuyển đổi, bằng ${nf1.format(a.cost/hot.cpa)} lần CPA trung bình (${F.tr(hot.cpa)})`]);
-  else if(a.conv>=1&&ok(a.roas)&&a.roas<be)out.push(['b',`Chi phí / doanh thu book date ${F.pct(a.cos)}, cao hơn hoa hồng OTA ${F.pct0(S.otaCommission)}`]);
+  else if(a.conv>=1&&ok(a.roas)&&a.roas<be)out.push(['b',`COS ${F.pct(a.cos)}, cao hơn hoa hồng OTA ${F.pct0(S.otaCommission)}`]);
   if(ok(a.lostB)&&a.lostB>=0.2&&ok(a.roas)&&a.roas>=(tr||be*2))out.push(['g',`Mất ${F.pct0(a.lostB)} IS do ngân sách, ROAS ${F.x(a.roas)}: xem xét tăng ngân sách`]);
   if(ok(a.lostR)&&a.lostR>=0.4&&a.impr>=200)out.push(['w',`Mất ${F.pct0(a.lostR)} IS do rank: kiểm tra giá thầu, asset, landing page`]);
   if(p&&p.roas&&ok(a.roas)&&a.conv>=3&&p.conv>=3){const ch=a.roas/p.roas-1;if(ch<=-0.3)out.push(['w',`ROAS giảm ${nf0.format(-ch*100)}% ${cmpWord()} (${F.x(p.roas)} xuống ${F.x(a.roas)})`])}
@@ -648,7 +648,7 @@ function secOverview(){
   const ins=[];
   if(c)ins.push(['', `Chi phí ${F.tr(a.cost)}, ${delta(a.cost,c.cost,0).replace(/<[^>]+>/g,'')}. Doanh thu book date ${F.tr(a.val)}, ${delta(a.val,c.val,1).replace(/<[^>]+>/g,'')}.`]);
   else ins.push(['',`Chi phí ${F.tr(a.cost)}, doanh thu book date ${F.tr(a.val)}, ROAS ${F.x(a.roas)}.`]);
-  ins.push([ok(a.cos)&&a.cos<=S.otaCommission?'g':'b',`Chi phí / doanh thu book date ${F.pct(a.cos)} so với hoa hồng OTA ${F.pct0(S.otaCommission)}${tr?`. ROAS ${F.x(a.roas)} đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}`:''}.`]);
+  ins.push([ok(a.cos)&&a.cos<=S.otaCommission?'g':'b',`COS ${F.pct(a.cos)} so với hoa hồng OTA ${F.pct0(S.otaCommission)}${tr?`. ROAS ${F.x(a.roas)} đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}`:''}.`]);
   const g=dagg('geo',mk,FROM,TO);const gl=[...g.m.entries()].map(([k,v])=>({k,...v})).sort((x,y)=>y.cost-x.cost);const gt=gl.reduce((s,x)=>s+x.cost,0);
   if(gl.length&&gt>0){const t=gl[0];ins.push(['',`Thị trường (User location) chi nhiều nhất: ${geoName(t.k)} ${F.pct0(t.cost/gt)} chi phí, chi phí / doanh thu book date ${F.pct(t.cos)}.`]);
     const worst=gl.filter(x=>x.cost/gt>=0.05&&ok(x.cos)).sort((x,y)=>y.cos-x.cos)[0]||gl.find(x=>x.cost/gt>=0.05&&x.val===0);
@@ -661,8 +661,8 @@ function secOverview(){
   POST.push(()=>{const sb=bucketsIn(FROM,TO,'day'),sd=agg(mk,FROM,TO,'day').ser;spark('spV',sb.map(b=>(sd.get(b)||{}).val||0),css('--s3'));spark('spC',sb.map(b=>(sd.get(b)||{}).cost||0),css('--s1'));spark('spN',sb.map(b=>(sd.get(b)||{}).conv||0),css('--s7'))});
   POST.push(()=>{
     const labels=bs.map(b=>lab(b,GRAN));const cd=k=>{const v=sv(C,cbs,k);return bs.map((_,i)=>v[i]??null)};
-    const bl=(id,k,col)=>chart(id,{type:'bar',data:{labels,datasets:[{label:'Kỳ này',data:sv(X,bs,k),backgroundColor:col,borderRadius:4,maxBarThickness:30,order:2},...(C?[{type:'line',label:'Kỳ so sánh',data:cd(k),borderColor:css('--ink-3'),borderDash:[5,4],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.3,order:1,spanGaps:true}]:[])]},options:opts(F.tr,'triệu đồng')});
-    bl('cCost','cost',css('--s1'));bl('cVal','val',css('--s3'));
+    const bl=(id,k,col,yl)=>chart(id,{type:'bar',data:{labels,datasets:[{label:'Kỳ này',data:sv(X,bs,k),backgroundColor:col,borderRadius:4,maxBarThickness:30,order:2},...(C?[{type:'line',label:'Kỳ so sánh',data:cd(k),borderColor:css('--ink-3'),borderDash:[5,4],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.3,order:1,spanGaps:true}]:[])]},options:opts(F.tr,yl)});
+    bl('cCost','cost',css('--s1'),'Cost (triệu đồng)');bl('cVal','val',css('--s3'),'Conv. value (triệu đồng)');
     const rc=C?(()=>{const v=rv(C,cbs);return bs.map((_,i)=>v[i]??null)})():[];
     chart('cRoas',{type:'line',data:{labels,datasets:[{label:'ROAS kỳ này',data:rv(X,bs),borderColor:css('--s2'),backgroundColor:css('--s2'),borderWidth:2.2,pointRadius:GRAN==='day'?0:3,pointHoverRadius:5,tension:.3,spanGaps:true},...(C?[{label:'ROAS kỳ so sánh',data:rc,borderColor:css('--ink-3'),borderDash:[5,4],borderWidth:2,pointRadius:0,tension:.3,spanGaps:true}]:[])]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]},{v:tr,c:css('--good'),t:tr?'Target '+F.x(tr):''}])]});
     const ty=[...X.byT.entries()].sort((x,y)=>y[1].cost-x[1].cost);const P=PAL();
@@ -671,18 +671,18 @@ function secOverview(){
   const ty=[...X.byT.entries()].sort((x,y)=>y[1].cost-x[1].cost);const P=['--s1','--s2','--s3','--s4'];
   return notes(a,mk)+`
    <div class="kpis">
-     ${kp('Doanh thu book date (tag Google Ads)',a.val,'tr',delta(a.val,c&&c.val,1),'hero','','spV')}
+     ${kp('Cost',a.cost,'tr',delta(a.cost,c&&c.cost,0),'hero','','spC')}
+     ${kp('Conv. value <span class="muted">(doanh thu book date)</span>',a.val,'tr',delta(a.val,c&&c.val,1),'hero','','spV')}
      ${kp('ROAS',a.roas,'x',delta(a.roas,c&&c.roas,1),'hero',tr?`đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}, hoà vốn ${F.x(be)}`:`hoà vốn ${F.x(be)}`)}
-     ${kp('Chi phí',a.cost,'tr',delta(a.cost,c&&c.cost,0),'hero','','spC')}
-     ${kp('Chi phí / doanh thu book date',a.cos,'pct',delta(a.cos,c&&c.cos,-1),'hero',`hoa hồng OTA ${F.pct0(S.otaCommission)}`)}
+     ${kp('COS',a.cos,'pct',delta(a.cos,c&&c.cos,-1),'hero',`hoa hồng OTA ${F.pct0(S.otaCommission)}`)}
    </div>
    <div class="kpis2">
-     ${kp('Lượt chuyển đổi',a.conv,'cv',delta(a.conv,c&&c.conv,1),'',`booking ${F.cv(a.bk)}`,'spN')}
+     ${kp('Conv.',a.conv,'cv',delta(a.conv,c&&c.conv,1),'',`Bookings ${F.cv(a.bk)}`,'spN')}
      ${kp('CPA',a.cpa,'tr',delta(a.cpa,c&&c.cpa,-1))}
-     ${kp('Lần nhấp',a.clk,'int',delta(a.clk,c&&c.clk,1))}
+     ${kp('CVR',a.cvr,'pct',delta(a.cvr,c&&c.cvr,1))}
+     ${kp('Clicks',a.clk,'int',delta(a.clk,c&&c.clk,1))}
      ${kp('CPC',a.cpc,'k',delta(a.cpc,c&&c.cpc,-1))}
      ${kp('CTR',a.ctr,'pct',delta(a.ctr,c&&c.ctr,1))}
-     ${kp('CVR',a.cvr,'pct',delta(a.cvr,c&&c.cvr,1))}
    </div>
    <div class="grid g21" style="margin-top:14px">
      <div class="card ${A()}"><h3>Điểm chính</h3><p class="q">Tự động tạo từ số liệu kỳ đang chọn. Nhãn màu là tín hiệu theo quy tắc (Suy luận).</p><ul class="ins">${ins.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Tốt':x[0]==='b'?'Cần xem':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
@@ -693,12 +693,12 @@ function secOverview(){
    <h2 class="sec">Xu hướng <small>${GRAN==='day'?'theo ngày':GRAN==='week'?'theo tuần (từ thứ Hai)':'theo tháng'}${a.pr>0&&GRAN!=='month'?`. ${F.pct0(a.pr/a.cost)} chi phí là số theo tháng chia đều theo ngày (Ước tính), nên xem theo Tháng`:''}</small>
      <span class="seg" style="margin-left:auto">${[['day','Ngày'],['week','Tuần'],['month','Tháng']].map(([k,t])=>`<button class="${GRAN===k?'on':''}" onclick="GRAN='${k}';renderMain(false)">${t}</button>`).join('')}</span></h2>
    <div class="grid g2">
-     <div class="card ${A()}"><h3>Chi phí</h3><p class="q">Chi phí đi theo hướng nào so với kỳ so sánh?</p><div class="legend"><span><i style="background:var(--s1)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cCost"></canvas></div></div>
-     <div class="card ${A()}"><h3>Doanh thu book date</h3><p class="q">Giá trị chuyển đổi theo ngày click quảng cáo.</p><div class="legend"><span><i style="background:var(--s3)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cVal"></canvas></div></div>
+     <div class="card ${A()}"><h3>Cost</h3><p class="q">Chi phí đi theo hướng nào so với kỳ so sánh?</p><div class="legend"><span><i style="background:var(--s1)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cCost"></canvas></div></div>
+     <div class="card ${A()}"><h3>Conv. value (doanh thu book date)</h3><p class="q">Giá trị chuyển đổi theo ngày click quảng cáo.</p><div class="legend"><span><i style="background:var(--s3)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cVal"></canvas></div></div>
      <div class="card ${A()}"><h3>ROAS</h3><p class="q">Có giữ trên mức hoà vốn${tr?' và Target':''} không?</p><div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}<span><i class="ln" style="background:var(--bad)"></i>Hoà vốn ${F.x(be)}</span>${tr?`<span><i class="ln" style="background:var(--good)"></i>Target ${F.x(tr)}</span>`:''}</div><div class="chartbox"><canvas id="cRoas"></canvas></div></div>
-     <div class="card ${A()}"><h3>Chi phí theo loại chiến dịch</h3><p class="q">Tiền đang chia cho Search, PMax, Demand Gen thế nào?</p>
+     <div class="card ${A()}"><h3>Cost theo loại chiến dịch</h3><p class="q">Tiền đang chia cho Search, PMax, Demand Gen thế nào?</p>
        <div class="grid g2" style="align-items:center"><div class="chartbox sm"><canvas id="cType"></canvas></div>
-       <div class="small num">${ty.map(([k,x],i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)"><i style="width:10px;height:10px;border-radius:3px;background:var(${P[i]||'--other'});margin-top:4px"></i><b style="min-width:80px">${k}</b><span>${F.pct0(x.cost/a.cost)} chi phí<br><span class="muted">ROAS ${F.x(x.roas)}, CP/DT ${F.pct(x.cos)}</span></span></div>`).join('')}</div></div></div>
+       <div class="small num">${ty.map(([k,x],i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)"><i style="width:10px;height:10px;border-radius:3px;background:var(${P[i]||'--other'});margin-top:4px"></i><b style="min-width:80px">${k}</b><span>${F.pct0(x.cost/a.cost)} chi phí<br><span class="muted">ROAS ${F.x(x.roas)}, COS ${F.pct(x.cos)}</span></span></div>`).join('')}</div></div></div>
    </div>
    <div class="cta"><button class="btn" data-gos="camp">Xem từng chiến dịch</button><button class="btn" data-gos="market">Xem theo thị trường</button></div>`;
 }
@@ -714,13 +714,13 @@ function secCamp(){
   POST.push(()=>{const pts=rows.filter(r=>r.cost>0).map(r=>({x:r.cost,y:r.roas||0,n:r.name,cv:r.conv}));const mx=Math.max(1,...pts.map(p=>p.cv));
     chart('cScat',{type:'bubble',data:{datasets:[{label:'Chiến dịch',data:pts.map(p=>Object.assign({r:4+10*Math.sqrt(p.cv/mx)},p)),backgroundColor:css('--s1')+'b0',hoverBackgroundColor:css('--s2'),borderColor:'#fff',borderWidth:1.5,hoverBorderWidth:2}]},
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false,axis:'xy'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',callbacks:{label:x=>{const p=x.raw;return [p.n,`Chi phí ${F.tr(p.x)}, ROAS ${F.x(p.y)}, ${F.cv(p.cv)} chuyển đổi`]}}}},
-       scales:{x:{beginAtZero:true,title:{display:true,text:'Chi phí trong kỳ',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{beginAtZero:true,title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{color:css('--ink-2'),font:{size:11}}}}},plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]}])]});
+       scales:{x:{beginAtZero:true,title:{display:true,text:'Cost trong kỳ (triệu đồng)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{beginAtZero:true,title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{color:css('--ink-2'),font:{size:11}}}}},plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]}])]});
     const top=[...rows].sort((x,y)=>y.cost-x.cost).slice(0,10);
-    const capC=Math.max(S.otaCommission*200,...top.filter(r=>ok(r.cos)).map(r=>r.cos*100));chart('cTop',{type:'bar',data:{labels:top.map(r=>r.name.length>34?r.name.slice(0,33)+'…':r.name),datasets:[{label:'Chi phí / doanh thu book date',data:top.map(r=>ok(r.cos)?r.cos*100:capC),backgroundColor:top.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
-      options:opts(v=>nf1.format(v)+'%','',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}},title:{display:true,text:'Chi phí / doanh thu book date (%)',color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=top[x.dataIndex];return ok(r.cos)?' '+F.pct(r.cos):` Chưa có doanh thu book date (chi ${F.tr(r.cost)})`}}}}}),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}],'x')]})});
+    const capC=Math.max(S.otaCommission*200,...top.filter(r=>ok(r.cos)).map(r=>r.cos*100));chart('cTop',{type:'bar',data:{labels:top.map(r=>r.name.length>34?r.name.slice(0,33)+'…':r.name),datasets:[{label:'COS',data:top.map(r=>ok(r.cos)?r.cos*100:capC),backgroundColor:top.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+      options:opts(v=>nf1.format(v)+'%','',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}},title:{display:true,text:'COS (%)',color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=top[x.dataIndex];return ok(r.cos)?' '+F.pct(r.cos):` Chưa có doanh thu book date (chi ${F.tr(r.cost)})`}}}}}),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}],'x')]})});
   return notes(a,mk)+`<div class="grid g2">
-    <div class="card ${A()}"><h3>Chi phí và ROAS từng chiến dịch</h3><p class="q">Kích thước chấm theo lượt chuyển đổi. Góc phải dưới: chi nhiều, ROAS thấp.</p><div class="chartbox lg"><canvas id="cScat"></canvas></div></div>
-    <div class="card ${A()}"><h3>Chi phí / doanh thu book date, 10 chiến dịch chi nhiều nhất</h3><p class="q">Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí, chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="cTop"></canvas></div></div></div>
+    <div class="card ${A()}"><h3>Cost và ROAS từng chiến dịch</h3><p class="q">Kích thước chấm theo lượt chuyển đổi. Góc phải dưới: chi nhiều, ROAS thấp.</p><div class="chartbox lg"><canvas id="cScat"></canvas></div></div>
+    <div class="card ${A()}"><h3>COS, 10 chiến dịch chi nhiều nhất</h3><p class="q">Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí, chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="cTop"></canvas></div></div></div>
    <h2 class="sec">Bảng chiến dịch <small>Bấm tiêu đề cột để sắp xếp. Chọn chiến dịch ở nút lọc phía trên để các phần khác chỉ tính chiến dịch đó.</small></h2>
    <div class="${A()}">${T('camps',cols,rows,{sort:'cost',what:'chiến dịch',foot,limit:200})}</div>
    <p class="small muted">Tín hiệu là quy tắc tự động cho chiến dịch chi từ 300.000 đ: 0 chuyển đổi khi chi từ 2 lần CPA trung bình, chi phí / doanh thu book date cao hơn hoa hồng OTA, mất IS do ngân sách từ 20% kèm ROAS đạt Target (hoặc gấp 2 lần hoà vốn), mất IS do rank từ 40%, ROAS giảm từ 30% ${cmpWord()} (từ 3 chuyển đổi mỗi kỳ). 3 đến 7 ngày gần nhất thường còn tăng thêm chuyển đổi do độ trễ ghi nhận.</p>`;
@@ -740,7 +740,7 @@ function secMarket(){
     chart('mDon',{type:'doughnut',data:{labels:[...top.map(r=>r.name),...(other.length?['Khác']:[])],datasets:[{data:[...top.map(r=>r.cost),...(other.length?[oth.cost]:[])],backgroundColor:[...top.map((_,i)=>PL[i]),css('--other')],borderColor:'#fff',borderWidth:2,hoverOffset:8}]},
       options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>` ${x.label}: ${F.tr(x.parsed)} (${F.pct(x.parsed/tot)})`}}}}});
     const t10=rows.filter(r=>r.share>=0.01).slice(0,12);
-    chart('mCos',{type:'bar',data:{labels:t10.map(r=>r.name),datasets:[{label:'Chi phí / doanh thu book date',data:t10.map(r=>ok(r.cos)?Math.min(r.cos*100,100):100),backgroundColor:t10.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+    chart('mCos',{type:'bar',data:{labels:t10.map(r=>r.name),datasets:[{label:'COS',data:t10.map(r=>ok(r.cos)?Math.min(r.cos*100,100):100),backgroundColor:t10.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
       options:opts(v=>nf1.format(v)+'%','',{indexAxis:'y',scales:{x:{beginAtZero:true,suggestedMax:40,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=t10[x.dataIndex];return ok(r.cos)?` ${F.pct(r.cos)} (chi ${F.tr(r.cost)}, doanh thu book date ${F.tr(r.val)})`:` Chưa có doanh thu book date (chi ${F.tr(r.cost)})`}}}}}),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}],'x')]});
   });
   const PLV=['--s1','--s2','--s3','--s4','--s5','--s6','--s7'];
@@ -752,9 +752,9 @@ function secMarket(){
   const det=VIEW.mktSel!=null?mktDetail(mk,VIEW.mktSel):'';
   return notes(null,mk,'geo')+(g.partial>0?`<p class="note ${A()}">${F.tr(g.partial)} chi phí thuộc tháng chỉ có số theo tháng (trước 3 tháng gần nhất), chia đều theo ngày (Ước tính).</p>`:'')+`
    <div class="grid g12">
-    <div class="card ${A()}"><h3>Phân bổ chi phí theo thị trường (User location)</h3><p class="q">Thị trường = User location: quốc gia nơi người dùng đang ở khi thấy quảng cáo (báo cáo "Vị trí người dùng" trên Google Ads, không phải vị trí target). Tổng ${F.tr(tot)}.</p><div class="chartbox"><canvas id="mDon"></canvas></div>
+    <div class="card ${A()}"><h3>Cost theo thị trường (User location)</h3><p class="q">Thị trường = User location: quốc gia nơi người dùng đang ở khi thấy quảng cáo (báo cáo "Vị trí người dùng" trên Google Ads, không phải vị trí target). Tổng ${F.tr(tot)}.</p><div class="chartbox"><canvas id="mDon"></canvas></div>
       <div class="legend" style="margin-top:10px">${top.map((r,i)=>`<span><i style="background:var(${PLV[i]})"></i>${esc(r.name)} ${F.pct0(r.share)}</span>`).join('')}${other.length?`<span><i style="background:var(--other)"></i>Khác ${F.pct0(oth.cost/tot)}</span>`:''}</div></div>
-    <div class="card ${A()}"><h3>Chi phí / doanh thu book date từng thị trường (User location)</h3><p class="q">Thị trường chiếm từ 1% chi phí. Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí nhưng chưa có doanh thu book date (cột vẽ ở 100%).</p><div class="chartbox lg"><canvas id="mCos"></canvas></div></div>
+    <div class="card ${A()}"><h3>COS từng thị trường (User location)</h3><p class="q">Thị trường chiếm từ 1% chi phí. Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí nhưng chưa có doanh thu book date (cột vẽ ở 100%).</p><div class="chartbox lg"><canvas id="mCos"></canvas></div></div>
    </div>
    <h2 class="sec">Bảng thị trường <small>User location: quốc gia nơi người dùng đang ở. Bấm tên thị trường hoặc số chiến dịch để xem chi phí theo từng chiến dịch.</small></h2><div id="mktDet">${det}</div><div class="${A()}">${T('mkt',cols,rows,{sort:'cost',what:'thị trường',limit:60})}</div>`;
 }
@@ -764,22 +764,22 @@ function mktDetail(mk,k){
   const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);const totv=[...g.m.values()].reduce((s,x)=>s+x.val,0);const totc=[...g.m.values()].reduce((s,x)=>s+x.conv,0);
   const rows=[...g.m.entries()].map(([c,x])=>Object.assign({},x,{name:M.camps[c].name,_q:M.camps[c].name,status:M.camps[c].status,share:div(x.cost,tot)})).sort((a,b)=>b.cost-a.cost);
   const nm=geoName(k);
-  POST.push(()=>chart('mDetBar',{type:'bar',data:{labels:rows.map(r=>r.name.length>38?r.name.slice(0,37)+'…':r.name),datasets:[{label:'Chi phí',data:rows.map(r=>r.cost),backgroundColor:rows.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:20}]},
-    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>rows[x[0].dataIndex].name,label:x=>{const r=rows[x.dataIndex];return [` Chi ${F.tr(r.cost)} (${F.pct0(r.share)} chi phí ${nm})`,` ${F.cv(r.conv)} chuyển đổi, doanh thu book date ${F.tr(r.val)}`,` CP/DT ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}`]}}}}})}));
+  POST.push(()=>chart('mDetBar',{type:'bar',data:{labels:rows.map(r=>r.name.length>38?r.name.slice(0,37)+'…':r.name),datasets:[{label:'Cost',data:rows.map(r=>r.cost),backgroundColor:rows.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:20}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>rows[x[0].dataIndex].name,label:x=>{const r=rows[x.dataIndex];return [` Chi ${F.tr(r.cost)} (${F.pct0(r.share)} chi phí ${nm})`,` ${F.cv(r.conv)} chuyển đổi, doanh thu book date ${F.tr(r.val)}`,` COS ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}`]}}}}})}));
   return `<div class="card" style="margin-bottom:14px;border-color:var(--s1)"><h3 style="display:flex;justify-content:space-between;align-items:center">${esc(nm)}: chi phí theo chiến dịch<button class="btn" data-mkt="__close">Đóng</button></h3>
-   <p class="q">${rows.length} chiến dịch, tổng chi ${F.tr(tot)}, ${F.cv(totc)} chuyển đổi, doanh thu book date ${F.tr(totv)}, CP/DT ${ok(div(tot,totv))?F.pct(div(tot,totv)):'chưa có doanh thu book date'}. Xanh: CP/DT thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: chưa có doanh thu book date.</p>
+   <p class="q">${rows.length} chiến dịch, tổng chi ${F.tr(tot)}, ${F.cv(totc)} chuyển đổi, doanh thu book date ${F.tr(totv)}, COS ${ok(div(tot,totv))?F.pct(div(tot,totv)):'chưa có doanh thu book date'}. Xanh: COS thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: chưa có doanh thu book date.</p>
    <div class="grid g2"><div class="chartbox" style="height:${Math.max(160,rows.length*34+40)}px"><canvas id="mDetBar"></canvas></div>
-   <div>${T('mktdet_'+k,[MC('name','Chiến dịch',esc,{l:1,cls:'t'}),MC('share','% chi phí '+esc(nm),F.pct0),MC('cost','Chi phí',F.tr),MC('clk','Nhấp',F.int),MC('conv','Lượt chuyển đổi',F.cv),MC('val','Doanh thu book date',F.tr),MC('cos','CP/DT',cosCell),MC('roas','ROAS',F.x)],rows,{sort:'cost',search:false,limit:50})}</div></div></div>`;
+   <div>${T('mktdet_'+k,[MC('name','Chiến dịch',esc,{l:1,cls:'t'}),...METRIC_COLS().map(c=>c.k==='share'?MC('share','% Cost',F.pct,{tip:'Tỷ trọng trong chi phí của thị trường '+nm}):c)],rows,{sort:'cost',search:false,limit:50})}</div></div></div>`;
 }
 function secMarketAll(){
   IX=0;const per=MAIN.map(h=>({h,...marketRows(campMask(h))}));
   const keys=new Map();per.forEach(p=>p.rows.forEach(r=>keys.set(r.k,(keys.get(r.k)||0)+r.share)));
   const ks=[...keys.entries()].sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0]);
   const rows=ks.map(k=>{const o={name:geoName(k),_q:geoName(k)};per.forEach((p,i)=>{const r=p.rows.find(x=>x.k===k);o['s'+i]=r?r.share:null;o['c'+i]=r?r.cos:null;o['v'+i]=r?r.cost:null});return o});
-  const cols=[MC('name','Thị trường (User location)',esc,{l:1}),...per.flatMap((p,i)=>[MC('s'+i,p.h+': % chi phí',F.pct),MC('v'+i,p.h+': chi phí',F.tr),MC('c'+i,p.h+': CP/DT',cosCell)])];
+  const cols=[MC('name','Thị trường (User location)',esc,{l:1}),...per.flatMap((p,i)=>[MC('s'+i,p.h+': % chi phí',F.pct),MC('v'+i,p.h+': chi phí',F.tr),MC('c'+i,p.h+': COS',cosCell)])];
   const n396=[M.noDimAccs.has('3965442048')?'Sakyo chưa gồm tài khoản 396-544-2048':'',''].filter(Boolean);const n396h=n396.length?`<p class="note ${A()}">${n396.join('. ')} trong snapshot. Có sau khi cài script và bấm Refresh.</p>`:'';
   return n396h+`<p class="note info ${A()}">Mỗi khách sạn tính tỷ trọng trên chi phí của chính khách sạn đó. Bảng đặt cạnh nhau để so sánh, không cộng gộp. Mở từng khách sạn để xem biểu đồ.</p>
-   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${per.map(p=>`<div class="card ${A()}"><h3>${p.h}</h3><p class="q">${p.tot>0?'Tổng chi '+F.tr(p.tot):'Chưa có số thị trường (tài khoản đang lấy số theo tháng qua giao diện, có sau khi cài script)'}</p>${p.rows.sort((a,b)=>b.cost-a.cost).slice(0,6).map(r=>`<div style="margin:7px 0"><div class="small" style="display:flex;justify-content:space-between"><span>${esc(r.name)}</span><span class="num">${F.pct0(r.share)} | CP/DT ${ok(r.cos)?F.pct(r.cos):'-'}</span></div><div class="pace"><div class="bar" style="margin:3px 0;height:8px"><span style="width:${r.share*100}%;${ok(r.cos)&&r.cos<=S.otaCommission?'':'background:var(--s8)'}"></span></div></div></div>`).join('')}<button class="btn" data-goh="${p.h}" data-sec="market">Chi tiết ${p.h}</button></div>`).join('')}</div>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${per.map(p=>`<div class="card ${A()}"><h3>${p.h}</h3><p class="q">${p.tot>0?'Tổng chi '+F.tr(p.tot):'Chưa có số thị trường (tài khoản đang lấy số theo tháng qua giao diện, có sau khi cài script)'}</p>${p.rows.sort((a,b)=>b.cost-a.cost).slice(0,6).map(r=>`<div style="margin:7px 0"><div class="small" style="display:flex;justify-content:space-between"><span>${esc(r.name)}</span><span class="num">${F.pct0(r.share)} | COS ${ok(r.cos)?F.pct(r.cos):'-'}</span></div><div class="pace"><div class="bar" style="margin:3px 0;height:8px"><span style="width:${r.share*100}%;${ok(r.cos)&&r.cos<=S.otaCommission?'':'background:var(--s8)'}"></span></div></div></div>`).join('')}<button class="btn" data-goh="${p.h}" data-sec="market">Chi tiết ${p.h}</button></div>`).join('')}</div>
    <h2 class="sec">So sánh 25 thị trường lớn nhất</h2><div class="${A()}">${T('mktall',cols,rows,{sort:'s0',what:'thị trường',search:true})}</div>`;
 }
 
@@ -789,13 +789,13 @@ function secAge(){
   IX=0;const mk=campMask(HOTEL);const g=dagg('age',mk,FROM,TO);const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);
   const order=Object.keys(AGE);const rows=order.filter(k=>g.m.has(k)).map(k=>Object.assign({},g.m.get(k),{k,name:AGE[k],_q:AGE[k],share:div(g.m.get(k).cost,tot),ord:order.indexOf(k)}));
   POST.push(()=>{const lb=rows.map(r=>r.name);
-    chart('aCost',{type:'bar',data:{labels:lb,datasets:[{label:'Chi phí',data:rows.map(r=>r.cost),backgroundColor:css('--s1'),borderRadius:5,maxBarThickness:46}]},options:opts(F.tr,'triệu đồng')});
-    chart('aCos',{type:'bar',data:{labels:lb,datasets:[{label:'Chi phí / doanh thu book date',data:rows.map(r=>ok(r.cos)?r.cos*100:null),backgroundColor:rows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s3'):css('--s8')),borderRadius:5,maxBarThickness:46}]},options:opts(v=>nf1.format(v)+'%','%'),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}])]});
-    chart('aConv',{type:'bar',data:{labels:lb,datasets:[{label:'Lượt chuyển đổi',data:rows.map(r=>r.conv),backgroundColor:css('--s7'),borderRadius:5,maxBarThickness:46}]},options:opts(F.cv,'lượt')})});
+    chart('aCost',{type:'bar',data:{labels:lb,datasets:[{label:'Cost',data:rows.map(r=>r.cost),backgroundColor:css('--s1'),borderRadius:5,maxBarThickness:46}]},options:opts(F.tr,'Cost (triệu đồng)')});
+    chart('aCos',{type:'bar',data:{labels:lb,datasets:[{label:'COS',data:rows.map(r=>ok(r.cos)?r.cos*100:null),backgroundColor:rows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s3'):css('--s8')),borderRadius:5,maxBarThickness:46}]},options:opts(v=>nf1.format(v)+'%','%'),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}])]});
+    chart('aConv',{type:'bar',data:{labels:lb,datasets:[{label:'Conv.',data:rows.map(r=>r.conv),backgroundColor:css('--s7'),borderRadius:5,maxBarThickness:46}]},options:opts(F.cv,'Conv.')})});
   return notes(null,mk,'age')+`<p class="note info ${A()}">Độ tuổi chỉ có cho chiến dịch Search, Demand Gen, Display. Google không báo cáo độ tuổi cho PMax, nên tổng ở đây (${F.tr(tot)}) nhỏ hơn tổng chi phí khách sạn. Độ tuổi đang lấy theo tháng, kỳ cắt ngang tháng được chia đều theo ngày (Ước tính).</p>
-   <div class="grid g3"><div class="card ${A()}"><h3>Chi phí theo độ tuổi</h3><p class="q">Tiền đang đổ vào nhóm tuổi nào?</p><div class="chartbox"><canvas id="aCost"></canvas></div></div>
-   <div class="card ${A()}"><h3>Lượt chuyển đổi</h3><p class="q">Nhóm tuổi nào đặt phòng?</p><div class="chartbox"><canvas id="aConv"></canvas></div></div>
-   <div class="card ${A()}"><h3>Chi phí / doanh thu book date</h3><p class="q">Đỏ: cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox"><canvas id="aCos"></canvas></div></div></div>
+   <div class="grid g3"><div class="card ${A()}"><h3>Cost theo độ tuổi</h3><p class="q">Tiền đang đổ vào nhóm tuổi nào?</p><div class="chartbox"><canvas id="aCost"></canvas></div></div>
+   <div class="card ${A()}"><h3>Conv.</h3><p class="q">Nhóm tuổi nào đặt phòng?</p><div class="chartbox"><canvas id="aConv"></canvas></div></div>
+   <div class="card ${A()}"><h3>COS</h3><p class="q">Đỏ: cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox"><canvas id="aCos"></canvas></div></div></div>
    <h2 class="sec">Bảng độ tuổi</h2><div class="${A()}">${T('age',[MC('name','Độ tuổi',esc,{l:1,sv:r=>-r.ord}),...METRIC_COLS()],rows,{sort:'name',search:false})}</div>`;
 }
 
@@ -806,8 +806,8 @@ function secTloc(){
   const rows=[...g.m.entries()].map(([k,x])=>{const [id,c]=k.split('@');const gg=M.geo[id];const nm=id==='0'?'Bán kính quanh địa điểm':geoName(id);
     return Object.assign({},x,{name:nm,type:gg?gg[2]:(id==='0'?'Bán kính':''),full:gg?gg[3]:'',camp:M.camps[+c].name,_q:nm+' '+M.camps[+c].name+' '+(gg?gg[3]:''),share:div(x.cost,tot)})});
   const locRows=[...byLoc.m.entries()].map(([k,x])=>({k,...x,name:k===0||k==='0'?'Bán kính':geoName(k)})).sort((a,b)=>b.cost-a.cost).slice(0,12);
-  POST.push(()=>chart('tBar',{type:'bar',data:{labels:locRows.map(r=>r.name),datasets:[{label:'Chi phí',data:locRows.map(r=>r.cost),backgroundColor:locRows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
-    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=locRows[x.dataIndex];return ` Chi ${F.tr(r.cost)}, CP/DT ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}, ${F.cv(r.conv)} chuyển đổi`}}}}})}));
+  POST.push(()=>chart('tBar',{type:'bar',data:{labels:locRows.map(r=>r.name),datasets:[{label:'Cost',data:locRows.map(r=>r.cost),backgroundColor:locRows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=locRows[x.dataIndex];return ` Chi ${F.tr(r.cost)}, COS ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}, ${F.cv(r.conv)} chuyển đổi`}}}}})}));
   return notes(null,mk,'tloc')+`<div class="grid g12"><div class="card ${A()}"><h3>Cách đọc</h3><p class="q">Vị trí target là vị trí đã cài trong chiến dịch, khác với thị trường (nơi người dùng đang ở).</p>
      <ul class="ins"><li><span class="tg">Ví dụ</span><span>Chiến dịch target Việt Nam theo "quan tâm" vẫn hiện cho người ở Úc đang tìm khách sạn ở Sài Gòn. Chi phí đó nằm ở vị trí target Việt Nam, nhưng ở thị trường Úc.</span></li>
      <li><span class="tg">Tổng</span><span>${F.tr(tot)} chi phí có gắn vị trí target trong kỳ.</span></li></ul></div>
@@ -822,12 +822,12 @@ function secKw(){
   const rows=[...g.m.entries()].map(([k,x])=>{const i=k.lastIndexOf('@'),kt=k.slice(0,i),c=+k.slice(i+1);const j=kt.lastIndexOf('|');const text=kt.slice(0,j),mt=kt.slice(j+1);
     return Object.assign({},x,{text,mt:MT[mt]||mt,camp:M.camps[c].name,_q:text+' '+M.camps[c].name,share:div(x.cost,tot)})});
   const top=[...rows].sort((a,b)=>b.cost-a.cost).slice(0,12);
-  POST.push(()=>chart('kBar',{type:'bar',data:{labels:top.map(r=>r.text.length>36?r.text.slice(0,35)+'…':r.text),datasets:[{label:'Chi phí',data:top.map(r=>r.cost),backgroundColor:top.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
-    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>top[x[0].dataIndex].text,label:x=>{const r=top[x.dataIndex];return ` Chi ${F.tr(r.cost)}, ${F.cv(r.conv)} chuyển đổi, CP/DT ${ok(r.cos)?F.pct(r.cos):'-'}`}}}}})}));
+  POST.push(()=>chart('kBar',{type:'bar',data:{labels:top.map(r=>r.text.length>36?r.text.slice(0,35)+'…':r.text),datasets:[{label:'Cost',data:top.map(r=>r.cost),backgroundColor:top.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>top[x[0].dataIndex].text,label:x=>{const r=top[x.dataIndex];return ` Chi ${F.tr(r.cost)}, ${F.cv(r.conv)} chuyển đổi, COS ${ok(r.cos)?F.pct(r.cos):'-'}`}}}}})}));
   const brand=rows.filter(r=>/silverland|sakyo|myst/i.test(r.text));const bc=brand.reduce((s,r)=>s+r.cost,0),bv=brand.reduce((s,r)=>s+r.val,0),av=rows.reduce((s,r)=>s+r.val,0);
   return notes(null,mk,'kw')+`<div class="grid g12"><div class="card ${A()}"><h3>Từ khoá thương hiệu và không thương hiệu</h3><p class="q">Thương hiệu = từ khoá chứa tên Silverland, Sakyo, The Myst (Suy luận theo chữ).</p>
-     <ul class="ins"><li><span class="tg">Thương hiệu</span><span>${F.pct0(div(bc,tot))} chi phí, ${F.pct0(div(bv,av))} doanh thu book date, CP/DT ${F.pct(div(bc,bv))}</span></li>
-     <li><span class="tg">Không thương hiệu</span><span>${F.pct0(div(tot-bc,tot))} chi phí, ${F.pct0(div(av-bv,av))} doanh thu book date, CP/DT ${F.pct(div(tot-bc,av-bv))}</span></li>
+     <ul class="ins"><li><span class="tg">Thương hiệu</span><span>${F.pct0(div(bc,tot))} chi phí, ${F.pct0(div(bv,av))} doanh thu book date, COS ${F.pct(div(bc,bv))}</span></li>
+     <li><span class="tg">Không thương hiệu</span><span>${F.pct0(div(tot-bc,tot))} chi phí, ${F.pct0(div(av-bv,av))} doanh thu book date, COS ${F.pct(div(tot-bc,av-bv))}</span></li>
      <li><span class="tg">Phạm vi</span><span>Chỉ chiến dịch Search có từ khoá. PMax không có từ khoá nên không nằm ở đây. Tổng ${F.tr(tot)}.</span></li></ul></div>
    <div class="card ${A()}"><h3>12 từ khoá chi nhiều nhất</h3><p class="q">Đỏ: chi phí / doanh thu book date cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="kBar"></canvas></div></div></div>
    <h2 class="sec">Bảng từ khoá</h2><div class="${A()}">${T('kw',[MC('text','Từ khoá',esc,{l:1,cls:'t'}),MC('mt','Kiểu khớp',esc,{l:1}),MC('camp','Chiến dịch',esc,{l:1}),...METRIC_COLS()],rows,{sort:'cost',what:'từ khoá'})}</div>`;
@@ -849,9 +849,9 @@ function secAsset(){
      <ul class="ins"><li><span class="tg">Lưu ý</span><span>Một lượt hiển thị được tính cho nhiều headline và description cùng lúc, nên cộng các dòng sẽ lớn hơn tổng chiến dịch. Chỉ so sánh các dòng với nhau.</span></li>
      <li><span class="tg">Chỉ số chính</span><span>Chuyển đổi trên 1.000 hiển thị: so được dòng hiện nhiều với dòng hiện ít. Chỉ xếp hạng dòng có từ 300 hiển thị.</span></li>
      <li><span class="tg">Kỳ</span><span>Theo tháng cho dữ liệu cũ, theo tuần cho 3 tháng gần nhất. Kỳ cắt ngang được chia đều theo ngày (Ước tính).</span></li></ul></div>
-   <div class="card ${A()}"><h3>10 dòng chữ chuyển đổi tốt nhất trên 1.000 hiển thị</h3><p class="q">${src==='RSA'?'Search RSA':'PMax'}, ${ff==='ALL'?'mọi loại':FT[ff]}</p><div class="chartbox lg"><canvas id="asBar"></canvas></div></div></div>
+   <div class="card ${A()}"><h3>10 dòng chữ có Conv. / 1k Impr. cao nhất</h3><p class="q">${src==='RSA'?'Search RSA':'PMax'}, ${ff==='ALL'?'mọi loại':FT[ff]}</p><div class="chartbox lg"><canvas id="asBar"></canvas></div></div></div>
    <h2 class="sec">Bảng ${src==='RSA'?'headline, description Search':'headline, description PMax'}</h2>
-   <div class="${A()}">${T('asset_'+src,[MC('text','Nội dung',esc,{l:1,cls:'t'}),MC('ft','Loại',esc,{l:1}),MC('impr','Hiển thị',F.int),MC('clk','Nhấp',F.int),MC('ctr','CTR',F.pct),MC('conv','Lượt chuyển đổi',F.cv),MC('cpm','Chuyển đổi / 1.000 hiển thị',v=>ok(v)?nf2.format(v):'-'),MC('val','Doanh thu book date',F.tr),MC('cost','Chi phí',F.tr),MC('ncamp','Số chiến dịch',F.int),MC('camps','Chiến dịch',v=>`<span class="small">${esc(v)}</span>`,{l:1,cls:'t'})],rows,{sort:'impr',what:'nội dung',total:false})}</div>`;
+   <div class="${A()}">${T('asset_'+src,[MC('text','Nội dung',esc,{l:1,cls:'t'}),MC('ft','Loại',esc,{l:1}),MC('cost','Cost',F.tr,{tip:'Chi phí'}),MC('val','Conv. value',F.tr,{tip:'Doanh thu book date theo tag Google Ads'}),MC('conv','Conv.',F.cv,{tip:'Lượt chuyển đổi'}),MC('cpm','Conv. / 1k Impr.',v=>ok(v)?nf2.format(v):'-',{tip:'Conv. trên 1.000 lượt hiển thị, so được giữa asset có lượt hiển thị khác nhau'}),MC('clk','Clicks',F.int,{tip:'Lượt nhấp'}),MC('ctr','CTR',F.pct,{tip:'Clicks / Impr.'}),MC('impr','Impr.',F.int,{tip:'Lượt hiển thị'}),MC('ncamp','Campaigns',F.int,{tip:'Số chiến dịch dùng asset này'}),MC('camps','Chiến dịch',v=>`<span class="small">${esc(v)}</span>`,{l:1,cls:'t'})],rows,{sort:'cost',what:'nội dung',total:false})}</div>`;
 }
 
 
