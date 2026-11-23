@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Google Ads Performance | Silverland Hospitality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f3ef;--surface:#fffefc;--surface-2:#faf8f4;--line:#e8e3db;--line-2:#d6cec2;
+  --ink:#1d1f26;--ink-2:#55555a;--ink-3:#8c7973;
+  --nav:#1d1f26;--nav-2:#2a2c35;--nav-ink:#c9c5be;
+  --brand:#faaa3f;--brand-2:#ffddb3;--brand-ink:#8a5200;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;--s7:#6250d6;--s8:#e34948;--other:#b9b4ab;
+  --good:#0a7d0a;--good-bg:#e5f3e5;--bad:#c13232;--bad-bg:#fbe8e8;--warn:#9a6200;--warn-bg:#fff2d9;
+  --r:10px;--r-sm:6px;--shadow:0 1px 2px rgba(29,31,38,.05),0 4px 16px rgba(29,31,38,.05);
+  font-family:"Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-size:13.5px;line-height:1.5}
+.num{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+/* sidebar */
+aside{background:var(--nav);color:var(--nav-ink);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 8px 18px;color:#fff;font-weight:600;font-size:15px}
+.logo .mk{width:30px;height:30px;border-radius:8px;background:var(--brand);display:grid;place-items:center;color:var(--nav);font-weight:700}
+.logo small{display:block;color:var(--nav-ink);font-weight:400;font-size:11px}
+.nh{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:#7d7a74;padding:14px 10px 6px}
+.nav{list-style:none;margin:0;padding:0;position:relative}
+.nav button{width:100%;text-align:left;border:0;background:none;color:var(--nav-ink);padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .2s,color .2s}
+.nav button:hover{background:var(--nav-2);color:#fff}
+.nav button.on{background:var(--nav-2);color:#fff}
+.nav button.on::before{content:"";position:absolute;left:-12px;width:3px;height:22px;background:var(--brand);border-radius:0 3px 3px 0;animation:grow .25s ease}
+.nav button .dot{width:8px;height:8px;border-radius:50%;background:#55575f;flex:none}
+.nav button.on .dot{background:var(--brand)}
+.nav button .ic{width:18px;height:18px;flex:none;opacity:.85}
+.nav button[disabled]{opacity:.35;cursor:not-allowed}
+.nav .badge{margin-left:auto;font-size:11px;color:#8d8a84}
+@keyframes grow{from{transform:scaleY(0)}to{transform:none}}
+/* topbar */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(245,243,239,.97);border-bottom:1px solid var(--line);padding:12px 26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar h1{margin:0;font-size:18px;font-weight:600;letter-spacing:-.2px}
+.topbar .crumb{color:var(--ink-3);font-weight:400}
+.sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .2s,box-shadow .2s}
+.pill:hover{border-color:var(--ink-3);box-shadow:var(--shadow)}
+.pill svg{width:16px;height:16px}
+.pill b{font-weight:600}
+.pill.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pill.primary:hover{background:#30323b}
+.pill.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sub{font-size:12px;color:var(--ink-2);padding:6px 26px 0}
+/* popover */
+.pop{position:absolute;z-index:50;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r);box-shadow:0 12px 40px rgba(29,31,38,.18);padding:14px;min-width:300px;animation:popin .16s ease}
+@keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.presets button{border:1px solid var(--line);background:var(--surface-2);padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.presets button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.pop label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--ink-2)}
+.pop input[type=date],.pop select,.pop input[type=search]{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:6px 8px;background:#fff}
+.row{display:flex;gap:8px;align-items:flex-end}
+.pop .ft{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--line-2);background:var(--surface);padding:6px 12px;border-radius:var(--r-sm);cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.clist{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:var(--r-sm);margin-top:8px}
+.clist label{flex-direction:row;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--line);color:var(--ink);font-size:12.5px;cursor:pointer}
+.clist label:hover{background:var(--surface-2)}
+.clist .meta{margin-left:auto;color:var(--ink-3);font-size:11px;white-space:nowrap}
+/* main */
+main{padding:18px 26px 50px;max-width:1520px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.anim{animation:rise .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.anim,.pop,.nav button.on::before{animation:none!important}.pill.spin svg{animation:none}}
+.card h3{margin:0;font-size:14px;font-weight:600}
+.card .q{margin:2px 0 10px;font-size:12px;color:var(--ink-2)}
+h2.sec{font-size:15px;font-weight:600;margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
+h2.sec small{font-weight:400;color:var(--ink-2);font-size:12px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.g21{grid-template-columns:2fr 1fr}.g12{grid-template-columns:1fr 2fr}
+@media (max-width:1150px){.g2,.g3,.g4,.g21,.g12{grid-template-columns:1fr}}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpis2{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:12px}
+@media (max-width:1150px){.kpis{grid-template-columns:1fr 1fr}.kpis2{grid-template-columns:repeat(3,1fr)}}
+.kpi{position:relative;overflow:hidden}
+.kpi .lb{font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;gap:6px}
+.kpi .v{font-size:28px;font-weight:600;letter-spacing:-.5px;margin:4px 0 2px;white-space:nowrap}
+.kpis2 .kpi .v{font-size:19px}
+.kpi .d{font-size:12px;color:var(--ink-2)}
+.kpi.hero{background:linear-gradient(180deg,#fff 0,#fffaf2 100%);border-color:#f0dcc0}
+.kpi.hero::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.kpi canvas{position:absolute;right:10px;bottom:10px;width:90px!important;height:30px!important;opacity:.9}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.chip.good{background:var(--good-bg);color:var(--good)}.chip.bad{background:var(--bad-bg);color:var(--bad)}.chip.neu{background:#eeebe6;color:var(--ink-2)}
+.chartbox{position:relative;height:270px;contain:layout paint}
+.chartbox canvas{cursor:default}
+.chartbox.sm{height:200px}.chartbox.lg{height:330px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2);margin:0 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend i.ln{height:3px;width:14px;border-radius:2px;vertical-align:3px}
+.legend i.dash{height:0;width:14px;border-top:2px dashed var(--ink-3);border-radius:0;vertical-align:3px}
+/* insights */
+.ins{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ins li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--line)}
+.ins li .tg{flex:none;font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:2px 6px;border-radius:4px;background:#eceae5;color:var(--ink-2);text-transform:uppercase}
+.ins li .tg.g{background:var(--good-bg);color:var(--good)}.ins li .tg.b{background:var(--bad-bg);color:var(--bad)}.ins li .tg.w{background:var(--warn-bg);color:var(--warn)}
+/* pace */
+.pace .bar{height:12px;background:#ece8e1;border-radius:6px;position:relative;overflow:hidden;margin:8px 0}
+.pace .bar span{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--s1),#4f95e6);border-radius:6px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.pace .bar em{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink)}
+/* tables */
+.tw{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);max-height:640px;box-shadow:var(--shadow)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:#f4f0ea;font-weight:600;font-size:11.5px;color:var(--ink-2);cursor:pointer;user-select:none;z-index:2}
+th:hover{color:var(--ink)}
+th.l,td.l{text-align:left}
+td.t{text-align:left;white-space:normal;min-width:240px;max-width:420px}
+tbody tr{transition:background .15s}
+tbody tr:hover td{background:#fbf7f0}
+tfoot td{font-weight:600;background:#f8f5f0;position:sticky;bottom:0}
+.tw th:first-child,.tw td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
+.tw th:first-child{z-index:3;background:#f4f0ea}
+.tw tfoot td:first-child{z-index:3;background:#f8f5f0}
+.tw tbody tr:hover td:first-child{background:#fbf7f0}
+.lnk{border:0;background:none;padding:0;color:var(--s1);cursor:pointer;font:inherit;text-align:left}
+.lnk:hover{text-decoration:underline}
+.st{font-size:11px;padding:1px 7px;border-radius:999px;background:#eeebe6;color:var(--ink-2)}
+.st.on{background:var(--good-bg);color:var(--good)}
+.cos{display:inline-flex;align-items:center;gap:6px}
+.cos .mb{width:54px;height:6px;border-radius:3px;background:#ece8e1;overflow:hidden;display:inline-block}
+.cos .mb span{display:block;height:100%;background:var(--s1)}
+.cos.over .mb span{background:var(--bad)}
+.tt{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.tt input[type=search]{border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;min-width:240px;background:var(--surface)}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:12.5px}
+.seg button.on{background:var(--ink);color:#fff}
+.sig{white-space:normal;text-align:left;min-width:260px;font-size:12px}
+.sig div{margin:1px 0}.sig .b{color:var(--bad)}.sig .g{color:var(--good)}.sig .w{color:var(--warn)}
+.note{background:var(--warn-bg);border:1px solid #f3d9a6;padding:9px 12px;border-radius:var(--r-sm);margin:0 0 12px;font-size:12.5px}
+.note.info{background:#eef4fb;border-color:#cfe0f5}
+.empty{padding:34px;text-align:center;color:var(--ink-2)}
+.muted{color:var(--ink-2)}.small{font-size:12px}
+.hotelcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+@media (max-width:1150px){.hotelcards{grid-template-columns:1fr}}
+.hc h3{display:flex;justify-content:space-between;align-items:center;font-size:16px}
+.hc .big{font-size:30px;font-weight:600;letter-spacing:-.5px}
+.hc dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:12px 0 0}
+.hc dt{color:var(--ink-2)}.hc dd{margin:0;text-align:right}
+/* skeleton */
+.loading main{position:relative}
+.loading main::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(245,243,239,.0) 30%,rgba(255,255,255,.75) 50%,rgba(245,243,239,0) 70%);background-size:200% 100%;animation:shimmer 1.1s infinite;pointer-events:none}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:99;max-width:420px;animation:rise .3s ease;font-size:13px}
+.toast.err{background:var(--bad)}
+dialog{border:0;border-radius:14px;padding:0;max-width:880px;width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(29,31,38,.5);backdrop-filter:blur(2px)}
+dialog .hd{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+dialog .hd h3{margin:0;font-size:16px}
+dialog .bd{padding:16px 20px;max-height:70vh;overflow:auto}
+dialog .fb{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--ink-2)}
+.form input,textarea,dialog select,dialog input{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:6px 8px;font-size:13px}
+textarea{width:100%;font-family:Consolas,monospace;font-size:12px}
+.drop{border:2px dashed var(--line-2);border-radius:var(--r);padding:20px;text-align:center;color:var(--ink-2);margin:8px 0;transition:all .2s}
+.drop.over{border-color:var(--brand);background:var(--warn-bg)}
+code{background:#f1ede6;padding:1px 5px;border-radius:4px;font-size:12px}
+ol.steps li{margin:4px 0}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:6px 22px;font-size:12.5px}
+.gloss b{display:inline-block;min-width:120px}
+footer{padding:0 26px 40px;max-width:1520px;color:var(--ink-2);font-size:12px}
+.cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.rcl{display:flex;flex-direction:column;gap:10px;margin-top:6px}.rcb{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:4px 0 2px}.rcb span{display:block;height:100%;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo"><div class="mk">S</div><div>Silverland Ads<small>Google Ads Performance</small></div></div>
+  <div class="nh">Khách sạn</div>
+  <ul class="nav" id="navHotel"></ul>
+  <div class="nh">Phân tích</div>
+  <ul class="nav" id="navSec"></ul>
+  <div class="nh">Hệ thống</div>
+  <ul class="nav">
+    <li><button id="btnData"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Nguồn data</button></li>
+    <li><button id="btnSettings"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Cài đặt</button></li>
+  </ul>
+</aside>
+<div>
+  <div class="topbar">
+    <h1 id="title">Tổng quan</h1>
+    <span class="sp"></span>
+    <button class="pill" id="pDate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="pDateTxt"></span></button>
+    <button class="pill" id="pCamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg><span id="pCampTxt">Tất cả chiến dịch</span></button>
+    <button class="pill primary" id="pRefresh" title="Tải data mới nhất (đến hôm qua) từ Google Sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>Refresh</button>
+  </div>
+  <div class="sub" id="sub"></div>
+  <main id="main"></main>
+  <footer>
+    <p id="srcLine" style="margin-top:0;padding-top:14px;border-top:1px solid var(--line)"></p>
+  </footer>
+</div>
+</div>
+
+<dialog id="dlgData">
+  <div class="hd"><h3>Nguồn data và cập nhật tự động</h3><button class="btn" data-close>Đóng</button></div>
+  <div class="bd">
+    <p class="small muted" id="dataState"></p>
+    <h3 style="font-size:14px;margin:12px 0 6px">Link Google Sheet</h3>
+    <div class="row"><input id="sheetUrl" style="flex:1" placeholder="https://docs.google.com/spreadsheets/d/.../edit"><button class="btn dark" id="btnSheet">Lưu và tải</button></div>
+    <p class="small muted">Lưu 1 lần trên trình duyệt này. Sau đó mỗi lần mở dashboard hoặc bấm Refresh, dashboard tự đọc Sheet (data đến hôm qua). Sheet cần chia sẻ "Bất kỳ ai có đường liên kết: Người xem".</p>
+    <h3 style="font-size:14px;margin:16px 0 6px">Cài script lần đầu (làm 1 lần, khoảng 5 phút)</h3>
+    <ol class="steps small">
+      <li>Tạo Google Sheet mới (tên tuỳ ý). Chia sẻ: Bất kỳ ai có đường liên kết, quyền Người xem. Copy link.</li>
+      <li>Mở Google Ads ở tài khoản MCC SILVERLAND HOSPITALITY (140-788-0633): Công cụ, Hành động hàng loạt, Tập lệnh, bấm dấu +.</li>
+      <li>Xoá code mẫu, dán toàn bộ file <code>GoogleAds_Dashboard_Export.js</code>. Thay <code>DAN_LINK_GOOGLE_SHEET_VAO_DAY</code> bằng link Sheet.</li>
+      <li>Bấm Uỷ quyền, sau đó Chạy. Lần đầu mất khoảng 3 đến 8 phút. Sheet sẽ có 4 tab Data, Dims, GeoNames, Info.</li>
+      <li>Tần suất: Hằng ngày, 6:00. Từ đó Sheet luôn có data đến hôm qua.</li>
+      <li>Dán link Sheet vào ô bên trên, bấm Lưu và tải.</li>
+    </ol>
+    <p class="small muted">Script đọc 3 tài khoản 396-544-2048 (Sakyo), 753-421-2327 (chỉ chiến dịch Sakyo), 623-388-2444 (The Myst) qua MCC, chỉ đọc, không sửa gì trong tài khoản.</p>
+    <h3 style="font-size:14px;margin:16px 0 6px">Đối soát tracking (booking engine và GA4), làm 1 lần</h3>
+    <ol class="steps small">
+      <li>Mở chính Google Sheet ở trên: Tiện ích mở rộng, Apps Script. Dán toàn bộ file <code>GoogleAds_Dashboard_Recon.gs</code>.</li>
+      <li>Bên trái bấm Dịch vụ (+), chọn Google Analytics Data API, Thêm.</li>
+      <li>Chọn hàm <code>runRecon</code>, bấm Chạy, cấp quyền. Sheet có thêm tab Recon (chỉ số tổng hợp, không có tên, email, mã booking của khách).</li>
+      <li>Chọn hàm <code>installTrigger</code>, bấm Chạy một lần. Script tự chạy hằng ngày lúc 8 đến 9 giờ.</li>
+    </ol>
+    <p class="small muted">Script đọc sheet Data của file Booking Website SVL & The Myst và GA4 property 340245620. Tài khoản chạy script cần quyền xem 2 nguồn này.</p>
+    <h3 style="font-size:14px;margin:16px 0 6px">Cách khác: nạp file CSV</h3>
+    <div class="drop" id="drop">Kéo thả các file CSV tải từ Sheet (tab Data, Dims, GeoNames) hoặc <label style="color:var(--s1);cursor:pointer;text-decoration:underline">chọn file<input type="file" id="fileIn" accept=".csv" multiple hidden></label></div>
+    <div class="small" id="loadStatus"></div>
+  </div>
+  <div class="fb"><button class="btn" id="btnReset">Bỏ link Sheet, dùng snapshot gốc</button></div>
+</dialog>
+
+<dialog id="dlgSet">
+  <div class="hd"><h3>Cài đặt</h3><button class="btn" data-close>Đóng</button></div>
+  <div class="bd" id="setBody"></div>
+  <div class="fb"><button class="btn" id="btnSetDefault">Về mặc định</button><button class="btn dark" id="btnSetSave">Lưu</button></div>
+</dialog>
+
+<script id="rawdata" type="application/json">/*__DATA__*/</script>
+<script>
+"use strict";
+/* ============ utils ============ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const RAW=JSON.parse(document.getElementById('rawdata').textContent);
+const BASE=Date.UTC(2025,0,1),DAY=864e5;
+const toIdx=s=>Math.round((Date.parse(String(s).slice(0,10)+'T00:00:00Z')-BASE)/DAY);
+const toStr=i=>new Date(BASE+i*DAY).toISOString().slice(0,10);
+const dmy=i=>{const s=toStr(i);return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4)};
+const dm=i=>{const s=toStr(i);return s.slice(8,10)+'/'+s.slice(5,7)};
+const ymd=i=>{const d=new Date(BASE+i*DAY);return [d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),d.getUTCDay()]};
+const idxYMD=(y,m,d)=>Math.round((Date.UTC(y,m,d)-BASE)/DAY);
+const nf0=new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}),nf1=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1}),nf2=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ok=v=>v!=null&&isFinite(v);
+const F={
+  tr:v=>!ok(v)?'-':(Math.abs(v)>=1e9?nf2.format(v/1e9)+' tỷ':(Math.abs(v)>=1e7?nf1.format(v/1e6):nf2.format(v/1e6))+' tr'),
+  k:v=>!ok(v)?'-':nf0.format(Math.round(v/100)*100)+' đ',
+  int:v=>!ok(v)?'-':nf0.format(Math.round(v)),
+  cv:v=>!ok(v)?'-':(Math.abs(v-Math.round(v))<0.05?nf0.format(Math.round(v)):nf1.format(v)),
+  x:v=>!ok(v)?'-':nf1.format(v),
+  pct:v=>!ok(v)?'-':nf1.format(v*100)+'%',
+  pct0:v=>!ok(v)?'-':nf0.format(v*100)+'%'
+};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const div=(a,b)=>b?a/b:null;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============ settings ============ */
+const LS='svl_gads_dash_v2';
+const HOTELS=['Sakyo','The Myst','Nhiều khách sạn','Chưa phân loại'];
+const MAIN=['Sakyo','The Myst'];
+const CFGV=4;
+const DEFAULT_SHEET=''/*__SHEET__*/;// bản gửi riêng có sẵn link Sheet, bản public để trống// 23/11/2026: dashboard chỉ còn Sakyo và The Myst
+const HIDDEN=['Nhiều khách sạn','Chưa phân loại'];
+const DEF={otaCommission:0.17,targetRoas:{'Sakyo':14,'The Myst':null},
+  budgets:{'2026-11':{'Sakyo':27.5e6},'2026-12':{'Sakyo':37.4e6}},
+  rules:'Sakyo = sakyo|little tokyo\nThe Myst = myst\nBến Thành = bến thành|ben thanh|\\bbt\\b\nJolie = jolie\nYen = (^|[^a-z])yen([^a-z]|$)\nSil = (^|[^a-z])sil([^a-z]|$)\nMây = mây|(^|[^a-z])may([^a-z]|$)',
+  accountDefault:{'3965442048':'Sakyo','7534212327':'Chưa phân loại','6233882444':'The Myst'},overrides:{},sheetUrl:'',cfgV:CFGV};
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+let S=Object.assign(JSON.parse(JSON.stringify(DEF)),lsGet(LS)||{});
+if(!S.sheetUrl&&!S.sheetOff&&DEFAULT_SHEET)S.sheetUrl=DEFAULT_SHEET;
+// Link cá nhân ?sheet=<ID Google Sheet>: tự nối và nhớ trên trình duyệt này, rồi xoá tham số khỏi thanh địa chỉ
+try{const q=new URLSearchParams(location.search).get('sheet');if(q&&/^[a-zA-Z0-9-_]{20,}$/.test(q)){S.sheetUrl='https://docs.google.com/spreadsheets/d/'+q+'/edit';S.sheetOff=false;localStorage.setItem(LS,JSON.stringify(Object.assign({},S,{cfgV:S.cfgV})));history.replaceState(null,'',location.pathname)}}catch(e){}
+if(S.cfgV!==CFGV){const keep={sheetUrl:S.sheetUrl||'',otaCommission:S.otaCommission,overrides:S.overrides||{}};S=Object.assign(JSON.parse(JSON.stringify(DEF)),keep);try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+S.accountDefault=Object.assign({},DEF.accountDefault,S.accountDefault);S.targetRoas=Object.assign({},DEF.targetRoas,S.targetRoas);
+const saveS=()=>lsSet(LS,S);
+
+/* ============ model ============ */
+const VI={'Australia':'Úc','United States':'Mỹ','Vietnam':'Việt Nam','United Kingdom':'Anh','Germany':'Đức','France':'Pháp','Japan':'Nhật Bản','South Korea':'Hàn Quốc','Taiwan':'Đài Loan','Hong Kong':'Hồng Kông','China':'Trung Quốc','Thailand':'Thái Lan','India':'Ấn Độ','Netherlands':'Hà Lan','Italy':'Ý','Spain':'Tây Ban Nha','Switzerland':'Thuỵ Sĩ','Belgium':'Bỉ','Austria':'Áo','Denmark':'Đan Mạch','Sweden':'Thuỵ Điển','Norway':'Na Uy','Poland':'Ba Lan','United Arab Emirates':'UAE','Russia':'Nga','Cambodia':'Campuchia','Laos':'Lào','Myanmar (Burma)':'Myanmar','Saudi Arabia':'Ả Rập Xê Út','Finland':'Phần Lan','Portugal':'Bồ Đào Nha','Macao':'Ma Cao'};
+let M;
+function fromRaw(raw){
+  const camps=raw.camps.map(c=>({key:c[0],acc:String(c[1]),name:c[2],status:c[3],type:c[4]}));
+  const rows=raw.rows.map(r=>({s:r[0],e:r[1],c:r[2],cost:r[3],impr:r[4],clk:r[5],conv:r[6],val:r[9],bk:r[8],bval:r[9],chk:r[10]||0,is:r[11],lb:r[12],lr:r[13],gi:r[14]||0,gv:r[15]||0}));
+  const dims={};
+  for(const k in raw.dims)dims[k]=raw.dims[k].map(r=>{const o=r.slice();if(k==='kw')o[3]=raw.kw[r[3]];if(k==='asset')o[3]=raw.asset[r[3]];return o});
+  return {camps,rows,dims,geo:Object.assign({},raw.geo),lastDate:toIdx(raw.lastDate),accounts:Object.assign({},raw.accounts),monthlyAccs:new Set(raw.monthlyAccounts||[]),noDimAccs:new Set(['3965442048','6233882444']),recon:raw.recon||null,source:'snapshot',stamp:'Snapshot Google Ads ngày '+raw.generated.split('-').reverse().join('/')};
+}
+function classify(){
+  const rules=S.rules.split('\n').map(l=>l.split('=')).filter(p=>p.length>=2).map(p=>{let re=null;try{re=new RegExp(p.slice(1).join('=').trim(),'i')}catch(e){}return{h:p[0].trim(),re}}).filter(r=>r.re);
+  for(const c of M.camps){
+    if(S.overrides[c.key]){c.hotel=S.overrides[c.key];c.how='Gán tay';continue}
+    const hit=[...new Set(rules.filter(r=>r.re.test(c.name.toLowerCase())).map(r=>r.h))];
+    if(hit.length===1){c.hotel=hit[0];c.how='Theo tên'}else if(hit.length>1){c.hotel='Nhiều khách sạn';c.how='Tên chứa '+hit.join(', ')}else{c.hotel=S.accountDefault[c.acc]||'Chưa phân loại';c.how='Theo tài khoản'}
+  }
+}
+/* CSV */
+function parseCSV(text){const out=[];let row=[],f='',q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(f);f=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f=''}else f+=ch}if(f!==''||row.length){row.push(f);out.push(row)}return out.filter(r=>r.length>1)}
+const nn=v=>{if(v==null||v==='')return null;const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:null};
+function tableOf(text){const t=parseCSV(text.replace(/^﻿/,''));const h=t[0].map(x=>x.trim());return {h,rows:t.slice(1),ix:k=>h.indexOf(k)}}
+function kindOf(text){const h=text.replace(/^﻿/,'').slice(0,400).split(/\r?\n/)[0];if(/\bdim\b/.test(h)&&/k1/.test(h))return 'dims';if(/campaign_name/.test(h))return 'data';if(/canonical_name/.test(h))return 'geo';if(/^"?key"?,"?value/.test(h))return 'info';if(/^"?kind"?,"?date/.test(h))return 'recon';return null}
+function importTables(T){
+  if(!T.data)throw new Error('Thiếu bảng Data');
+  const d=tableOf(T.data);const need=['date','account_id','campaign_id','campaign_name','cost','impressions','clicks','conversions','conv_value'];
+  const miss=need.filter(k=>d.ix(k)<0);if(miss.length)throw new Error('Bảng Data thiếu cột: '+miss.join(', '));
+  const I={};d.h.forEach((k,i)=>I[k]=i);
+  const accs=new Set(),accNames={},cmap=new Map(),camps=[],rows=[];let last=-1e9;
+  for(const r of d.rows){const ds=r[I.date];if(!/^\d{4}-\d{2}-\d{2}/.test(ds))continue;
+    const acc=String(r[I.account_id]).replace(/-/g,'');accs.add(acc);if(I.account_name!=null)accNames[acc]=r[I.account_name];
+    const key=acc+':'+r[I.campaign_id];if(!cmap.has(key)){cmap.set(key,camps.length);camps.push({key,acc,name:r[I.campaign_name],status:r[I.campaign_status]||'',type:r[I.channel_type]||''})}
+    const i=toIdx(ds);last=Math.max(last,i);
+    rows.push({s:i,e:i,c:cmap.get(key),cost:nn(r[I.cost])||0,impr:nn(r[I.impressions])||0,clk:nn(r[I.clicks])||0,conv:nn(r[I.conversions])||0,val:(I.booking_value!=null?nn(r[I.booking_value]):nn(r[I.conv_value]))||0,bk:nn(r[I.bookings])||0,bval:nn(r[I.booking_value])||0,gi:nn(r[I.ga4_import])||0,gv:nn(r[I.ga4_import_value])||0,chk:nn(r[I.checkouts])||0,is:nn(r[I.search_is]),lb:nn(r[I.search_lost_is_budget]),lr:nn(r[I.search_lost_is_rank])})}
+  if(!rows.length)throw new Error('Bảng Data không có dòng hợp lệ');
+  const dims={geo:[],age:[],tloc:[],kw:[],asset:[]},dimAccs=new Set();
+  if(T.dims){const t=tableOf(T.dims);const J={};t.h.forEach((k,i)=>J[k]=i);
+    for(const r of t.rows){const kind=r[J.dim];if(!dims[kind])continue;const acc=String(r[J.account_id]).replace(/-/g,'');dimAccs.add(acc);
+      const key=acc+':'+r[J.campaign_id];let c=cmap.get(key);if(c==null){cmap.set(key,camps.length);c=camps.length;camps.push({key,acc,name:'(ID '+r[J.campaign_id]+')',status:'',type:''})}
+      let k=r[J.k1];if(kind==='geo'||kind==='tloc')k=+String(k).replace(/^[gt]/,'');else if(kind==='kw')k=r[J.k1]+'|'+r[J.k2];else if(kind==='asset')k=r[J.k1]+'|'+r[J.k2];
+      dims[kind].push([toIdx(r[J.start]),toIdx(r[J.end]),c,k,nn(r[J.cost])||0,nn(r[J.impressions])||0,nn(r[J.clicks])||0,nn(r[J.conversions])||0,nn(r[J.conv_value])||0])}}
+  const geo={};if(T.geo){const t=tableOf(T.geo);for(const r of t.rows){const n=r[t.ix('name')],ty=r[t.ix('target_type')];geo[r[t.ix('id')]]=[VI[n]||n,r[t.ix('country_code')],ty,r[t.ix('canonical_name')]]}}
+  let info={};if(T.info){const t=tableOf(T.info);t.rows.forEach(r=>info[r[0]]=r[1])}
+  return {accs,accNames,camps,rows,dims,dimAccs,geo,last,info};
+}
+function importRecon(text,base){
+  const t=tableOf(text);const I={};t.h.forEach((k,i)=>I[k]=i);['kind','date','hotel','bucket','campaign_id','in_ibe','n','value'].forEach(k=>{if(I[k]==null)throw new Error('thiếu cột '+k)});
+  const hotels=base?base.hotels.slice():['Bến Thành','Sakyo','Jolie','Mây','Yen','Sil','Min','The Myst'],buckets=base?base.buckets.slice():['Google Ads','Tìm kiếm tự nhiên','Trực tiếp','Tự giới thiệu (mất nguồn)','Trợ lý AI','Google Hotel Ads','Khác','Không có trong GA4'],hosts=base&&base.hosts?base.hosts.slice():['booking.silverlandhotels.com','reservation.travelanium.net','khác'];
+  const hix=n=>{let i=hotels.indexOf(n);if(i<0){hotels.push(n);i=hotels.length-1}return i};const bix=n=>{let i=buckets.indexOf(n);if(i<0){buckets.push(n);i=buckets.length-1}return i};
+  const out={hotels,buckets,hosts,ibe:[],gaonly:[],dda:[],host:[],through:''};
+  for(const r of t.rows){const k=r[I.kind];if(k==='info'){if(r[I.hotel]==='through')out.through=r[I.bucket];continue}
+    const d=toIdx(r[I.date]),h=hix(r[I.hotel]),cid=String(r[I.campaign_id]||''),n=nn(r[I.n])||0,v=nn(r[I.value])||0;
+    if(k==='ibe')out.ibe.push([d,h,bix(r[I.bucket]),cid,n,v]);else if(k==='gaonly')out.gaonly.push([d,h,bix(r[I.bucket]),cid,n,v]);
+    else if(k==='dda')out.dda.push([d,h,cid,+(r[I.in_ibe]||0),n,v]);else if(k==='host')out.host.push([d,h,Math.max(0,hosts.indexOf(r[I.bucket])),n])}
+  if(!out.ibe.length)throw new Error('không có dòng ibe');
+  const nb=buckets.indexOf('Không có trong GA4');if(nb>=0&&nb!==buckets.length-1)throw new Error('thứ tự nhóm nguồn sai');
+  if(!out.through)out.through=toStr(Math.max(...out.ibe.map(r=>r[0])));return out}
+// Phạm vi: bỏ TK Bến Thành và chiến dịch không phải Sakyo trong TK dùng chung 753-421-2327 (Sheet cũ có thể còn số này)
+function inScope(c){if(c.acc==='6453855576')return false;if(c.acc==='7534212327')return /sakyo|little tokyo/i.test(c.name);return true}
+function scope(m){const keep=[],re=new Map();m.camps.forEach((c,i)=>{if(inScope(c)){re.set(i,keep.length);keep.push(c)}});if(keep.length===m.camps.length)return m;
+  m.camps=keep;m.rows=m.rows.filter(r=>re.has(r.c)).map(r=>Object.assign({},r,{c:re.get(r.c)}));for(const k in m.dims)m.dims[k]=m.dims[k].filter(r=>re.has(r[2])).map(r=>{const o=r.slice();o[2]=re.get(r[2]);return o});
+  delete m.accounts['6453855576'];return m}
+function merge(base,imp){return scope(merge0(base,imp))}
+function merge0(base,imp){
+  const cut=imp.info&&imp.info.data_from?toIdx(imp.info.data_from):null;
+  if(cut==null){
+  const remap=new Map(),camps=[];base.camps.forEach((c,i)=>{if(!imp.accs.has(c.acc)){remap.set(i,camps.length);camps.push(c)}});
+  const off=camps.length;imp.camps.forEach(c=>camps.push(c));
+  const rows=base.rows.filter(r=>remap.has(r.c)).map(r=>Object.assign({},r,{c:remap.get(r.c)}));imp.rows.forEach(r=>rows.push(Object.assign({},r,{c:r.c+off})));
+  const dims={};for(const k in base.dims){dims[k]=base.dims[k].filter(r=>remap.has(r[2])).map(r=>{const o=r.slice();o[2]=remap.get(r[2]);return o});(imp.dims[k]||[]).forEach(r=>{const o=r.slice();o[2]+=off;dims[k].push(o)})}
+  const noDim=new Set([...base.noDimAccs].filter(a=>!imp.dimAccs.has(a)));
+  return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:imp.last,accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:new Set([...base.monthlyAccs].filter(a=>!imp.accs.has(a))),noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
+  }
+  // Sheet chi co so tu ngay cut: giu snapshot truoc cut, thay tu cut tro di
+  const camps=base.camps.map(c=>Object.assign({},c));const k2i=new Map(camps.map((c,i)=>[c.key,i]));
+  const n2i=new Map();camps.forEach((c,i)=>{if(/:ui-/.test(c.key))n2i.set(c.acc+'|'+c.name,i)});
+  const map=imp.camps.map(c=>{if(k2i.has(c.key)){const i=k2i.get(c.key);Object.assign(camps[i],{name:c.name,status:c.status||camps[i].status,type:c.type||camps[i].type});return i}
+    const ni=n2i.get(c.acc+'|'+c.name);if(ni!=null){Object.assign(camps[ni],{key:c.key,status:c.status||camps[ni].status,type:c.type||camps[ni].type});k2i.set(c.key,ni);return ni}
+    camps.push(Object.assign({},c));k2i.set(c.key,camps.length-1);return camps.length-1});
+  const MK=['cost','impr','clk','conv','val','bk','bval','chk','gi','gv'];
+  const rows=[];
+  for(const r of base.rows){const acc=camps[r.c].acc;if(!imp.accs.has(acc)||r.e<cut){rows.push(r);continue}if(r.s>=cut)continue;
+    const f=(cut-r.s)/(r.e-r.s+1),o=Object.assign({},r,{e:cut-1});MK.forEach(k=>{if(o[k]!=null)o[k]*=f});rows.push(o)}
+  imp.rows.forEach(r=>rows.push(Object.assign({},r,{c:map[r.c]})));
+  const dims={};
+  for(const k in base.dims){dims[k]=[];for(const r of base.dims[k]){const acc=camps[r[2]].acc;if(!imp.dimAccs.has(acc)||r[1]<cut){dims[k].push(r);continue}if(r[0]>=cut)continue;
+      const f=(cut-r[0])/(r[1]-r[0]+1),o=r.slice();o[1]=cut-1;for(let j=4;j<9;j++)o[j]*=f;dims[k].push(o)}
+    (imp.dims[k]||[]).forEach(r=>{const o=r.slice();o[2]=map[r[2]];dims[k].push(o)})}
+  const noDim=new Set([...base.noDimAccs].filter(a=>!imp.dimAccs.has(a)));
+  let bmin=Infinity;for(const r of base.rows)if(r.s<bmin)bmin=r.s;
+  const monthly=new Set([...base.monthlyAccs].filter(x=>!(imp.accs.has(x)&&cut<=bmin)));
+  return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:Math.max(base.lastDate,imp.last),accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:monthly,noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
+}
+function sheetId(u){const m=String(u).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null}
+// File mở từ máy (file://) bị chặn CORS khi fetch Google Sheet: đọc bằng thẻ script (gviz responseHandler), đổi về CSV cho bộ đọc sẵn có
+function jsonpTab(id,name){return new Promise((res,rej)=>{const cb='__gv'+Math.random().toString(36).slice(2),sc=document.createElement('script');
+  const done=()=>{clearTimeout(to);try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove()};const to=setTimeout(()=>{done();rej(new Error('Hết thời gian tải tab '+name))},90000);
+  window[cb]=o=>{done();if(!o||o.status==='error'){rej(new Error('Sheet báo lỗi khi đọc tab '+name+'. Kiểm tra quyền chia sẻ: Bất kỳ ai có link, Người xem'));return}
+    const t=o.table,q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',L=[t.cols.map(c=>q(c.label||'')).join(',')];
+    for(const r of t.rows)L.push(t.cols.map((c,i)=>{const x=r.c&&r.c[i];return q(x&&x.v!=null?x.v:'')}).join(','));res(L.join('\n'))};
+  sc.onerror=()=>{done();rej(new Error('Không tải được Sheet (kiểm tra mạng hoặc quyền chia sẻ)'))};
+  sc.src=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json;responseHandler:${cb}&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;document.head.appendChild(sc)})}
+async function fetchTab(id,name){if(location.protocol==='file:')return jsonpTab(id,name);try{return await fetchTab0(id,name)}catch(e){if(/chưa chia sẻ/.test(e.message))throw e;return jsonpTab(id,name)}}
+async function fetchTab0(id,name){const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(/<html/i.test(t.slice(0,300)))throw new Error('Sheet chưa chia sẻ cho người có link');return t}
+async function refresh(manual){
+  if(!S.sheetUrl){if(manual){openData();toast('Chưa có link Google Sheet. Làm theo 6 bước cài script để Refresh tự lấy data đến hôm qua.')}return}
+  const id=sheetId(S.sheetUrl);if(!id){toast('Link Sheet không hợp lệ',1);return}
+  document.body.classList.add('loading');$('#pRefresh').classList.add('spin');
+  try{
+    const want={Data:'data',Dims:'dims',GeoNames:'geo',Info:'info',Recon:'recon'};let err=null;
+    const [data,dims,geo,info,rc]=await Promise.all(Object.keys(want).map(n=>fetchTab(id,n).then(t=>kindOf(t)===want[n]?t:'').catch(e=>{err=e;return ''})));
+    if(!data&&!rc)throw (err||new Error('Sheet chưa có tab Data hoặc Recon'));
+    if(data){const imp=importTables({data,dims,geo,info});M=merge(fromRaw(RAW),imp);M.stamp='Google Sheet, script chạy '+(imp.info.run_at||'?')+(imp.info.data_through?', data đến '+imp.info.data_through.split('-').reverse().join('/'):'')}
+    else{M=scope(fromRaw(RAW));M.stamp+=', đối soát từ Google Sheet'}
+    if(rc){try{M.recon=importRecon(rc,M.recon)}catch(e){toast('Tab Recon lỗi: '+e.message,1)}}
+    classify();applyPreset(PRE);render(true);toast('Đã cập nhật. Data đến '+dmy(M.lastDate)+'.');
+  }catch(e){toast('Không tải được Sheet: '+e.message,1)}
+  finally{document.body.classList.remove('loading');$('#pRefresh').classList.remove('spin')}
+}
+function toast(msg,err){const t=document.createElement('div');t.className='toast'+(err?' err':'');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity .4s';t.style.opacity=0;setTimeout(()=>t.remove(),400)},err?6000:3500)}
+
+/* ============ state ============ */
+let HOTEL='ALL',SEC='overview',PRE='l30',FROM,TO,CMP='yoy',GRAN='week',TYPE='ALL',STATUS='ALL',CSEL=null;// CSEL: Set of camp keys or null=all
+const SECS=[['overview','Tổng quan','M3 12h4l3 8 4-16 3 8h4'],['real','Hiệu quả thực','M3 3v18h18M7 15l4-4 3 3 5-6'],['camp','Chiến dịch','M4 6h16M4 12h16M4 18h10'],['market','Thị trường','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20'],['age','Độ tuổi','M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'],['tloc','Vị trí target','M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'],['kw','Từ khoá','M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'],['asset','Headline & Description','M4 7V4h16v3M9 20h6M12 4v16'],['recon','Đối soát tracking','M9 11l3 3 8-8M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9']];
+
+/* ============ aggregation ============ */
+const E=()=>({cost:0,impr:0,clk:0,conv:0,val:0,bk:0,bval:0,chk:0,gi:0,gv:0,el:0,elB:0,elR:0,isImpr:0,pr:0});
+function add(a,r,f){a.cost+=r.cost*f;a.impr+=r.impr*f;a.clk+=r.clk*f;a.conv+=r.conv*f;a.val+=r.val*f;a.bk+=r.bk*f;a.bval+=r.bval*f;a.chk+=r.chk*f;a.gi+=(r.gi||0)*f;a.gv+=(r.gv||0)*f;
+  if(r.s===r.e){if(r.is>0){const el=r.impr/r.is;a.el+=el;a.elB+=el*(r.lb||0);a.elR+=el*(r.lr||0);a.isImpr+=r.impr}}else a.pr+=r.cost*f}
+function der(a){a.roas=div(a.val,a.cost);a.cos=div(a.cost,a.val);a.cpa=div(a.cost,a.conv);a.cpc=div(a.cost,a.clk);a.ctr=div(a.clk,a.impr);a.cvr=div(a.conv,a.clk);a.is=a.el?a.isImpr/a.el:null;a.lostB=a.el?a.elB/a.el:null;a.lostR=a.el?a.elR/a.el:null;return a}
+function campMask(hotel,useSel=true,raw=false){
+  return M.camps.map(c=>{
+    if(hotel&&hotel!=='ALL'&&c.hotel!==hotel)return false;
+    if(hotel==='ALL'&&!MAIN.includes(c.hotel))return false;
+    if(raw)return true;
+    if(TYPE!=='ALL'){if(TYPE==='OTHER'){if(['SEARCH','PERFORMANCE_MAX','DEMAND_GEN'].includes(c.type))return false}else if(c.type!==TYPE)return false}
+    if(STATUS==='ENABLED'&&c.status!=='ENABLED')return false;
+    if(useSel&&CSEL&&!CSEL.has(c.key))return false;
+    return true});
+}
+function bucketOf(d,g){if(g==='day')return d;const [y,m,,w]=ymd(d);return g==='week'?d-((w+6)%7):idxYMD(y,m,1)}
+function agg(mask,from,to,gran){
+  const tot=E(),byC=new Map(),byT=new Map(),ser=new Map(),srch=E();
+  for(const r of M.rows){if(!mask[r.c]||r.e<from||r.s>to)continue;
+    const len=r.e-r.s+1,lo=Math.max(r.s,from),hi=Math.min(r.e,to),f=(hi-lo+1)/len;add(tot,r,f);
+    if(!byC.has(r.c))byC.set(r.c,E());add(byC.get(r.c),r,f);
+    const c=M.camps[r.c],tk=c.type==='SEARCH'?'Search':c.type==='PERFORMANCE_MAX'?'PMax':c.type==='DEMAND_GEN'?'Demand Gen':'Khác';
+    if(!byT.has(tk))byT.set(tk,E());add(byT.get(tk),r,f);if(c.type==='SEARCH')add(srch,r,f);
+    if(gran){if(len===1){const b=bucketOf(r.s,gran);if(!ser.has(b))ser.set(b,E());add(ser.get(b),r,1)}else for(let d=lo;d<=hi;d++){const b=bucketOf(d,gran);if(!ser.has(b))ser.set(b,E());add(ser.get(b),r,1/len)}}}
+  der(tot);der(srch);byC.forEach(der);byT.forEach(der);ser.forEach(der);return {tot,byC,byT,ser,srch};
+}
+const DE=()=>({cost:0,impr:0,clk:0,conv:0,val:0,pr:0,camps:new Set()});
+function dagg(kind,mask,from,to,keyFn,gran){
+  const m=new Map(),ser=new Map();let partial=0;
+  for(const r of (M.dims[kind]||[])){if(!mask[r[2]]||r[1]<from||r[0]>to)continue;
+    const len=r[1]-r[0]+1,lo=Math.max(r[0],from),hi=Math.min(r[1],to),f=(hi-lo+1)/len;if(f<1)partial+=r[4]*f;
+    const k=keyFn?keyFn(r):r[3];let a=m.get(k);if(!a){a=DE();m.set(k,a)}
+    a.cost+=r[4]*f;a.impr+=r[5]*f;a.clk+=r[6]*f;a.conv+=r[7]*f;a.val+=r[8]*f;a.camps.add(r[2]);
+    if(gran){if(len===1){const b=bucketOf(r[0],gran);addS(ser,b,k,r,1)}else for(let d=lo;d<=hi;d++)addS(ser,bucketOf(d,gran),k,r,1/len)}}
+  m.forEach(der);return {m,ser,partial};
+}
+function addS(ser,b,k,r,f){let x=ser.get(b);if(!x){x=new Map();ser.set(b,x)}x.set(k,(x.get(k)||0)+r[4]*f)}
+function bucketsIn(from,to,g){const out=[],seen=new Set();for(let d=from;d<=to;d++){const b=bucketOf(d,g);if(!seen.has(b)){seen.add(b);out.push(b)}}return out}
+function cmpRange(){if(CMP==='none')return null;if(CMP==='prev'){const L=TO-FROM+1;return [FROM-L,TO-L]}const sh=i=>{const [y,m,d]=ymd(i);return (m===1&&d===29)?idxYMD(y-1,1,28):idxYMD(y-1,m,d)};return [sh(FROM),sh(TO)]}
+const cmpWord=()=>CMP==='yoy'?'so với cùng kỳ':'so với kỳ trước';
+let DSTART=0;
+const cmpOK=cr=>cr&&cr[0]>=DSTART;
+
+/* ============ presets ============ */
+const PRESETS=[['yday','Hôm qua'],['l7','7 ngày gần nhất'],['l14','14 ngày gần nhất'],['l30','30 ngày gần nhất'],['mtd','Tháng này'],['lm','Tháng trước'],['l90','90 ngày gần nhất'],['qtd','Quý này'],['ytd','Từ đầu năm'],['l365','12 tháng gần nhất']];
+function applyPreset(p){if(p!=='custom')PRE=p;const L=M.lastDate;const [y,m]=ymd(L);let f=L,t=L;
+  if(p==='l7')f=L-6;else if(p==='l14')f=L-13;else if(p==='l30')f=L-29;else if(p==='l90')f=L-89;else if(p==='l365')f=L-364;else if(p==='mtd')f=idxYMD(y,m,1);
+  else if(p==='lm'){f=idxYMD(y,m-1,1);t=idxYMD(y,m,1)-1}else if(p==='qtd')f=idxYMD(y,m-m%3,1);else if(p==='ytd')f=idxYMD(y,0,1);else if(p==='custom')return;
+  FROM=f;TO=t}
+
+/* ============ deltas ============ */
+function delta(cur,prev,dir){
+  if(!ok(prev)||!ok(cur))return '<span class="muted">không có kỳ so sánh</span>';
+  if(prev===0)return cur===0?'<span class="chip neu">không đổi</span>':'<span class="muted">kỳ so sánh bằng 0</span>';
+  const ch=cur/prev-1;if(Math.abs(ch)<0.005)return `<span class="chip neu">không đổi</span> ${cmpWord()}`;
+  const up=ch>0,cls=dir===0?'neu':((up?1:-1)*dir>0?'good':'bad');
+  let t=(up?'▲ tăng ':'▼ giảm ')+nf0.format(Math.abs(ch)*100)+'%';if(up&&ch>=1)t+=' (gấp '+nf1.format(ch+1)+' lần)';
+  return `<span class="chip ${cls}">${t}</span> <span class="muted">${cmpWord()}</span>`;
+}
+
+/* ============ charts ============ */
+const CH={};const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const PAL=()=>['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css);
+function chart(id,cfg){if(CH[id]){CH[id].destroy();delete CH[id]}const el=document.getElementById(id);if(!el||!window.Chart)return;cfg.options=cfg.options||{};const o=cfg.options;o.animation=false;
+  o.transitions={active:{animation:{duration:0}},resize:{animation:{duration:0}},show:{animations:{}},hide:{animations:{}}};
+  if(o.indexAxis==='y'){o.interaction={mode:'index',intersect:false,axis:'y'}}
+  o.hover=Object.assign({mode:o.interaction?o.interaction.mode:'nearest',intersect:o.interaction?o.interaction.intersect:true,axis:o.interaction&&o.interaction.axis?o.interaction.axis:undefined},o.hover||{});
+  o.plugins=o.plugins||{};const tp=o.plugins.tooltip=o.plugins.tooltip||{};
+  Object.assign(tp,{animation:false,position:'nearest',caretPadding:8,caretSize:5,cornerRadius:8,padding:10,displayColors:tp.displayColors??true,backgroundColor:'rgba(29,31,38,.94)',titleFont:{weight:'600',size:12},bodyFont:{size:12},boxPadding:4},Object.fromEntries(Object.entries(tp).filter(([k])=>k==='callbacks'||k==='mode'||k==='enabled')));
+  o.events=['mousemove','mouseout','click','touchstart','touchmove'];
+  CH[id]=new Chart(el,cfg)}
+function opts(yf,yt,extra){return Object.assign({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',padding:10,cornerRadius:8,titleFont:{weight:'600'},callbacks:{label:c=>' '+c.dataset.label+': '+yf(c.parsed.y)}}},
+  scales:{x:{grid:{display:false},ticks:{color:css('--ink-2'),maxRotation:0,autoSkip:true,maxTicksLimit:12,font:{size:11}}},y:{beginAtZero:true,grid:{color:'#eeeae3'},border:{display:false},title:{display:!!yt,text:yt,color:css('--ink-2'),font:{size:11}},ticks:{color:css('--ink-2'),font:{size:11},callback:v=>yf(v)}}}},extra||{})}
+function hl(lines,axis){return {id:'hl'+Math.random(),afterDatasetsDraw(ch){const {ctx,chartArea:a}=ch,sc=ch.scales[axis||'y'];lines.forEach(l=>{if(!ok(l.v))return;ctx.save();ctx.strokeStyle=l.c;ctx.setLineDash(l.dash||[]);ctx.lineWidth=1.5;ctx.beginPath();
+  if(axis==='x'){const px=sc.getPixelForValue(l.v);if(px<a.left||px>a.right){ctx.restore();return}ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke();ctx.fillStyle=l.c;ctx.font='11px "Be Vietnam Pro",Arial';ctx.fillText(l.t,px+4,a.top+10)}
+  else{const py=sc.getPixelForValue(l.v);if(py<a.top||py>a.bottom){ctx.restore();return}ctx.moveTo(a.left,py);ctx.lineTo(a.right,py);ctx.stroke();ctx.fillStyle=l.c;ctx.font='11px "Be Vietnam Pro",Arial';ctx.textAlign='right';ctx.fillText(l.t,a.right-4,py-4)}ctx.restore()})}}}
+const lab=(b,g)=>{if(g==='month'){const s=toStr(b);return 'T'+(+s.slice(5,7))+'/'+s.slice(2,4)}return dm(b)};
+function spark(id,vals,col){chart(id,{type:'line',data:{labels:vals.map((_,i)=>i),datasets:[{data:vals,borderColor:col,borderWidth:1.6,pointRadius:0,tension:.35,fill:true,backgroundColor:col+'22'}]},options:{responsive:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true}}}})}
+
+/* count-up */
+function countUp(root){if(reduced)return;root.querySelectorAll('[data-cu]').forEach(el=>{const v=+el.dataset.cu,fm=F[el.dataset.f];if(!ok(v))return;const t0=performance.now(),d=700;const step=t=>{const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=fm(v*e);if(p<1)requestAnimationFrame(step);else el.textContent=fm(v)};requestAnimationFrame(step)})}
+const cu=(v,f)=>`<span data-cu="${ok(v)?v:''}" data-f="${f}">${F[f](v)}</span>`;
+
+/* ============ generic table ============ */
+const TS={};
+function table(id,cols,rows,o={}){
+  const st=TS[id]||(TS[id]={k:o.sort||cols[3]?.k,dir:-1,q:'',lim:o.limit||60});
+  let rs=rows;if(st.q){const q=st.q.toLowerCase();rs=rs.filter(r=>(r._q||'').toLowerCase().includes(q))}
+  const col=cols.find(c=>c.k===st.k);if(col)rs=[...rs].sort((a,b)=>{const va=col.sv?col.sv(a):a[st.k],vb=col.sv?col.sv(b):b[st.k];const A=va==null?-Infinity:va,B=vb==null?-Infinity:vb;return (A>B?1:A<B?-1:0)*st.dir});
+  const shown=rs.slice(0,st.lim);
+  const head=cols.map(c=>`<th class="${c.l?'l':''}" data-k="${c.k}" title="${esc(c.tip||'')}">${c.t}${st.k===c.k?(st.dir>0?' ▲':' ▼'):''}</th>`).join('');
+  const body=shown.map(r=>`<tr>${cols.map(c=>`<td class="${c.cls||(c.l?'l':'num')}">${c.f?c.f(r[c.k],r):esc(r[c.k])}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="empty">Không có dữ liệu trong kỳ và bộ lọc hiện tại</td></tr>`;
+  const ft=o.foot||(o.total!==false?autoFoot(cols,rs,st.q):null);
+  const foot=ft?`<tfoot><tr>${cols.map(c=>`<td class="${c.l?'l':'num'}">${ft[c.k]??''}</td>`).join('')}</tr></tfoot>`:'';
+  return `<div class="tt">${o.search!==false?`<input type="search" data-tq="${id}" placeholder="Tìm ${o.what||''}" value="${esc(st.q)}">`:''}<span class="muted small">${rs.length} dòng${rs.length>st.lim?`, đang hiện ${st.lim}`:''}</span><span class="sp"></span>${rs.length>st.lim?`<button class="btn" data-tmore="${id}">Xem thêm</button>`:''}<button class="btn" data-tcsv="${id}">Tải CSV</button></div>
+   <div class="tw"><table data-tid="${id}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${foot}</table></div>`;
+}
+const TBL={};// id -> {cols,rows}
+// Dòng tổng tự tính cho bảng có cột Cost: cộng các dòng đang lọc (theo ô tìm), chỉ số tỷ lệ tính lại từ tổng
+function autoFoot(cols,rs,q){
+  if(!cols.some(c=>c.k==='cost')||!rs.length)return null;
+  const S0=k=>rs.reduce((s,r)=>s+(ok(r[k])?r[k]:0),0);
+  const t={cost:S0('cost'),impr:S0('impr'),clk:S0('clk'),conv:S0('conv'),val:S0('val'),share:S0('share'),dshare:S0('dshare'),bk:S0('bk'),chk:S0('chk')};
+  t.ctr=div(t.clk,t.impr);t.cpc=div(t.cost,t.clk);t.cvr=div(t.conv,t.clk);t.cpa=div(t.cost,t.conv);t.roas=div(t.val,t.cost);t.cos=div(t.cost,t.val);
+  const fmt={cost:F.tr,share:F.pct,impr:F.int,clk:F.int,ctr:F.pct,cpc:F.k,conv:F.cv,cvr:F.pct,cpa:F.tr,val:F.tr,roas:F.x,cos:F.pct,bk:F.cv,chk:F.int,dshare:v=>(v>0?'+':'')+nf1.format(v*100)+' pp'};
+  const o={};cols.forEach(c=>{if(fmt[c.k])o[c.k]='<b>'+fmt[c.k](t[c.k])+'</b>'});
+  o[cols[0].k]=`<b>Tổng${q?' (theo ô tìm)':''}</b> <span class="muted small">${F.int(rs.length)} dòng</span>`;
+  return o;
+}
+function bindTables(){
+  $$('table[data-tid] th').forEach(th=>th.onclick=()=>{const id=th.closest('table').dataset.tid,k=th.dataset.k,st=TS[id];st.dir=st.k===k?-st.dir:-1;st.k=k;renderMain(false)});
+  $$('[data-tq]').forEach(i=>{i.oninput=()=>{TS[i.dataset.tq].q=i.value;clearTimeout(i._t);i._t=setTimeout(()=>{const pos=i.selectionStart;renderMain(false);const n=document.querySelector(`[data-tq="${i.dataset.tq}"]`);if(n){n.focus();n.setSelectionRange(pos,pos)}},250)}});
+  $$('[data-tmore]').forEach(b=>b.onclick=()=>{TS[b.dataset.tmore].lim+=200;renderMain(false)});
+  $$('[data-tcsv]').forEach(b=>b.onclick=()=>{const t=TBL[b.dataset.tcsv];if(!t)return;const lines=[t.cols.map(c=>c.t).join(',')].concat(t.rows.map(r=>t.cols.map(c=>{const v=r[c.k];return typeof v==='number'?Math.round(v*1000)/1000:'"'+String(v??'').replace(/"/g,'""')+'"'}).join(',')));
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\n')],{type:'text/csv'}));a.download=b.dataset.tcsv+'_'+toStr(FROM)+'_'+toStr(TO)+'.csv';a.click()})}
+const T=(id,cols,rows,o)=>{TBL[id]={cols,rows};return table(id,cols,rows,o)};
+const cosCell=v=>{if(!ok(v))return '-';const lim=S.otaCommission;return `<span class="cos ${v>lim?'over':''}"><span class="mb"><span style="width:${Math.min(100,v/(lim*2)*100)}%"></span></span>${F.pct(v)}</span>`};
+const MC=(k,t,f,o)=>Object.assign({k,t,f},o||{});
+// Thứ tự: chi tiêu, kết quả, hiệu quả, rồi phễu (nhấp, hiển thị). Tên chỉ số theo thuật ngữ Google Ads, giải thích ở tooltip.
+const COL_COST=()=>[MC('cost','Cost',F.tr,{tip:'Chi phí'}),MC('share','% Cost',F.pct,{tip:'Tỷ trọng chi phí trong kỳ'})];
+const COL_RESULT=()=>[MC('val','Conv. value',F.tr,{tip:'Doanh thu book date theo tag Google Ads (giá trị chuyển đổi)'}),MC('roas','ROAS',v=>`<b>${F.x(v)}</b>`,{tip:'Conv. value / Cost'}),MC('cos','CIR',cosCell,{cls:'num',tip:'CIR = Cost / Conv. value (chi phí quảng cáo / doanh thu book date), bằng 1 / ROAS. Xanh: thấp hơn hoa hồng OTA'})];
+const COL_CONV=()=>[MC('conv','Conv.',F.cv,{tip:'Lượt chuyển đổi'}),MC('cpa','CPA',F.tr,{tip:'Cost / Conv.'}),MC('cvr','CVR',F.pct,{tip:'Conv. / Clicks'})];
+const COL_FUNNEL=()=>[MC('clk','Clicks',F.int,{tip:'Lượt nhấp'}),MC('cpc','CPC',F.k,{tip:'Cost / Clicks'}),MC('ctr','CTR',F.pct,{tip:'Clicks / Impr.'}),MC('impr','Impr.',F.int,{tip:'Lượt hiển thị'})];
+const METRIC_COLS=()=>[...COL_COST(),...COL_RESULT(),...COL_CONV(),...COL_FUNNEL()];
+
+/* ============ render ============ */
+function render(anim=true){renderNav();renderTop();renderMain(anim)}
+function renderNav(){
+  const counts={};
+  $('#navHotel').innerHTML=[['ALL','Tất cả (so sánh 2 KS)']].concat(MAIN.map(h=>[h,h])).concat(HOTELS.filter(h=>!MAIN.includes(h)&&!HIDDEN.includes(h)).map(h=>[h,h])).map(([k,t],i)=>`${i===MAIN.length+1?'<li class="nh" style="padding-left:10px">Khác</li>':''}<li><button data-h="${k}" class="${HOTEL===k?'on':''}"><span class="dot"></span>${t}</button></li>`).join('');
+  $('#navSec').innerHTML=SECS.map(([k,t,p])=>`<li><button data-s="${k}" class="${SEC===k?'on':''}" ${HOTEL==='ALL'&&!['overview','market','recon','real'].includes(k)?'title="Chọn một khách sạn để xem"':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>${t}</button></li>`).join('');
+  $$('#navHotel [data-h]').forEach(b=>b.onclick=()=>{HOTEL=b.dataset.h;CSEL=null;VIEW.mktSel=null;Object.keys(TS).forEach(k=>delete TS[k]);render()});
+  $$('#navSec [data-s]').forEach(b=>b.onclick=()=>{SEC=b.dataset.s;render();window.scrollTo({top:0,behavior:reduced?'auto':'smooth'})});
+}
+function renderTop(){
+  const cr=cmpRange();
+  $('#title').innerHTML=`${HOTEL==='ALL'?'Tất cả khách sạn':HOTEL} <span class="crumb">/ ${SECS.find(s=>s[0]===SEC)[1]}</span>`;
+  $('#pDateTxt').innerHTML=`<b>${dmy(FROM)} đến ${dmy(TO)}</b>${cr?' <span class="muted">| '+(CMP==='yoy'?'so với cùng kỳ':'so với kỳ trước')+'</span>':''}`;
+  const n=CSEL?CSEL.size:0;$('#pCampTxt').textContent=CSEL?`${n} chiến dịch đã chọn`:(TYPE!=='ALL'||STATUS!=='ALL'?'Đang lọc loại/trạng thái':'Tất cả chiến dịch');
+  $('#sub').innerHTML=`Data đến <b>${dmy(M.lastDate)}</b> | ${esc(M.stamp)}${cr&&cmpOK(cr)?` | Kỳ so sánh: ${dmy(cr[0])} đến ${dmy(cr[1])}`:''}`;
+}
+function renderMain(anim){
+  const el=$('#main');Object.keys(TBL).forEach(k=>delete TBL[k]);
+  let html='';
+  if(HOTEL==='ALL'){html=SEC==='market'?secMarketAll():SEC==='overview'?secAll():SEC==='recon'?secReconAll():SEC==='real'?secRealAll():`<div class="card anim empty">Phần này phân tích riêng từng khách sạn. Chọn Sakyo hoặc The Myst ở cột trái.<div class="cta" style="justify-content:center">${MAIN.map(h=>`<button class="btn dark" data-goh="${h}">${h}</button>`).join('')}</div></div>`}
+  else html=({overview:secOverview,camp:secCamp,market:secMarket,age:secAge,tloc:secTloc,kw:secKw,asset:secAsset,recon:secRecon,real:secReal}[SEC])();
+  el.innerHTML=html;
+  if(!anim)el.querySelectorAll('.anim').forEach(x=>x.style.animation='none');
+  $$('[data-goh]').forEach(b=>b.onclick=e=>{e.preventDefault();HOTEL=b.dataset.goh;if(b.dataset.sec)SEC=b.dataset.sec;CSEL=null;render();window.scrollTo(0,0)});
+  $$('[data-gos]').forEach(b=>b.onclick=()=>{SEC=b.dataset.gos;render()});
+  bindTables();(POST.splice(0)).forEach(f=>f());if(anim)countUp(el);
+  $$('[data-seg]').forEach(b=>b.onclick=()=>{VIEW[b.dataset.seg]=b.dataset.v;renderMain(false)});
+  $$('[data-mkt]').forEach(b=>b.onclick=()=>{const k=b.dataset.mkt;VIEW.mktSel=(k==='__close'||String(VIEW.mktSel)===k)?null:k;renderMain(false);if(VIEW.mktSel!=null){const d=$('#mktDet');d&&d.scrollIntoView({behavior:'smooth',block:'start'})}});
+}
+const POST=[];const VIEW={asset:'RSA',assetF:'ALL',mkt:'cost',tl:'all',mktSel:null};
+let IX=0;const A=()=>`anim" style="--i:${IX++}`;
+
+/* ---------- helper: notes ---------- */
+function notes(a,mask,dimKind){
+  const out=[];const cr=cmpRange();
+  if(cr&&!cmpOK(cr))out.push(`Kỳ so sánh bắt đầu ${dmy(cr[0])}, trước ngày đầu có data (${dmy(DSTART)}), nên không hiện mức tăng giảm.`);
+  if(a&&a.pr>0)out.push(`${F.tr(a.pr)} chi phí trong kỳ đến từ tài khoản ${HOTEL==='The Myst'?'The Myst 623-388-2444':'Sakyo 396-544-2048'} trong snapshot, chỉ có số theo tháng, đã chia đều theo ngày (Ước tính). Bấm Refresh sau khi cài script để có số theo ngày.`);
+  if(dimKind){const miss=[...new Set(M.camps.filter((c,i)=>mask[i]&&M.noDimAccs.has(c.acc)).map(c=>c.acc))];if(miss.length)out.push(`Tài khoản ${miss.map(a=>a==='6233882444'?'The Myst 623-388-2444':'Sakyo 396-544-2048').join(', ')} chưa có số chi tiết (thị trường, độ tuổi, vị trí target, từ khoá, headline) trong snapshot. Có sau khi cài script và bấm Refresh.`)}
+  if(HOTEL==='Sakyo'&&SEC==='overview')out.push('Sakyo gồm tài khoản riêng 396-544-2048 và các chiến dịch có chữ "Sakyo" trong tài khoản 753-421-2327, 645-385-5576.');
+  if(HOTEL==='The Myst'&&SEC==='overview')out.push(M.monthlyAccs.has('6233882444')?'The Myst là tài khoản 623-388-2444. Snapshot lấy qua giao diện Google Ads theo tháng. Lượt chuyển đổi của tài khoản này bằng số Mua hàng trên giao diện. Có số theo ngày và chi tiết sau khi script runAds chạy và bấm Refresh.':'The Myst là tài khoản 623-388-2444, số lấy qua Google Ads API. Booking và doanh thu book date là các chuyển đổi chính loại Mua hàng của tài khoản này.');
+  if(HOTEL==='Jolie'&&SEC==='overview')out.push('Jolie là các chiến dịch có chữ "Jolie" trong tài khoản 753-421-2327 (dùng chung với Sakyo, Yen, Sil).');
+  return out.map(n=>`<p class="note ${A()}">${n}</p>`).join('');
+}
+
+/* ---------- ALL hotels ---------- */
+function secAll(){
+  IX=0;const cr=cmpRange(),cOK=cmpOK(cr);
+  const cards=MAIN.map((h,i)=>{const mk=campMask(h);const a=agg(mk,FROM,TO,'day').tot,c=cOK?agg(mk,cr[0],cr[1]).tot:null;const tr=S.targetRoas[h];
+    const ser=agg(mk,FROM,TO,'day').ser;const bs=bucketsIn(FROM,TO,'day');POST.push(()=>{chart('hs'+i,{type:'bar',data:{labels:bs.map(dm),datasets:[{label:'Cost',data:bs.map(b=>(ser.get(b)||{}).cost||0),backgroundColor:css('--s1'),borderRadius:3,maxBarThickness:12}]},options:opts(F.tr,'',{scales:{x:{display:false},y:{display:false,beginAtZero:true}}})})});
+    return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}">Chi tiết</button></h3>
+      <div class="small muted">Conv. value (doanh thu book date, tag Google Ads)</div><div class="big num">${cu(a.val,'tr')}</div><div class="small">${delta(a.val,c&&c.val,1)}</div>
+      <dl class="num"><dt>Cost</dt><dd>${F.tr(a.cost)}<br><span class="small">${delta(a.cost,c&&c.cost,0)}</span></dd>
+      <dt>ROAS</dt><dd><b>${F.x(a.roas)}</b>${tr?` <span class="muted small">đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}</span>`:''}<br><span class="small">${delta(a.roas,c&&c.roas,1)}</span></dd>
+      <dt>CIR</dt><dd>${cosCell(a.cos)}</dd>
+      <dt>Conv.</dt><dd>${F.cv(a.conv)} <span class="muted small">(Bookings ${F.cv(a.bk)})</span><br><span class="small">${delta(a.conv,c&&c.conv,1)}</span></dd>
+      <dt>CPA</dt><dd>${F.tr(a.cpa)}</dd></dl>
+      <div class="pace" style="margin-top:12px">${paceInner(h)}</div>
+      <div class="chartbox" style="height:90px;margin-top:6px"><canvas id="hs${i}"></canvas></div><div class="small muted">Cost theo ngày trong kỳ</div>
+      ${a.pr>0?`<div class="small" style="color:var(--warn)">Có ${F.tr(a.pr)} chi phí trong snapshot lấy theo tháng qua giao diện, chia đều theo ngày (Ước tính). Có số theo ngày sau khi script runAds chạy.</div>`:''}</div>`}).join('');
+  const rows=HOTELS.filter(h=>!MAIN.includes(h)).map(h=>{const x=agg(campMask(h),FROM,TO).tot;return Object.assign({name:h,_q:h},x)}).filter(x=>x.cost>0);
+  return `<p class="note info ${A()}">Mỗi khách sạn hiển thị số riêng, không cộng gộp. Chiến dịch gán khách sạn theo tên, tên không có khách sạn thì theo tài khoản. Sửa trong Cài đặt.</p>
+   <div class="hotelcards">${cards}</div>
+   <h2 class="sec">Khách sạn khác và chiến dịch chưa gán <small>trong các tài khoản</small></h2>
+   <div class="${A()}">${T('others',[MC('name','Nhóm',v=>HIDDEN.includes(v)?`${esc(v)} <span class="muted small">(gán lại trong Cài đặt)</span>`:`<a href="#" data-goh="${esc(v)}">${esc(v)}</a>`,{l:1}),...METRIC_COLS().filter(c=>c.k!=='share')],rows,{search:false,sort:'cost'})}</div>`;
+}
+function paceInner(h){
+  const [y,m,d]=ymd(M.lastDate),f=idxYMD(y,m,1),dim=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+  const a=agg(campMask(h,false,true),f,M.lastDate).tot;const k=y+'-'+String(m+1).padStart(2,'0'),b=(S.budgets[k]||{})[h];const est=a.cost/d*dim;
+  if(!b)return `<div class="small"><b>Ngân sách T${m+1}/${y}</b>: đã chi ${F.tr(a.cost)}, ước tính cuối tháng ${F.tr(est)}. Chưa nhập ngân sách (Cài đặt).</div>`;
+  return `<div class="small"><b>Ngân sách T${m+1}/${y}</b>: đã chi ${F.tr(a.cost)} / ${F.tr(b)} (${F.pct0(a.cost/b)}), thời gian đã qua ${F.pct0(d/dim)}</div>
+    <div class="bar" title="Vạch đen: tỷ lệ thời gian đã qua"><span style="width:${Math.min(100,a.cost/b*100)}%"></span><em style="left:${d/dim*100}%"></em></div>
+    <div class="small muted">Ước tính cuối tháng ${F.tr(est)}, bằng ${F.pct0(est/b)} ngân sách (Ước tính = chi trung bình ngày × ${dim} ngày)</div>`;
+}
+
+/* ---------- Overview (hotel) ---------- */
+function signals(a,p,hot,h){
+  const out=[],be=1/S.otaCommission,tr=S.targetRoas[h];if(a.cost<300000)return out;
+  if(a.conv<0.5&&hot.cpa&&a.cost>=2*hot.cpa)out.push(['b',`Chi ${F.tr(a.cost)}, 0 chuyển đổi, bằng ${nf1.format(a.cost/hot.cpa)} lần CPA trung bình (${F.tr(hot.cpa)})`]);
+  else if(a.conv>=1&&ok(a.roas)&&a.roas<be)out.push(['b',`CIR ${F.pct(a.cos)}, cao hơn hoa hồng OTA ${F.pct0(S.otaCommission)}`]);
+  if(ok(a.lostB)&&a.lostB>=0.2&&ok(a.roas)&&a.roas>=(tr||be*2))out.push(['g',`Mất ${F.pct0(a.lostB)} IS do ngân sách, ROAS ${F.x(a.roas)}: xem xét tăng ngân sách`]);
+  if(ok(a.lostR)&&a.lostR>=0.4&&a.impr>=200)out.push(['w',`Mất ${F.pct0(a.lostR)} IS do rank: kiểm tra giá thầu, asset, landing page`]);
+  if(p&&p.roas&&ok(a.roas)&&a.conv>=3&&p.conv>=3){const ch=a.roas/p.roas-1;if(ch<=-0.3)out.push(['w',`ROAS giảm ${nf0.format(-ch*100)}% ${cmpWord()} (${F.x(p.roas)} xuống ${F.x(a.roas)})`])}
+  if(a.conv<0.5&&a.chk>=3)out.push(['w',`${F.int(a.chk)} lượt bắt đầu thanh toán, 0 chuyển đổi`]);
+  return out;
+}
+function secOverview(){
+  IX=0;const h=HOTEL,mk=campMask(h),cr=cmpRange(),cOK=cmpOK(cr);
+  const X=agg(mk,FROM,TO,GRAN),a=X.tot,C=cOK?agg(mk,cr[0],cr[1],GRAN):null,c=C?C.tot:null;const tr=S.targetRoas[h],be=1/S.otaCommission;
+  const bs=bucketsIn(FROM,TO,GRAN),cbs=cOK?bucketsIn(cr[0],cr[1],GRAN):[];
+  const sv=(Z,list,k)=>list.map(b=>{const x=Z.ser.get(b);return x?x[k]:0});
+  const rv=(Z,list)=>list.map(b=>{const x=Z.ser.get(b);return x&&x.cost>0?x.val/x.cost:null});
+  // insights
+  const ins=[];
+  if(c)ins.push(['', `Chi phí ${F.tr(a.cost)}, ${delta(a.cost,c.cost,0).replace(/<[^>]+>/g,'')}. Doanh thu book date ${F.tr(a.val)}, ${delta(a.val,c.val,1).replace(/<[^>]+>/g,'')}.`]);
+  else ins.push(['',`Chi phí ${F.tr(a.cost)}, doanh thu book date ${F.tr(a.val)}, ROAS ${F.x(a.roas)}.`]);
+  ins.push([ok(a.cos)&&a.cos<=S.otaCommission?'g':'b',`CIR ${F.pct(a.cos)} so với hoa hồng OTA ${F.pct0(S.otaCommission)}${tr?`. ROAS ${F.x(a.roas)} đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}`:''}.`]);
+  const g=dagg('geo',mk,FROM,TO);const gl=[...g.m.entries()].map(([k,v])=>({k,...v})).sort((x,y)=>y.cost-x.cost);const gt=gl.reduce((s,x)=>s+x.cost,0);
+  if(gl.length&&gt>0){const t=gl[0];ins.push(['',`Thị trường (User location) chi nhiều nhất: ${geoName(t.k)} ${F.pct0(t.cost/gt)} chi phí, chi phí / doanh thu book date ${F.pct(t.cos)}.`]);
+    const worst=gl.filter(x=>x.cost/gt>=0.05&&ok(x.cos)).sort((x,y)=>y.cos-x.cos)[0]||gl.find(x=>x.cost/gt>=0.05&&x.val===0);
+    if(worst)ins.push(['w',`Thị trường hiệu quả thấp nhất trong nhóm chiếm từ 5% chi phí: ${geoName(worst.k)} (${F.pct0(worst.cost/gt)} chi phí, chi phí / doanh thu book date ${ok(worst.cos)?F.pct(worst.cos):'không có doanh thu book date'}).`])}
+  const cl=[...X.byC.entries()].map(([i,v])=>({i,...v})).filter(x=>x.cost>=a.cost*0.05);
+  if(cl.length>1){const best=[...cl].sort((x,y)=>(y.roas||0)-(x.roas||0))[0],worst=[...cl].sort((x,y)=>(x.roas||0)-(y.roas||0))[0];
+    ins.push(['g',`ROAS cao nhất (chiến dịch chiếm từ 5% chi phí): ${esc(M.camps[best.i].name)}, ROAS ${F.x(best.roas)}, ${F.pct0(best.cost/a.cost)} chi phí.`]);
+    ins.push(['b',`ROAS thấp nhất: ${esc(M.camps[worst.i].name)}, ROAS ${F.x(worst.roas)}, ${F.pct0(worst.cost/a.cost)} chi phí.`])}
+  const kp=(lb,v,f,d,cls,ex,sid)=>`<div class="card kpi ${cls||''} ${A()}"><div class="lb"><span>${lb}</span></div><div class="v num">${cu(v,f)}</div><div class="d">${d}${ex?'<br>'+ex:''}</div>${sid?`<canvas id="${sid}" width="90" height="30"></canvas>`:''}</div>`;
+  POST.push(()=>{const sb=bucketsIn(FROM,TO,'day'),sd=agg(mk,FROM,TO,'day').ser;spark('spV',sb.map(b=>(sd.get(b)||{}).val||0),css('--s3'));spark('spC',sb.map(b=>(sd.get(b)||{}).cost||0),css('--s1'));spark('spN',sb.map(b=>(sd.get(b)||{}).conv||0),css('--s7'))});
+  POST.push(()=>{
+    const labels=bs.map(b=>lab(b,GRAN));const cd=k=>{const v=sv(C,cbs,k);return bs.map((_,i)=>v[i]??null)};
+    const bl=(id,k,col,yl)=>chart(id,{type:'bar',data:{labels,datasets:[{label:'Kỳ này',data:sv(X,bs,k),backgroundColor:col,borderRadius:4,maxBarThickness:30,order:2},...(C?[{type:'line',label:'Kỳ so sánh',data:cd(k),borderColor:css('--ink-3'),borderDash:[5,4],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.3,order:1,spanGaps:true}]:[])]},options:opts(F.tr,yl)});
+    bl('cCost','cost',css('--s1'),'Cost (triệu đồng)');bl('cVal','val',css('--s3'),'Conv. value (triệu đồng)');
+    const rc=C?(()=>{const v=rv(C,cbs);return bs.map((_,i)=>v[i]??null)})():[];
+    chart('cRoas',{type:'line',data:{labels,datasets:[{label:'ROAS kỳ này',data:rv(X,bs),borderColor:css('--s2'),backgroundColor:css('--s2'),borderWidth:2.2,pointRadius:GRAN==='day'?0:3,pointHoverRadius:5,tension:.3,spanGaps:true},...(C?[{label:'ROAS kỳ so sánh',data:rc,borderColor:css('--ink-3'),borderDash:[5,4],borderWidth:2,pointRadius:0,tension:.3,spanGaps:true}]:[])]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]},{v:tr,c:css('--good'),t:tr?'Target '+F.x(tr):''}])]});
+    const ty=[...X.byT.entries()].sort((x,y)=>y[1].cost-x[1].cost);const P=PAL();
+    chart('cType',{type:'doughnut',data:{labels:ty.map(t=>t[0]),datasets:[{data:ty.map(t=>t[1].cost),backgroundColor:ty.map((_,i)=>P[i]),borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>` ${x.label}: ${F.tr(x.parsed)} (${F.pct0(x.parsed/a.cost)})`}}}}});
+  });
+  const ty=[...X.byT.entries()].sort((x,y)=>y[1].cost-x[1].cost);const P=['--s1','--s2','--s3','--s4'];
+  return notes(a,mk)+`
+   <div class="kpis">
+     ${kp('Cost',a.cost,'tr',delta(a.cost,c&&c.cost,0),'hero','','spC')}
+     ${kp('Conv. value <span class="muted">(doanh thu book date)</span>',a.val,'tr',delta(a.val,c&&c.val,1),'hero','','spV')}
+     ${kp('ROAS',a.roas,'x',delta(a.roas,c&&c.roas,1),'hero',tr?`đạt ${F.pct0(a.roas/tr)} Target ${F.x(tr)}, hoà vốn ${F.x(be)}`:`hoà vốn ${F.x(be)}`)}
+     ${kp('CIR',a.cos,'pct',delta(a.cos,c&&c.cos,-1),'hero',`hoa hồng OTA ${F.pct0(S.otaCommission)}`)}
+   </div>
+   <div class="kpis2">
+     ${kp('Conv.',a.conv,'cv',delta(a.conv,c&&c.conv,1),'',`Bookings ${F.cv(a.bk)}`,'spN')}
+     ${kp('CPA',a.cpa,'tr',delta(a.cpa,c&&c.cpa,-1))}
+     ${kp('CVR',a.cvr,'pct',delta(a.cvr,c&&c.cvr,1))}
+     ${kp('Clicks',a.clk,'int',delta(a.clk,c&&c.clk,1))}
+     ${kp('CPC',a.cpc,'k',delta(a.cpc,c&&c.cpc,-1))}
+     ${kp('CTR',a.ctr,'pct',delta(a.ctr,c&&c.ctr,1))}
+   </div>
+   <div class="grid g21" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Điểm chính</h3><p class="q">Tự động tạo từ số liệu kỳ đang chọn. Nhãn màu là tín hiệu theo quy tắc (Suy luận).</p><ul class="ins">${ins.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Tốt':x[0]==='b'?'Cần xem':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
+     <div class="card ${A()} pace"><h3>Ngân sách tháng</h3><p class="q">Không phụ thuộc bộ lọc chiến dịch.</p>${paceInner(h)}
+       <div style="margin-top:14px"><b class="small">IS Search</b> <span class="small muted">(chỉ chiến dịch Search, gia quyền theo hiển thị, Ước tính)</span>
+       <div class="small num" style="margin-top:4px">${X.srch.is!=null?`Hiển thị ${F.pct0(X.srch.is)}, mất do ngân sách ${F.pct0(X.srch.lostB)}, mất do rank ${F.pct0(X.srch.lostR)}`:(X.srch.cost>0?'Chưa có số IS (tài khoản đang lấy số theo tháng qua giao diện, có sau khi cài script)':'Không có chiến dịch Search trong kỳ')}</div></div></div>
+   </div>
+   <h2 class="sec">Xu hướng <small>${GRAN==='day'?'theo ngày':GRAN==='week'?'theo tuần (từ thứ Hai)':'theo tháng'}${a.pr>0&&GRAN!=='month'?`. ${F.pct0(a.pr/a.cost)} chi phí là số theo tháng chia đều theo ngày (Ước tính), nên xem theo Tháng`:''}</small>
+     <span class="seg" style="margin-left:auto">${[['day','Ngày'],['week','Tuần'],['month','Tháng']].map(([k,t])=>`<button class="${GRAN===k?'on':''}" onclick="GRAN='${k}';renderMain(false)">${t}</button>`).join('')}</span></h2>
+   <div class="grid g2">
+     <div class="card ${A()}"><h3>Cost</h3><p class="q">Chi phí đi theo hướng nào so với kỳ so sánh?</p><div class="legend"><span><i style="background:var(--s1)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cCost"></canvas></div></div>
+     <div class="card ${A()}"><h3>Conv. value (doanh thu book date)</h3><p class="q">Giá trị chuyển đổi theo ngày click quảng cáo.</p><div class="legend"><span><i style="background:var(--s3)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}</div><div class="chartbox"><canvas id="cVal"></canvas></div></div>
+     <div class="card ${A()}"><h3>ROAS</h3><p class="q">Có giữ trên mức hoà vốn${tr?' và Target':''} không?</p><div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Kỳ này</span>${C?'<span><i class="dash"></i>Kỳ so sánh</span>':''}<span><i class="ln" style="background:var(--bad)"></i>Hoà vốn ${F.x(be)}</span>${tr?`<span><i class="ln" style="background:var(--good)"></i>Target ${F.x(tr)}</span>`:''}</div><div class="chartbox"><canvas id="cRoas"></canvas></div></div>
+     <div class="card ${A()}"><h3>Cost theo loại chiến dịch</h3><p class="q">Tiền đang chia cho Search, PMax, Demand Gen thế nào?</p>
+       <div class="grid g2" style="align-items:center"><div class="chartbox sm"><canvas id="cType"></canvas></div>
+       <div class="small num">${ty.map(([k,x],i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)"><i style="width:10px;height:10px;border-radius:3px;background:var(${P[i]||'--other'});margin-top:4px"></i><b style="min-width:80px">${k}</b><span>${F.pct0(x.cost/a.cost)} chi phí<br><span class="muted">ROAS ${F.x(x.roas)}, CIR ${F.pct(x.cos)}</span></span></div>`).join('')}</div></div></div>
+   </div>
+   <div class="cta"><button class="btn" data-gos="camp">Xem từng chiến dịch</button><button class="btn" data-gos="market">Xem theo thị trường</button></div>`;
+}
+
+/* ---------- Campaigns ---------- */
+function secCamp(){
+  IX=0;const h=HOTEL,mk=campMask(h),cr=cmpRange(),cOK=cmpOK(cr);const X=agg(mk,FROM,TO),a=X.tot,C=cOK?agg(mk,cr[0],cr[1]):null;const be=1/S.otaCommission;
+  const rows=[...X.byC.entries()].map(([i,x])=>{const c=M.camps[i],p=C?C.byC.get(i):null;const sig=signals(x,p,a,h);
+    return Object.assign({},x,{name:c.name,_q:c.name,type:c.type==='PERFORMANCE_MAX'?'PMax':c.type==='SEARCH'?'Search':c.type==='DEMAND_GEN'?'Demand Gen':String(c.type).toLowerCase(),status:c.status,share:div(x.cost,a.cost),proas:p?p.roas:null,sig,nsig:sig.length,acc:c.acc,how:c.how})}).filter(r=>r.impr>0||r.cost>0);
+  const cols=[MC('name','Chiến dịch',(v,r)=>`<span title="TK ${r.acc} | ${esc(r.how)}">${esc(v)}</span>`,{l:1,cls:'t'}),MC('nsig','Tín hiệu (Suy luận)',(v,r)=>r.sig.map(s=>`<div class="${s[0]}">${s[0]==='b'?'■':s[0]==='g'?'▲':'●'} ${s[1]}</div>`).join(''),{l:1,cls:'sig'}),MC('type','Loại',v=>v,{l:1}),MC('status','Trạng thái',v=>`<span class="st ${v==='ENABLED'?'on':''}">${v==='ENABLED'?'Đang bật':v==='PAUSED'?'Tạm dừng':v==='REMOVED'?'Đã xoá':v}</span>`,{l:1}),
+    ...COL_COST(),...COL_RESULT(),MC('proas','ROAS (prev)',F.x,{tip:'ROAS kỳ so sánh'}),...COL_CONV(),MC('bk','Bookings',F.cv,{tip:'Chuyển đổi mua hàng (booking)'}),MC('chk','Checkouts',F.int,{tip:'Bắt đầu thanh toán'}),...COL_FUNNEL(),MC('is','Search IS',F.pct0,{tip:'Search impression share'}),MC('lostB','Lost IS (budget)',F.pct0),MC('lostR','Lost IS (rank)',F.pct0)];
+  const foot={name:'Tổng '+h,cost:F.tr(a.cost),share:'100%',impr:F.int(a.impr),clk:F.int(a.clk),ctr:F.pct(a.ctr),cpc:F.k(a.cpc),conv:F.cv(a.conv),cvr:F.pct(a.cvr),cpa:F.tr(a.cpa),val:F.tr(a.val),cos:F.pct(a.cos),roas:F.x(a.roas),proas:C?F.x(C.tot.roas):'',bk:F.cv(a.bk),chk:F.int(a.chk)};
+  POST.push(()=>{const pts=rows.filter(r=>r.cost>0).map(r=>({x:r.cost,y:r.roas||0,n:r.name,cv:r.conv}));const mx=Math.max(1,...pts.map(p=>p.cv));
+    chart('cScat',{type:'bubble',data:{datasets:[{label:'Chiến dịch',data:pts.map(p=>Object.assign({r:4+10*Math.sqrt(p.cv/mx)},p)),backgroundColor:css('--s1')+'b0',hoverBackgroundColor:css('--s2'),borderColor:'#fff',borderWidth:1.5,hoverBorderWidth:2}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false,axis:'xy'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#1d1f26',callbacks:{label:x=>{const p=x.raw;return [p.n,`Chi phí ${F.tr(p.x)}, ROAS ${F.x(p.y)}, ${F.cv(p.cv)} chuyển đổi`]}}}},
+       scales:{x:{beginAtZero:true,title:{display:true,text:'Cost trong kỳ (triệu đồng)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{beginAtZero:true,title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},grid:{color:'#eeeae3'},ticks:{color:css('--ink-2'),font:{size:11}}}}},plugins:[hl([{v:be,c:css('--bad'),t:'Hoà vốn '+F.x(be),dash:[2,3]}])]});
+    const top=[...rows].sort((x,y)=>y.cost-x.cost).slice(0,10);
+    const capC=Math.max(S.otaCommission*200,...top.filter(r=>ok(r.cos)).map(r=>r.cos*100));chart('cTop',{type:'bar',data:{labels:top.map(r=>r.name.length>34?r.name.slice(0,33)+'…':r.name),datasets:[{label:'CIR',data:top.map(r=>ok(r.cos)?r.cos*100:capC),backgroundColor:top.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+      options:opts(v=>nf1.format(v)+'%','',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}},title:{display:true,text:'CIR (%)',color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=top[x.dataIndex];return ok(r.cos)?' '+F.pct(r.cos):` Chưa có doanh thu book date (chi ${F.tr(r.cost)})`}}}}}),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}],'x')]})});
+  return notes(a,mk)+`<div class="grid g2">
+    <div class="card ${A()}"><h3>Cost và ROAS từng chiến dịch</h3><p class="q">Kích thước chấm theo lượt chuyển đổi. Góc phải dưới: chi nhiều, ROAS thấp.</p><div class="chartbox lg"><canvas id="cScat"></canvas></div></div>
+    <div class="card ${A()}"><h3>CIR, 10 chiến dịch chi nhiều nhất</h3><p class="q">Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí, chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="cTop"></canvas></div></div></div>
+   <h2 class="sec">Bảng chiến dịch <small>Bấm tiêu đề cột để sắp xếp. Chọn chiến dịch ở nút lọc phía trên để các phần khác chỉ tính chiến dịch đó.</small></h2>
+   <div class="${A()}">${T('camps',cols,rows,{sort:'cost',what:'chiến dịch',foot,limit:200})}</div>
+   <p class="small muted">Tín hiệu là quy tắc tự động cho chiến dịch chi từ 300.000 đ: 0 chuyển đổi khi chi từ 2 lần CPA trung bình, chi phí / doanh thu book date cao hơn hoa hồng OTA, mất IS do ngân sách từ 20% kèm ROAS đạt Target (hoặc gấp 2 lần hoà vốn), mất IS do rank từ 40%, ROAS giảm từ 30% ${cmpWord()} (từ 3 chuyển đổi mỗi kỳ). 3 đến 7 ngày gần nhất thường còn tăng thêm chuyển đổi do độ trễ ghi nhận.</p>`;
+}
+
+/* ---------- Markets ---------- */
+const geoName=id=>{const g=M.geo[String(id)];return g?g[0]:(id?'Mã '+id:'Không xác định')};
+function marketRows(mk){const g=dagg('geo',mk,FROM,TO);const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);
+  return {g,tot,rows:[...g.m.entries()].map(([k,x])=>Object.assign({},x,{k,name:geoName(k),_q:geoName(k),share:div(x.cost,tot),ncamp:x.camps.size}))}}
+function secMarket(){
+  IX=0;const mk=campMask(HOTEL),cr=cmpRange(),cOK=cmpOK(cr);
+  const {g,tot,rows}=marketRows(mk);rows.sort((x,y)=>y.cost-x.cost);
+  const P=cOK?dagg('geo',mk,cr[0],cr[1]):null;const ptot=P?[...P.m.values()].reduce((s,x)=>s+x.cost,0):0;
+  rows.forEach(r=>{const p=P&&P.m.get(r.k);r.pshare=p&&ptot?p.cost/ptot:null;r.pcos=p?p.cos:null;r.dshare=r.pshare!=null?r.share-r.pshare:null});
+  const top=rows.slice(0,7),other=rows.slice(7);const oth=other.reduce((s,x)=>({cost:s.cost+x.cost,val:s.val+x.val}),{cost:0,val:0});
+  POST.push(()=>{const PL=PAL();
+    chart('mDon',{type:'doughnut',data:{labels:[...top.map(r=>r.name),...(other.length?['Khác']:[])],datasets:[{data:[...top.map(r=>r.cost),...(other.length?[oth.cost]:[])],backgroundColor:[...top.map((_,i)=>PL[i]),css('--other')],borderColor:'#fff',borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>` ${x.label}: ${F.tr(x.parsed)} (${F.pct(x.parsed/tot)})`}}}}});
+    const t10=rows.filter(r=>r.share>=0.01).slice(0,12);
+    chart('mCos',{type:'bar',data:{labels:t10.map(r=>r.name),datasets:[{label:'CIR',data:t10.map(r=>ok(r.cos)?Math.min(r.cos*100,100):100),backgroundColor:t10.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+      options:opts(v=>nf1.format(v)+'%','',{indexAxis:'y',scales:{x:{beginAtZero:true,suggestedMax:40,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=t10[x.dataIndex];return ok(r.cos)?` ${F.pct(r.cos)} (chi ${F.tr(r.cost)}, doanh thu book date ${F.tr(r.val)})`:` Chưa có doanh thu book date (chi ${F.tr(r.cost)})`}}}}}),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}],'x')]});
+  });
+  const PLV=['--s1','--s2','--s3','--s4','--s5','--s6','--s7'];
+  const dsh=(v,r)=>ok(v)?`${v>0?'+':''}${nf1.format(v*100)} pp <span class="muted small">từ ${F.pct(r.pshare)}</span>`:'-';
+  const cols=[MC('name','Thị trường (User location)',(v,r)=>`<button class="lnk" data-mkt="${r.k}" title="Xem chi phí theo chiến dịch">${esc(v)} <span class="muted">${String(VIEW.mktSel)===String(r.k)?'▾':'▸'}</span></button>`,{l:1}),
+    ...COL_COST(),MC('dshare','Δ % Cost',dsh,{tip:'Thay đổi tỷ trọng chi phí so với kỳ so sánh, điểm phần trăm (pp)'}),
+    ...COL_RESULT(),MC('pcos','CIR (prev)',F.pct,{tip:'CIR kỳ so sánh'}),...COL_CONV(),...COL_FUNNEL(),
+    MC('ncamp','Campaigns',(v,r)=>`<button class="lnk" data-mkt="${r.k}">${F.int(v)}</button>`,{tip:'Số chiến dịch có chi phí ở thị trường này'})];
+  const det=VIEW.mktSel!=null?mktDetail(mk,VIEW.mktSel):'';
+  return notes(null,mk,'geo')+(g.partial>0?`<p class="note ${A()}">${F.tr(g.partial)} chi phí thuộc tháng chỉ có số theo tháng (trước 3 tháng gần nhất), chia đều theo ngày (Ước tính).</p>`:'')+`
+   <div class="grid g12">
+    <div class="card ${A()}"><h3>Cost theo thị trường (User location)</h3><p class="q">Thị trường = User location: quốc gia nơi người dùng đang ở khi thấy quảng cáo (báo cáo "Vị trí người dùng" trên Google Ads, không phải vị trí target). Tổng ${F.tr(tot)}.</p><div class="chartbox"><canvas id="mDon"></canvas></div>
+      <div class="legend" style="margin-top:10px">${top.map((r,i)=>`<span><i style="background:var(${PLV[i]})"></i>${esc(r.name)} ${F.pct0(r.share)}</span>`).join('')}${other.length?`<span><i style="background:var(--other)"></i>Khác ${F.pct0(oth.cost/tot)}</span>`:''}</div></div>
+    <div class="card ${A()}"><h3>CIR từng thị trường (User location)</h3><p class="q">Thị trường chiếm từ 1% chi phí. Xanh: thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: có chi phí nhưng chưa có doanh thu book date (cột vẽ ở 100%).</p><div class="chartbox lg"><canvas id="mCos"></canvas></div></div>
+   </div>
+   <h2 class="sec">Bảng thị trường <small>User location: quốc gia nơi người dùng đang ở. Bấm tên thị trường hoặc số chiến dịch để xem chi phí theo từng chiến dịch.</small></h2><div id="mktDet">${det}</div><div class="${A()}">${T('mkt',cols,rows,{sort:'cost',what:'thị trường',limit:60})}</div>`;
+}
+
+function mktDetail(mk,k){
+  const g=dagg('geo',mk,FROM,TO,r=>String(r[3])===String(k)?r[2]:null);g.m.delete(null);
+  const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);const totv=[...g.m.values()].reduce((s,x)=>s+x.val,0);const totc=[...g.m.values()].reduce((s,x)=>s+x.conv,0);
+  const rows=[...g.m.entries()].map(([c,x])=>Object.assign({},x,{name:M.camps[c].name,_q:M.camps[c].name,status:M.camps[c].status,share:div(x.cost,tot)})).sort((a,b)=>b.cost-a.cost);
+  const nm=geoName(k);
+  POST.push(()=>chart('mDetBar',{type:'bar',data:{labels:rows.map(r=>r.name.length>38?r.name.slice(0,37)+'…':r.name),datasets:[{label:'Cost',data:rows.map(r=>r.cost),backgroundColor:rows.map(r=>!ok(r.cos)?css('--other'):r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:20}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>rows[x[0].dataIndex].name,label:x=>{const r=rows[x.dataIndex];return [` Chi ${F.tr(r.cost)} (${F.pct0(r.share)} chi phí ${nm})`,` ${F.cv(r.conv)} chuyển đổi, doanh thu book date ${F.tr(r.val)}`,` CIR ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}`]}}}}})}));
+  return `<div class="card" style="margin-bottom:14px;border-color:var(--s1)"><h3 style="display:flex;justify-content:space-between;align-items:center">${esc(nm)}: chi phí theo chiến dịch<button class="btn" data-mkt="__close">Đóng</button></h3>
+   <p class="q">${rows.length} chiến dịch, tổng chi ${F.tr(tot)}, ${F.cv(totc)} chuyển đổi, doanh thu book date ${F.tr(totv)}, CIR ${ok(div(tot,totv))?F.pct(div(tot,totv)):'chưa có doanh thu book date'}. Xanh: CIR thấp hơn hoa hồng OTA ${F.pct0(S.otaCommission)}. Đỏ: cao hơn. Xám: chưa có doanh thu book date.</p>
+   <div class="grid g2"><div class="chartbox" style="height:${Math.max(160,rows.length*34+40)}px"><canvas id="mDetBar"></canvas></div>
+   <div>${T('mktdet_'+k,[MC('name','Chiến dịch',esc,{l:1,cls:'t'}),...METRIC_COLS().map(c=>c.k==='share'?MC('share','% Cost',F.pct,{tip:'Tỷ trọng trong chi phí của thị trường '+nm}):c)],rows,{sort:'cost',search:false,limit:50})}</div></div></div>`;
+}
+function secMarketAll(){
+  IX=0;const per=MAIN.map(h=>({h,...marketRows(campMask(h))}));
+  const keys=new Map();per.forEach(p=>p.rows.forEach(r=>keys.set(r.k,(keys.get(r.k)||0)+r.share)));
+  const ks=[...keys.entries()].sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0]);
+  const rows=ks.map(k=>{const o={name:geoName(k),_q:geoName(k)};per.forEach((p,i)=>{const r=p.rows.find(x=>x.k===k);o['s'+i]=r?r.share:null;o['c'+i]=r?r.cos:null;o['v'+i]=r?r.cost:null});return o});
+  const cols=[MC('name','Thị trường (User location)',esc,{l:1}),...per.flatMap((p,i)=>[MC('s'+i,p.h+': % chi phí',F.pct),MC('v'+i,p.h+': chi phí',F.tr),MC('c'+i,p.h+': CIR',cosCell)])];
+  const n396=[M.noDimAccs.has('3965442048')?'Sakyo chưa gồm tài khoản 396-544-2048':'',''].filter(Boolean);const n396h=n396.length?`<p class="note ${A()}">${n396.join('. ')} trong snapshot. Có sau khi cài script và bấm Refresh.</p>`:'';
+  return n396h+`<p class="note info ${A()}">Mỗi khách sạn tính tỷ trọng trên chi phí của chính khách sạn đó. Bảng đặt cạnh nhau để so sánh, không cộng gộp. Mở từng khách sạn để xem biểu đồ.</p>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${per.map(p=>`<div class="card ${A()}"><h3>${p.h}</h3><p class="q">${p.tot>0?'Tổng chi '+F.tr(p.tot):'Chưa có số thị trường (tài khoản đang lấy số theo tháng qua giao diện, có sau khi cài script)'}</p>${p.rows.sort((a,b)=>b.cost-a.cost).slice(0,6).map(r=>`<div style="margin:7px 0"><div class="small" style="display:flex;justify-content:space-between"><span>${esc(r.name)}</span><span class="num">${F.pct0(r.share)} | CIR ${ok(r.cos)?F.pct(r.cos):'-'}</span></div><div class="pace"><div class="bar" style="margin:3px 0;height:8px"><span style="width:${r.share*100}%;${ok(r.cos)&&r.cos<=S.otaCommission?'':'background:var(--s8)'}"></span></div></div></div>`).join('')}<button class="btn" data-goh="${p.h}" data-sec="market">Chi tiết ${p.h}</button></div>`).join('')}</div>
+   <h2 class="sec">So sánh 25 thị trường lớn nhất</h2><div class="${A()}">${T('mktall',cols,rows,{sort:'s0',what:'thị trường',search:true})}</div>`;
+}
+
+/* ---------- Age ---------- */
+const AGE={'18_24':'18 đến 24','25_34':'25 đến 34','35_44':'35 đến 44','45_54':'45 đến 54','55_64':'55 đến 64','65_UP':'65 trở lên','UNDETERMINED':'Không xác định'};
+function secAge(){
+  IX=0;const mk=campMask(HOTEL);const g=dagg('age',mk,FROM,TO);const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);
+  const order=Object.keys(AGE);const rows=order.filter(k=>g.m.has(k)).map(k=>Object.assign({},g.m.get(k),{k,name:AGE[k],_q:AGE[k],share:div(g.m.get(k).cost,tot),ord:order.indexOf(k)}));
+  POST.push(()=>{const lb=rows.map(r=>r.name);
+    chart('aCost',{type:'bar',data:{labels:lb,datasets:[{label:'Cost',data:rows.map(r=>r.cost),backgroundColor:css('--s1'),borderRadius:5,maxBarThickness:46}]},options:opts(F.tr,'Cost (triệu đồng)')});
+    chart('aCos',{type:'bar',data:{labels:lb,datasets:[{label:'CIR',data:rows.map(r=>ok(r.cos)?r.cos*100:null),backgroundColor:rows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s3'):css('--s8')),borderRadius:5,maxBarThickness:46}]},options:opts(v=>nf1.format(v)+'%','%'),plugins:[hl([{v:S.otaCommission*100,c:css('--ink'),t:'OTA '+F.pct0(S.otaCommission),dash:[3,3]}])]});
+    chart('aConv',{type:'bar',data:{labels:lb,datasets:[{label:'Conv.',data:rows.map(r=>r.conv),backgroundColor:css('--s7'),borderRadius:5,maxBarThickness:46}]},options:opts(F.cv,'Conv.')})});
+  return notes(null,mk,'age')+`<p class="note info ${A()}">Độ tuổi chỉ có cho chiến dịch Search, Demand Gen, Display. Google không báo cáo độ tuổi cho PMax, nên tổng ở đây (${F.tr(tot)}) nhỏ hơn tổng chi phí khách sạn. Độ tuổi đang lấy theo tháng, kỳ cắt ngang tháng được chia đều theo ngày (Ước tính).</p>
+   <div class="grid g3"><div class="card ${A()}"><h3>Cost theo độ tuổi</h3><p class="q">Tiền đang đổ vào nhóm tuổi nào?</p><div class="chartbox"><canvas id="aCost"></canvas></div></div>
+   <div class="card ${A()}"><h3>Conv.</h3><p class="q">Nhóm tuổi nào đặt phòng?</p><div class="chartbox"><canvas id="aConv"></canvas></div></div>
+   <div class="card ${A()}"><h3>CIR</h3><p class="q">Đỏ: cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox"><canvas id="aCos"></canvas></div></div></div>
+   <h2 class="sec">Bảng độ tuổi</h2><div class="${A()}">${T('age',[MC('name','Độ tuổi',esc,{l:1,sv:r=>-r.ord}),...METRIC_COLS()],rows,{sort:'name',search:false})}</div>`;
+}
+
+/* ---------- Targeted locations ---------- */
+function secTloc(){
+  IX=0;const mk=campMask(HOTEL);const g=dagg('tloc',mk,FROM,TO,r=>r[3]+'@'+r[2]);const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);
+  const byLoc=dagg('tloc',mk,FROM,TO);
+  const rows=[...g.m.entries()].map(([k,x])=>{const [id,c]=k.split('@');const gg=M.geo[id];const nm=id==='0'?'Bán kính quanh địa điểm':geoName(id);
+    return Object.assign({},x,{name:nm,type:gg?gg[2]:(id==='0'?'Bán kính':''),full:gg?gg[3]:'',camp:M.camps[+c].name,_q:nm+' '+M.camps[+c].name+' '+(gg?gg[3]:''),share:div(x.cost,tot)})});
+  const locRows=[...byLoc.m.entries()].map(([k,x])=>({k,...x,name:k===0||k==='0'?'Bán kính':geoName(k)})).sort((a,b)=>b.cost-a.cost).slice(0,12);
+  POST.push(()=>chart('tBar',{type:'bar',data:{labels:locRows.map(r=>r.name),datasets:[{label:'Cost',data:locRows.map(r=>r.cost),backgroundColor:locRows.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>{const r=locRows[x.dataIndex];return ` Chi ${F.tr(r.cost)}, CIR ${ok(r.cos)?F.pct(r.cos):'chưa có doanh thu book date'}, ${F.cv(r.conv)} chuyển đổi`}}}}})}));
+  return notes(null,mk,'tloc')+`<div class="grid g12"><div class="card ${A()}"><h3>Cách đọc</h3><p class="q">Vị trí target là vị trí đã cài trong chiến dịch, khác với thị trường (nơi người dùng đang ở).</p>
+     <ul class="ins"><li><span class="tg">Ví dụ</span><span>Chiến dịch target Việt Nam theo "quan tâm" vẫn hiện cho người ở Úc đang tìm khách sạn ở Sài Gòn. Chi phí đó nằm ở vị trí target Việt Nam, nhưng ở thị trường Úc.</span></li>
+     <li><span class="tg">Tổng</span><span>${F.tr(tot)} chi phí có gắn vị trí target trong kỳ.</span></li></ul></div>
+   <div class="card ${A()}"><h3>12 vị trí target chi nhiều nhất</h3><p class="q">Đỏ: chi phí / doanh thu book date cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="tBar"></canvas></div></div></div>
+   <h2 class="sec">Vị trí target theo chiến dịch</h2><div class="${A()}">${T('tloc',[MC('name','Vị trí target',(v,r)=>`<span title="${esc(r.full)}">${esc(v)}</span>`,{l:1}),MC('type','Cấp',v=>esc(v),{l:1}),MC('camp','Chiến dịch',esc,{l:1,cls:'t'}),...METRIC_COLS()],rows,{sort:'cost',what:'vị trí hoặc chiến dịch'})}</div>`;
+}
+
+/* ---------- Keywords ---------- */
+const MT={EXACT:'Chính xác',PHRASE:'Cụm từ',BROAD:'Rộng'};
+function secKw(){
+  IX=0;const mk=campMask(HOTEL);const g=dagg('kw',mk,FROM,TO,r=>r[3]+'@'+r[2]);const tot=[...g.m.values()].reduce((s,x)=>s+x.cost,0);
+  const rows=[...g.m.entries()].map(([k,x])=>{const i=k.lastIndexOf('@'),kt=k.slice(0,i),c=+k.slice(i+1);const j=kt.lastIndexOf('|');const text=kt.slice(0,j),mt=kt.slice(j+1);
+    return Object.assign({},x,{text,mt:MT[mt]||mt,camp:M.camps[c].name,_q:text+' '+M.camps[c].name,share:div(x.cost,tot)})});
+  const top=[...rows].sort((a,b)=>b.cost-a.cost).slice(0,12);
+  POST.push(()=>chart('kBar',{type:'bar',data:{labels:top.map(r=>r.text.length>36?r.text.slice(0,35)+'…':r.text),datasets:[{label:'Cost',data:top.map(r=>r.cost),backgroundColor:top.map(r=>ok(r.cos)&&r.cos<=S.otaCommission?css('--s1'):css('--s8')),borderRadius:4,maxBarThickness:18}]},
+    options:opts(F.tr,'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>top[x[0].dataIndex].text,label:x=>{const r=top[x.dataIndex];return ` Chi ${F.tr(r.cost)}, ${F.cv(r.conv)} chuyển đổi, CIR ${ok(r.cos)?F.pct(r.cos):'-'}`}}}}})}));
+  const brand=rows.filter(r=>/silverland|sakyo|myst/i.test(r.text));const bc=brand.reduce((s,r)=>s+r.cost,0),bv=brand.reduce((s,r)=>s+r.val,0),av=rows.reduce((s,r)=>s+r.val,0);
+  return notes(null,mk,'kw')+`<div class="grid g12"><div class="card ${A()}"><h3>Từ khoá thương hiệu và không thương hiệu</h3><p class="q">Thương hiệu = từ khoá chứa tên Silverland, Sakyo, The Myst (Suy luận theo chữ).</p>
+     <ul class="ins"><li><span class="tg">Thương hiệu</span><span>${F.pct0(div(bc,tot))} chi phí, ${F.pct0(div(bv,av))} doanh thu book date, CIR ${F.pct(div(bc,bv))}</span></li>
+     <li><span class="tg">Không thương hiệu</span><span>${F.pct0(div(tot-bc,tot))} chi phí, ${F.pct0(div(av-bv,av))} doanh thu book date, CIR ${F.pct(div(tot-bc,av-bv))}</span></li>
+     <li><span class="tg">Phạm vi</span><span>Chỉ chiến dịch Search có từ khoá. PMax không có từ khoá nên không nằm ở đây. Tổng ${F.tr(tot)}.</span></li></ul></div>
+   <div class="card ${A()}"><h3>12 từ khoá chi nhiều nhất</h3><p class="q">Đỏ: chi phí / doanh thu book date cao hơn hoa hồng OTA hoặc chưa có doanh thu book date.</p><div class="chartbox lg"><canvas id="kBar"></canvas></div></div></div>
+   <h2 class="sec">Bảng từ khoá</h2><div class="${A()}">${T('kw',[MC('text','Từ khoá',esc,{l:1,cls:'t'}),MC('mt','Kiểu khớp',esc,{l:1}),MC('camp','Chiến dịch',esc,{l:1}),...METRIC_COLS()],rows,{sort:'cost',what:'từ khoá'})}</div>`;
+}
+
+/* ---------- Assets ---------- */
+const FT={HEADLINE:'Headline',DESCRIPTION:'Description',LONG_HEADLINE:'Long headline'};
+function secAsset(){
+  IX=0;const mk=campMask(HOTEL);if(VIEW.asset==='RSA'&&VIEW.assetF==='LONG_HEADLINE')VIEW.assetF='ALL';const src=VIEW.asset,ff=VIEW.assetF;
+  const g=dagg('asset',mk,FROM,TO);
+  const rows=[...g.m.entries()].map(([k,x])=>{const p=k.split('|');const s=p[0],f=p[1],text=p.slice(2).join('|');return Object.assign({},x,{src:s,ft:FT[f]||f,f,text,_q:text,ncamp:x.camps.size,cpm:div(x.conv,x.impr)*1000,camps:[...x.camps].map(i=>M.camps[i].name).join(', ')})})
+    .filter(r=>r.src===src&&(ff==='ALL'||r.f===ff)&&r.text);
+  const top=rows.filter(r=>r.impr>=300).sort((a,b)=>(b.cpm||0)-(a.cpm||0)).slice(0,10);
+  POST.push(()=>chart('asBar',{type:'bar',data:{labels:top.map(r=>r.text.length>40?r.text.slice(0,39)+'…':r.text),datasets:[{label:'Chuyển đổi / 1.000 hiển thị',data:top.map(r=>r.cpm),backgroundColor:css('--s3'),borderRadius:4,maxBarThickness:18}]},
+    options:opts(v=>nf2.format(v),'',{indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:'#eeeae3'},ticks:{color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>top[x[0].dataIndex].text,label:x=>{const r=top[x.dataIndex];return [` ${nf2.format(r.cpm)} chuyển đổi / 1.000 hiển thị`,` ${F.int(r.impr)} hiển thị, ${F.cv(r.conv)} chuyển đổi, CTR ${F.pct(r.ctr)}`]}}}}})}));
+  const seg=(k,opts2)=>`<span class="seg">${opts2.map(([v,t])=>`<button data-seg="${k}" data-v="${v}" class="${VIEW[k]===v?'on':''}">${t}</button>`).join('')}</span>`;
+  return notes(null,mk,'asset')+`<div class="tt ${A()}">${seg('asset',[['RSA','Search (RSA)'],['PMax','PMax']])} ${seg('assetF',[['ALL','Tất cả'],['HEADLINE','Headline'],...(src==='PMax'?[['LONG_HEADLINE','Long headline']]:[]),['DESCRIPTION','Description']])}</div>
+   <div class="grid g12"><div class="card ${A()}"><h3>Cách đọc</h3><p class="q">Số liệu tính cho từng dòng chữ, gộp mọi nhóm quảng cáo có dùng cùng dòng chữ.</p>
+     <ul class="ins"><li><span class="tg">Lưu ý</span><span>Một lượt hiển thị được tính cho nhiều headline và description cùng lúc, nên cộng các dòng sẽ lớn hơn tổng chiến dịch. Chỉ so sánh các dòng với nhau.</span></li>
+     <li><span class="tg">Chỉ số chính</span><span>Chuyển đổi trên 1.000 hiển thị: so được dòng hiện nhiều với dòng hiện ít. Chỉ xếp hạng dòng có từ 300 hiển thị.</span></li>
+     <li><span class="tg">Kỳ</span><span>Theo tháng cho dữ liệu cũ, theo tuần cho 3 tháng gần nhất. Kỳ cắt ngang được chia đều theo ngày (Ước tính).</span></li></ul></div>
+   <div class="card ${A()}"><h3>10 dòng chữ có Conv. / 1k Impr. cao nhất</h3><p class="q">${src==='RSA'?'Search RSA':'PMax'}, ${ff==='ALL'?'mọi loại':FT[ff]}</p><div class="chartbox lg"><canvas id="asBar"></canvas></div></div></div>
+   <h2 class="sec">Bảng ${src==='RSA'?'headline, description Search':'headline, description PMax'}</h2>
+   <div class="${A()}">${T('asset_'+src,[MC('text','Nội dung',esc,{l:1,cls:'t'}),MC('ft','Loại',esc,{l:1}),MC('cost','Cost',F.tr,{tip:'Chi phí'}),MC('val','Conv. value',F.tr,{tip:'Doanh thu book date theo tag Google Ads'}),MC('conv','Conv.',F.cv,{tip:'Lượt chuyển đổi'}),MC('cpm','Conv. / 1k Impr.',v=>ok(v)?nf2.format(v):'-',{tip:'Conv. trên 1.000 lượt hiển thị, so được giữa asset có lượt hiển thị khác nhau'}),MC('clk','Clicks',F.int,{tip:'Lượt nhấp'}),MC('ctr','CTR',F.pct,{tip:'Clicks / Impr.'}),MC('impr','Impr.',F.int,{tip:'Lượt hiển thị'}),MC('ncamp','Campaigns',F.int,{tip:'Số chiến dịch dùng asset này'}),MC('camps','Chiến dịch',v=>`<span class="small">${esc(v)}</span>`,{l:1,cls:'t'})],rows,{sort:'cost',what:'nội dung',total:false})}</div>`;
+}
+
+
+/* ---------- Đối soát tracking ---------- */
+const RC_ACC={
+  '6453855576':['TK 645-385-5576 (Bến Thành): chuyển đổi chính là "Lượt mua hàng BT", tag Google Ads trên trang xác nhận, phân bổ DDA, cửa sổ click 30 ngày, đếm mọi lượt.',
+    'Từ 12/01/2025 đến 17/12/2025 chuyển đổi "Mua hàng" cũng là chuyển đổi chính, nên cột Conversions trên Google Ads giai đoạn 08 đến 12/2025 đếm trùng (T10/2025: 139,5 so với 84 của "Lượt mua hàng BT"). Dashboard chỉ lấy "Lượt mua hàng BT" từ 15/02/2025, nên số cùng kỳ 2025 đã loại phần trùng.',
+    '"Silverland (web) purchase" nhập từ GA4 là chuyển đổi phụ (cửa sổ 90 ngày), không dùng để tối ưu.'],
+  '7534212327':['TK 753-421-2327 (Jolie, Sakyo, Yen, Sil): chuyển đổi chính là "Purchase successful - Booking Silverland", tag Google Ads, phân bổ DDA, cửa sổ click 30 ngày, đếm mọi lượt. Một tag dùng chung cho mọi khách sạn, nên chiến dịch của khách sạn này có thể nhận booking của khách sạn khác (Suy luận, xem mục booking chéo).',
+    '"Bắt đầu quy trình thanh toán" và "Android installs (all other apps)" đang là chuyển đổi chính và tính vào cột Conversions. Chiến dịch đặt giá thầu theo Conversions sẽ tối ưu cả lượt bắt đầu thanh toán (Suy luận). Đề xuất chuyển 2 hành động này sang phụ.',
+    '"Silverland (web) purchase" nhập từ GA4 là chuyển đổi phụ.'],
+  '3965442048':['TK 396-544-2048 (Sakyo): snapshot lấy theo tháng qua giao diện nên chưa đọc cấu hình chuyển đổi. Booking theo ngày trong snapshot là Ước tính, có số theo ngày sau khi script runAds chạy.'],
+  '6233882444':['TK 623-388-2444 (The Myst): booking và doanh thu book date là các chuyển đổi chính loại Mua hàng của tài khoản. The Myst dùng booking engine secure.themystdongkhoihotel.com và GA4 riêng (property 340232784, The Myst Dong Khoi Hotel - GA4).']};
+const RC_GEN=['GA4 The Myst: property 340232784 (The Myst Dong Khoi Hotel - GA4), mọi purchase tính cho The Myst Đồng Khởi, bỏ purchase có item_brand chứa chữ Sapa. GA4 Sakyo: property 340245620 (www.silverlandhotels.com). Property 340242788 nhận cùng sự kiện purchase (T10/2026 cả hai ghi 349 purchase trên booking.silverlandhotels.com), nên chỉ đọc một property để tránh đếm đôi.',
+  'Khớp GA4 với booking engine theo mã booking (transaction_id = Booking Number). Khách sạn của từng purchase lấy theo item_brand trong GA4, khớp 100% với khách sạn trên booking engine.',
+  'Booking engine: sheet Data của file "Booking Website SVL & The Myst", chỉ có booking trạng thái Confirmed và Confirmed (Modified). Doanh thu book date = Total Revenue, cộng mọi phòng trong booking.'];
+
+function rcMap(){if(M._rcm)return M._rcm;const m={};M.camps.forEach((c,i)=>{m[c.key.split(':').pop()]=i});return M._rcm=m}
+function rcCampHotel(cid){if(!cid)return null;const i=rcMap()[cid];return i==null?null:M.camps[i].hotel}
+function rcZ(nb){return {n:0,rev:0,gn:0,grev:0,cn:0,crev:0,bk:new Array(nb).fill(0),bn:new Array(nb).fill(0),xIn:0,xInRev:0,xOut:0,xOutRev:0,xInBy:{},xOutBy:{},on:0,orev:0,ocn:0,ocrev:0,dc:0,drev:0,dcN:0,drevN:0,ads:0,adsv:0,gi:0,gv:0,pr:0,hostN:[0,0,0]}}
+function rcAgg(h,f,t,gran){
+  const R=M.recon,H=R.hotels.indexOf(h),nb=R.buckets.length;const tot=rcZ(nb),ser=new Map();
+  const at=d=>{const b=bucketOf(d,gran);if(!ser.has(b))ser.set(b,rcZ(nb));return ser.get(b)};
+  const both=(d,fn)=>{fn(tot);if(gran)fn(at(d))};
+  for(const [d,hi,b,cid,n,rev] of R.ibe){if(d<f||d>t)continue;
+    if(hi===H)both(d,a=>{a.n+=n;a.rev+=rev;a.bk[b]+=rev;a.bn[b]+=n;if(b!==nb-1){a.gn+=n;a.grev+=rev}
+      if(b===0){a.cn+=n;a.crev+=rev;const ch=rcCampHotel(cid);if(ch&&ch!==h){a.xIn+=n;a.xInRev+=rev;a.xInBy[ch]=(a.xInBy[ch]||0)+n}}});
+    else if(b===0&&cid&&rcCampHotel(cid)===h)both(d,a=>{a.xOut+=n;a.xOutRev+=rev;const oh=R.hotels[hi];a.xOutBy[oh]=(a.xOutBy[oh]||0)+n})}
+  for(const [d,hi,b,cid,n,rev] of R.gaonly){if(d<f||d>t||hi!==H)continue;both(d,a=>{a.on+=n;a.orev+=rev;if(b===0){a.ocn+=n;a.ocrev+=rev}})}
+  for(const [d,hi,cid,inI,c,rev] of R.dda){if(d<f||d>t||hi!==H)continue;both(d,a=>{if(inI){a.dc+=c;a.drev+=rev}else{a.dcN+=c;a.drevN+=rev}})}
+  for(const [d,hi,ho,n] of (R.host||[])){if(d<f||d>t||hi!==H)continue;both(d,a=>{a.hostN[ho]+=n})}
+  const mk=campMask(h,false,true);const X=agg(mk,f,t,gran||'day');
+  Object.assign(tot,{ads:X.tot.bk,adsv:X.tot.bval,gi:X.tot.gi,gv:X.tot.gv,pr:X.tot.pr,cost:X.tot.cost});
+  if(gran)X.ser.forEach((v,b)=>{const a=ser.has(b)?ser.get(b):(ser.set(b,rcZ(nb)),ser.get(b));Object.assign(a,{ads:v.bk,adsv:v.bval,gi:v.gi,gv:v.gv,pr:v.pr,cost:v.cost})});
+  tot.hasAds=tot.cost>0||tot.adsv>0;return {tot,ser};
+}
+function rcFind(h,a){
+  const L=[],R=M.recon,nb=R.buckets.length,p=F.pct0;if(!a.n)return L;
+  const cov=a.gn/a.n;
+  L.push([cov>=0.9?'g':'b',`Booking engine có ${F.int(a.n)} booking, doanh thu book date ${F.tr(a.rev)}. GA4 ghi nhận ${F.int(a.gn)} booking (${p(cov)}). ${F.int(a.n-a.gn)} booking, ${F.tr(a.rev-a.grev)} doanh thu book date không có purchase trong GA4.`]);
+  if(a.hasAds&&a.adsv>0){
+    L.push(['',`Google Ads tag ghi ${F.cv(a.ads)} booking, ${F.tr(a.adsv)}, bằng ${p(a.adsv/a.rev)} doanh thu book date trên booking engine${a.pr>0?' (có phần số theo tháng chia theo ngày, Ước tính)':''}.`]);
+    if(a.crev>0)L.push([a.adsv>=a.crev?'g':'b',`GA4 gán ${F.int(a.cn)} booking (${F.tr(a.crev)}, ${p(a.crev/a.rev)} doanh thu book date) cho phiên đến từ Google Ads. Google Ads tag ghi doanh thu book date gấp ${nf1.format(a.adsv/a.crev)} lần số này. Google Ads không ghi thiếu so với GA4. Khoảng cách giữa Google Ads tag và booking engine là các booking không gắn với lượt click quảng cáo trong 30 ngày (Suy luận).`]);
+    if(a.gv>0)L.push(['',`Chuyển đổi nhập từ GA4 trong Google Ads (phụ) ghi ${F.cv(a.gi)} booking, ${F.tr(a.gv)}, bằng ${p(a.gv/a.adsv)} số của Google Ads tag. Chênh lệch do khác mô hình phân bổ, khác cửa sổ chuyển đổi, và GA4 không ghi ${p(1-cov)} booking.`]);
+  }else L.push(['w',`${h} chưa có chi phí Google Ads trong kỳ ở các tài khoản đang nối vào dashboard, chỉ đối soát được booking engine và GA4.`]);
+  const nonAds=[[1,'tìm kiếm tự nhiên'],[2,'trực tiếp'],[5,'Google Hotel Ads'],[4,'trợ lý AI'],[3,'tự giới thiệu'],[nb-1,'không có trong GA4']].map(([i,t])=>[t,a.bk[i]/a.rev]).filter(x=>x[1]>=0.03).sort((x,y)=>y[1]-x[1]);
+  if(nonAds.length)L.push(['',`Doanh thu book date trên booking engine theo nguồn GA4 ngoài Google Ads: ${nonAds.map(x=>x[0]+' '+p(x[1])).join(', ')}.`]);
+  const sr=a.bk[3]/a.rev;if(sr>=0.03)L.push(['w',`${F.int(a.bn[3])} booking (${p(sr)} doanh thu book date) có nguồn GA4 là chính website hoặc booking engine (tự giới thiệu). Nguồn gốc thật của các booking này bị mất, một phần có thể đến từ Google Ads (Suy luận). Nguyên nhân thường gặp: thiếu cấu hình cross-domain giữa silverlandhotels.com và travelanium.net, chưa loại trừ referral.`]);
+  const hs=a.hostN[0]+a.hostN[1]+a.hostN[2];if(hs&&a.hostN[1]/hs>=0.03)L.push(['w',`${p(a.hostN[1]/hs)} purchase trong GA4 (${F.int(a.hostN[1])} booking) diễn ra trên tên miền cũ reservation.travelanium.net, khác tên miền booking.silverlandhotels.com. Cookie gclid và _ga của silverlandhotels.com không tự sang tên miền này, nên Google Ads và GA4 dễ mất nguồn (Suy luận). Cần tìm các link Book còn trỏ về reservation.travelanium.net.`]);
+  if(a.on>0)L.push(['w',`GA4 có ${F.int(a.on)} purchase (${F.tr(a.orev)}) không có trong dữ liệu booking engine, ${F.int(a.ocn)} purchase trong số đó (${F.tr(a.ocrev)}) từ phiên Google Ads. Suy luận: booking đã huỷ hoặc đổi mã. Google Ads tag cũng đếm các booking này lúc đặt, nên doanh thu trên Google Ads cao hơn doanh thu giữ được.`]);
+  if(a.xIn>0||a.xOut>0){const fm=o=>Object.entries(o).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`${k} ${v}`).join(', ');
+    L.push(['',`Booking chéo theo phiên GA4 Google Ads: ${a.xIn?`${F.int(a.xIn)} booking của ${h} đến từ chiến dịch khách sạn khác (${fm(a.xInBy)})`:'không có booking của '+h+' đến từ chiến dịch khách sạn khác'}${a.xOut?`. Chiến dịch ${h} mang về ${F.int(a.xOut)} booking cho khách sạn khác (${fm(a.xOutBy)}). Google Ads tính các booking này cho chiến dịch ${h}`:''}.`])}
+  return L;
+}
+function rcLadder(a){
+  const rows=[['Booking engine (booking xác nhận)',a.n,a.rev,'s1','Số thực tế, chuẩn để so'],['GA4 ghi nhận purchase (khớp mã booking)',a.gn,a.grev,'s7','Đo tag GA4 có bắn đủ không'],
+    ...(a.hasAds?[['Google Ads tag (chuyển đổi chính)',a.ads,a.adsv,'s2','Số dùng trong dashboard và để tối ưu'],['Google Ads nhập từ GA4 (chuyển đổi phụ)',a.gi,a.gv,'s4','Silverland (web) purchase']]:[]),
+    ['GA4: phiên đến từ Google Ads',a.cn,a.crev,'s3','google / cpc, theo phiên mua'],['GA4: phần ghi công Google Ads (DDA)',a.dc,a.drev,'s5','Mô hình phân bổ của GA4']];
+  const mx=Math.max(a.rev,...rows.map(r=>r[2]))||1;
+  return `<div class="rcl">${rows.map(r=>`<div class="rcr"><div class="small"><b>${r[0]}</b> <span class="muted">${r[4]}</span></div>
+    <div class="rcb"><span style="width:${r[2]/mx*100}%;background:var(--${r[3]})"></span></div>
+    <div class="small num">${F.tr(r[2])} <span class="muted">| ${F.cv(r[1])} booking | ${a.rev?F.pct0(r[2]/a.rev):'-'} doanh thu book date IBE</span></div></div>`).join('')}</div>`;
+}
+function secRecon(){
+  IX=0;const h=HOTEL,R=M.recon;
+  if(!R)return `<div class="card anim empty">Chưa có dữ liệu đối soát trên bản này. Bản công khai không chứa số booking engine. Cài <code>GoogleAds_Dashboard_Recon.gs</code> vào Google Sheet của dashboard (mục Nguồn data, phần Đối soát tracking), sau đó bấm Refresh.</div>`;
+  if(R.hotels.indexOf(h)<0)return `<div class="card anim empty">${esc(h)} không có booking trên booking engine Silverland để đối soát.</div>`;
+  const thr=toIdx(R.through),to=Math.min(TO,thr);
+  const {tot:a}=rcAgg(h,FROM,to);const gran=(to-FROM)>62?'month':(to-FROM)>31?'week':'day';const {ser}=rcAgg(h,FROM,to,gran);const bs=bucketsIn(FROM,to,gran);const g=b=>ser.get(b)||rcZ(R.buckets.length);
+  const nb=R.buckets.length,BC=['--s2','--s3','--s7','--s8','--s5','--s6','--other','--s4'];
+  POST.push(()=>{const labels=bs.map(b=>lab(b,gran));const pc=(x,y)=>y>0?x/y*100:null;
+    chart('rcLine',{type:'line',data:{labels,datasets:[
+      {label:'GA4 ghi nhận / IBE',data:bs.map(b=>pc(g(b).grev,g(b).rev)),borderColor:css('--s7'),backgroundColor:css('--s7'),borderWidth:2.2,pointRadius:3,tension:.3,spanGaps:true},
+      ...(a.hasAds?[{label:'Google Ads tag / IBE',data:bs.map(b=>pc(g(b).adsv,g(b).rev)),borderColor:css('--s2'),backgroundColor:css('--s2'),borderWidth:2.2,pointRadius:3,tension:.3,spanGaps:true},
+      {label:'Google Ads nhập từ GA4 / IBE',data:bs.map(b=>pc(g(b).gv,g(b).rev)),borderColor:css('--s4'),backgroundColor:css('--s4'),borderWidth:2,borderDash:[5,4],pointRadius:2,tension:.3,spanGaps:true}]:[]),
+      {label:'GA4 phiên Google Ads / IBE',data:bs.map(b=>pc(g(b).crev,g(b).rev)),borderColor:css('--s3'),backgroundColor:css('--s3'),borderWidth:2.2,pointRadius:3,tension:.3,spanGaps:true}]},
+      options:opts(v=>nf0.format(v)+'%','% doanh thu book date IBE')});
+    chart('rcMix',{type:'bar',data:{labels,datasets:R.buckets.map((nm,i)=>({label:nm,data:bs.map(b=>{const x=g(b);return x.rev?x.bk[i]/x.rev*100:0}),backgroundColor:css(BC[i]),borderColor:'#fff',borderWidth:1}))},
+      options:opts(v=>nf0.format(v)+'%','% doanh thu book date IBE',{scales:{x:{stacked:true,grid:{display:false},ticks:{color:css('--ink-2'),font:{size:11},maxRotation:0,autoSkip:true}},y:{stacked:true,max:100,beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>v+'%',color:css('--ink-2'),font:{size:11}}}},plugins:{legend:{display:false},tooltip:{mode:'index',callbacks:{label:x=>` ${x.dataset.label}: ${nf1.format(x.parsed.y)}% (${F.tr(g(bs[x.dataIndex]).bk[x.datasetIndex])})`}}}})});
+  });
+  const rows=bs.map(b=>{const x=g(b);return {name:lab(b,gran),_q:'',ord:b,n:x.n,rev:x.rev,cov:div(x.gn,x.n),covr:div(x.grev,x.rev),ads:x.ads,adsv:x.adsv,ar:div(x.adsv,x.rev),cn:x.cn,crev:x.crev,cr:div(x.crev,x.rev),ac:div(x.adsv,x.crev),gv:x.gv,gr:div(x.gv,x.adsv),on:x.on}}).filter(r=>r.n||r.adsv);
+  const cols=[MC('name',gran==='month'?'Tháng':gran==='week'?'Tuần':'Ngày',esc,{l:1,sv:r=>-r.ord}),MC('n','Booking IBE',F.int),MC('rev','Doanh thu book date IBE',F.tr),MC('cov','GA4 ghi nhận (% booking)',F.pct0),MC('covr','GA4 ghi nhận (% doanh thu)',F.pct0),
+    ...(a.hasAds?[MC('ads','Google Ads tag: booking',F.cv),MC('adsv','Google Ads tag: doanh thu book date',F.tr),MC('ar','Google Ads tag / IBE',F.pct0)]:[]),
+    MC('cn','GA4 phiên Google Ads: booking',F.int),MC('crev','GA4 phiên Google Ads: doanh thu book date',F.tr),MC('cr','GA4 phiên Google Ads / IBE',F.pct0),
+    ...(a.hasAds?[MC('ac','Google Ads tag / GA4 phiên Google Ads (lần)',F.x),MC('gr','Nhập từ GA4 / Google Ads tag',F.pct0)]:[]),MC('on','GA4 không có trong IBE',F.int)];
+  const accs=[...new Set(M.camps.filter(c=>c.hotel===h).map(c=>c.acc))];
+  const kp=(lb,v,ex,cls)=>`<div class="card kpi ${cls||''} ${A()}"><div class="lb"><span>${lb}</span></div><div class="v num">${v}</div><div class="d">${ex}</div></div>`;
+  const fl=rcFind(h,a);
+  return `${TO>thr?`<p class="note ${A()}">Dữ liệu booking engine và GA4 có đến ${dmy(thr)}, phần đối soát tính đến ngày này.</p>`:''}
+   <p class="note info ${A()}">Google Ads tag / doanh thu IBE không phải tỷ lệ tracking: booking engine gồm cả booking không đến từ quảng cáo. Tỷ lệ tracking đo bằng 2 phép so: GA4 ghi nhận / booking engine (tag có bắn đủ không) và Google Ads tag / GA4 phiên Google Ads (Google Ads có đếm đủ booking từ quảng cáo không). Google Ads tính theo ngày click, booking engine và GA4 theo ngày đặt.</p>
+   <div class="kpis">
+     ${kp('GA4 ghi nhận booking',F.pct0(div(a.gn,a.n)),`${F.int(a.gn)} / ${F.int(a.n)} booking IBE, ${F.pct0(div(a.grev,a.rev))} doanh thu book date`,'hero')}
+     ${a.hasAds?kp('Google Ads tag / doanh thu book date IBE',F.pct0(div(a.adsv,a.rev)),`${F.tr(a.adsv)} / ${F.tr(a.rev)}`,'hero'):''}
+     ${kp('GA4 phiên Google Ads / doanh thu book date IBE',F.pct0(div(a.crev,a.rev)),`${F.tr(a.crev)}, ${F.int(a.cn)} booking`,'hero')}
+     ${a.hasAds?kp('Google Ads tag / GA4 phiên Google Ads',F.x(div(a.adsv,a.crev)),'lần, theo doanh thu book date','hero'):''}
+   </div>
+   <div class="grid g12" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Thang đối soát</h3><p class="q">Kỳ ${dmy(FROM)} đến ${dmy(to)}, doanh thu book date.</p>${rcLadder(a)}</div>
+     <div class="card ${A()}"><h3>Phát hiện</h3><p class="q">Tự động tạo từ số trong kỳ. Nhận định nguyên nhân gắn nhãn Suy luận.</p><ul class="ins">${fl.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Khớp':x[0]==='b'?'Lệch':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
+   </div>
+   <div class="grid g2" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Tỷ lệ theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày'}</h3><p class="q">% doanh thu book date trên booking engine mà từng nguồn ghi được.</p>
+       <div class="legend"><span><i class="ln" style="background:var(--s7)"></i>GA4 ghi nhận (theo doanh thu)</span>${a.hasAds?'<span><i class="ln" style="background:var(--s2)"></i>Google Ads tag</span><span><i class="dash"></i>Google Ads nhập từ GA4</span>':''}<span><i class="ln" style="background:var(--s3)"></i>GA4 phiên Google Ads</span></div><div class="chartbox"><canvas id="rcLine"></canvas></div></div>
+     <div class="card ${A()}"><h3>Doanh thu book date IBE theo nguồn GA4</h3><p class="q">Nguồn của phiên có purchase. "Không có trong GA4" là booking GA4 không ghi được.</p>
+       <div class="legend">${R.buckets.map((nm,i)=>`<span><i style="background:var(${BC[i]})"></i>${esc(nm)}</span>`).join('')}</div><div class="chartbox"><canvas id="rcMix"></canvas></div></div>
+   </div>
+   <h2 class="sec">Bảng đối soát theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày đặt (booking date)'}</h2><div class="${A()}">${T('recon_'+h,cols,rows,{sort:'name',search:false,limit:62,foot:{name:'<b>Tổng kỳ</b>',n:'<b>'+F.int(a.n)+'</b>',rev:'<b>'+F.tr(a.rev)+'</b>',cov:F.pct0(div(a.gn,a.n)),covr:F.pct0(div(a.grev,a.rev)),ads:'<b>'+F.cv(a.ads)+'</b>',adsv:'<b>'+F.tr(a.adsv)+'</b>',ar:F.pct0(div(a.adsv,a.rev)),cn:'<b>'+F.int(a.cn)+'</b>',crev:'<b>'+F.tr(a.crev)+'</b>',cr:F.pct0(div(a.crev,a.rev)),ac:F.x(div(a.adsv,a.crev)),gr:F.pct0(div(a.gv,a.adsv)),on:'<b>'+F.int(a.on)+'</b>'}})}</div>
+   <div class="grid g2" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Cấu hình chuyển đổi Google Ads</h3><p class="q">Đọc từ Google Ads API ngày 06/11/2026.</p><ul class="ins">${accs.flatMap(ac=>(RC_ACC[ac]||[]).map(t=>`<li><span class="tg">TK</span><span>${t}</span></li>`)).join('')||'<li><span>Không có tài khoản Google Ads cho khách sạn này trong dashboard.</span></li>'}</ul></div>
+     <div class="card ${A()}"><h3>Nguồn và cách khớp</h3><p class="q">Booking engine: dữ liệu đến ${dmy(thr)}.</p><ul class="ins">${RC_GEN.map(t=>`<li><span class="tg">Cách tính</span><span>${t}</span></li>`).join('')}</ul></div>
+   </div>`;
+}
+function secReconAll(){
+  IX=0;const R=M.recon;if(!R)return `<div class="card anim empty">Chưa có dữ liệu đối soát trên bản này. Bản công khai không chứa số booking engine. Cài <code>GoogleAds_Dashboard_Recon.gs</code> vào Google Sheet của dashboard (mục Nguồn data, phần Đối soát tracking), sau đó bấm Refresh.</div>`;const thr=toIdx(R.through),to=Math.min(TO,thr);
+  const cards=MAIN.filter(h=>R.hotels.includes(h)).map(h=>{const {tot:a}=rcAgg(h,FROM,to);
+    return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}" data-sec="recon">Chi tiết</button></h3>
+      <div class="small muted">Booking engine, doanh thu book date</div><div class="big num">${F.tr(a.rev)}</div><div class="small muted">${F.int(a.n)} booking</div>
+      <dl class="num"><dt>GA4 ghi nhận (booking)</dt><dd>${F.pct0(div(a.gn,a.n))}</dd>
+      <dt>Google Ads tag / IBE</dt><dd>${F.pct0(div(a.adsv,a.rev))}</dd>
+      <dt>GA4 phiên Google Ads / IBE</dt><dd>${F.pct0(div(a.crev,a.rev))}</dd>
+      <dt>Google Ads tag / GA4 phiên Google Ads</dt><dd>${F.x(div(a.adsv,a.crev))} lần</dd>
+      <dt>Tự giới thiệu (mất nguồn)</dt><dd>${F.pct0(div(a.bk[3],a.rev))}</dd>
+      <dt>GA4 không có trong IBE</dt><dd>${F.int(a.on)} purchase</dd></dl>${rcLadder(a)}</div>`}).join('');
+  return `<p class="note info ${A()}">Mỗi khách sạn đối soát trên booking engine và GA4 của chính khách sạn đó, không cộng gộp. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Google Ads tag / IBE không phải tỷ lệ tracking, vì booking engine gồm cả booking không đến từ quảng cáo. Mở từng khách sạn để xem cách đọc.</p>
+   <div class="hotelcards">${cards}</div>`;
+}
+
+/* ---------- Hiệu quả thực: booking engine so với chi phí Google Ads ---------- */
+const NO_RC=`<div class="card anim empty">Phần này cần số booking engine và GA4 trong Google Sheet của dashboard. Bản công khai không chứa số booking engine. Mở bằng link cá nhân hoặc file gửi riêng, sau đó bấm Refresh.</div>`;
+function realAgg(h,f,t,gran){
+  const R=M.recon,H=R.hotels.indexOf(h),nb=R.buckets.length,MISS=nb-1;
+  const Z=()=>({rev:0,n:0,ar:0,an:0,gr:0,mr:0,cost:0,adsv:0,ads:0});
+  const tot=Z(),ser=new Map(),byC=new Map();
+  const at=d=>{const b=bucketOf(d,gran);if(!ser.has(b))ser.set(b,Z());return ser.get(b)};
+  for(const [d,hi,b,cid,n,rev] of R.ibe){if(d<f||d>t||hi!==H)continue;
+    const add=a=>{a.rev+=rev;a.n+=n;if(b===0){a.ar+=rev;a.an+=n}if(b!==MISS)a.gr+=rev;else a.mr+=rev};
+    add(tot);if(gran)add(at(d));
+    if(b===0){const k=cid||'';const x=byC.get(k)||{rn:0,rr:0};x.rn+=n;x.rr+=rev;byC.set(k,x)}}
+  const X=agg(campMask(h,false,true),f,t,gran||'day');
+  Object.assign(tot,{cost:X.tot.cost,adsv:X.tot.bval,ads:X.tot.bk});
+  if(gran)X.ser.forEach((v,b)=>{const a=ser.has(b)?ser.get(b):(ser.set(b,Z()),ser.get(b));Object.assign(a,{cost:v.cost,adsv:v.bval,ads:v.bk})});
+  const fin=a=>{a.cov=div(a.gr,a.rev);a.est=a.cov?a.ar/a.cov:null;a.rFloor=div(a.ar,a.cost);a.rEst=div(a.est,a.cost);a.rAds=div(a.adsv,a.cost);a.rWeb=div(a.rev,a.cost);a.adsShare=div(a.ar,a.rev);return a};
+  fin(tot);ser.forEach(fin);
+  return {tot,ser,byC,X};
+}
+function realLevels(a){return [
+  ['Mức sàn',a.rFloor,a.ar,'--s3','booking thực có phiên Google Ads'],
+  ['Ước tính',a.rEst,a.est,'--s7','bù phần GA4 không ghi'],
+  ['Ads tự ghi',a.rAds,a.adsv,'--s2','Google Ads tự ghi'],
+  ['Web / Cost',a.rWeb,a.rev,'--other','toàn bộ web revenue']]}
+function realFind(h,a,rows){
+  const L=[],tr=S.targetRoas[h],be=1/S.otaCommission;
+  L.push(['',`Web revenue ${F.tr(a.rev)} từ ${F.int(a.n)} booking. Booking có phiên Google Ads chiếm ${F.pct0(a.adsShare)} web revenue (${F.tr(a.ar)}).`]);
+  if(tr&&ok(a.rEst))L.push([a.rEst>=tr?'g':'w',`Real ROAS ước tính ${F.x(a.rEst)} đạt ${F.pct0(a.rEst/tr)} Target ROAS ${F.x(tr)}. Mức sàn ${F.x(a.rFloor)} đạt ${F.pct0(a.rFloor/tr)}, Google Ads tự ghi ${F.x(a.rAds)} đạt ${F.pct0(a.rAds/tr)}.`]);
+  if(ok(a.rFloor))L.push([a.rFloor>=be?'g':'b',`Real ROAS mức sàn ${F.x(a.rFloor)} ${a.rFloor>=be?'cao hơn':'thấp hơn'} mức hoà vốn so với OTA ${F.x(be)} (hoa hồng ${F.pct0(S.otaCommission)}).`]);
+  if(ok(a.rAds)&&ok(a.rEst)&&a.rEst>0){const q=a.rAds/a.rEst;L.push([q>1.3?'w':'g',q>1.3?`Google Ads tự ghi bằng ${nf1.format(q)} lần Real ROAS ước tính. Đánh giá chiến dịch theo số Google Ads sẽ thấy tốt hơn thực tế. Phần chênh có thể gồm booking huỷ hoặc đổi, chuyển đổi xem quảng cáo, đặt trên thiết bị khác, ghi công DDA, và tag mua hàng dùng chung nhiều khách sạn (Suy luận).`:`Google Ads tự ghi bằng ${nf1.format(q)} lần Real ROAS ước tính, sát với số thực. Số Google Ads dùng được để tối ưu hằng ngày.`])}
+  const zero=rows.filter(r=>r.cost>=Math.max(500000,a.cost*0.05)&&!r.rn);
+  if(zero.length)L.push(['b',`${zero.length} chiến dịch chi từ 5% Cost mà không có booking thực có phiên GA4: ${zero.slice(0,4).map(r=>`${esc(r.name)} (${F.tr(r.cost)})`).join(', ')}.`]);
+  return L;
+}
+function secReal(){
+  IX=0;const h=HOTEL,R=M.recon;if(!R)return NO_RC;
+  if(R.hotels.indexOf(h)<0)return `<div class="card anim empty">${esc(h)} không có số booking engine để đo.</div>`;
+  const thr=toIdx(R.through),to=Math.min(TO,thr);const gran=(to-FROM)>62?'month':(to-FROM)>13?'week':'day';
+  const {tot:a,ser,byC,X}=realAgg(h,FROM,to,gran);const bs=bucketsIn(FROM,to,gran);const g=b=>ser.get(b)||{};
+  const tr=S.targetRoas[h],be=1/S.otaCommission,lv=realLevels(a);
+  const rows=[],seen=new Set();
+  X.byC.forEach((x,i)=>{const c=M.camps[i],cid=c.key.split(':').pop(),r=byC.get(cid)||{rn:0,rr:0};seen.add(cid);
+    rows.push({name:c.name,_q:c.name,cost:x.cost,rn:r.rn,rr:r.rr,rroas:div(r.rr,x.cost),rcir:r.rr?x.cost/r.rr:null,bk:x.bk,val:x.val,roas:div(x.val,x.cost),ratio:r.rr?x.val/r.rr:null})});
+  byC.forEach((r,cid)=>{if(seen.has(cid))return;const i=rcMap()[cid];
+    rows.push({name:cid===''?'Google Ads, GA4 không rõ chiến dịch':(i!=null?M.camps[i].name+' (ngoài bộ lọc hoặc khách sạn khác)':'Chiến dịch ID '+cid),_q:'',cost:0,rn:r.rn,rr:r.rr,rroas:null,rcir:null,bk:null,val:null,roas:null,ratio:null})});
+  const rs=rows.filter(r=>r.cost>0||r.rn>0);
+  const cols=[MC('name','Chiến dịch',esc,{l:1,cls:'t'}),MC('cost','Cost',F.tr,{tip:'Chi phí'}),
+    MC('rr','Real revenue',F.tr,{tip:'Doanh thu book date trên booking engine của booking có phiên GA4 đến từ chiến dịch (mức sàn)'}),
+    MC('rroas','Real ROAS',v=>`<b>${F.x(v)}</b>`,{tip:'Real revenue / Cost'}),MC('rcir','Real CIR',cosCell,{cls:'num',tip:'Cost / Real revenue'}),
+    MC('rn','Real bookings',F.cv,{tip:'Booking trên booking engine có phiên GA4 đến từ chiến dịch'}),
+    MC('val','Ads conv. value',F.tr,{tip:'Conv. value Google Ads tự ghi'}),MC('roas','Ads ROAS',F.x,{tip:'Ads conv. value / Cost'}),MC('bk','Ads bookings',F.cv,{tip:'Booking Google Ads tự ghi'}),
+    MC('ratio','Ads / Real',v=>ok(v)?nf1.format(v)+' lần':'-',{tip:'Ads conv. value / Real revenue'})];
+  const S0=k=>rs.reduce((s,r)=>s+(ok(r[k])?r[k]:0),0);const fc=S0('cost'),frr=S0('rr'),fval=S0('val');
+  const foot={name:`<b>Tổng</b> <span class="muted small">${rs.length} dòng</span>`,cost:'<b>'+F.tr(fc)+'</b>',rr:'<b>'+F.tr(frr)+'</b>',rroas:'<b>'+F.x(div(frr,fc))+'</b>',rcir:F.pct(div(fc,frr)),rn:'<b>'+F.cv(S0('rn'))+'</b>',val:'<b>'+F.tr(fval)+'</b>',roas:'<b>'+F.x(div(fval,fc))+'</b>',bk:'<b>'+F.cv(S0('bk'))+'</b>',ratio:frr?nf1.format(fval/frr)+' lần':'-'};
+  POST.push(()=>{const labels=bs.map(b=>lab(b,gran));const mx=Math.max(...lv.map(x=>x[1]||0),tr||0,be)*1.1;
+    chart('rlLv',{type:'bar',data:{labels:lv.map(x=>x[0]),datasets:[{label:'ROAS',data:lv.map(x=>x[1]),backgroundColor:lv.map(x=>css(x[3])),borderRadius:4,maxBarThickness:26}]},
+      options:opts(F.x,'',{indexAxis:'y',scales:{x:{beginAtZero:true,suggestedMax:mx,grid:{color:'#eeeae3'},title:{display:true,text:'ROAS (lần)',color:css('--ink-2'),font:{size:11}},ticks:{color:css('--ink-2'),font:{size:11}}},y:{grid:{display:false},ticks:{color:css('--ink'),font:{size:11}}}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>lv[x[0].dataIndex][0]+': '+lv[x[0].dataIndex][4],label:x=>` ROAS ${F.x(x.parsed.x)}, CIR ${F.pct(div(1,x.parsed.x))}, doanh thu ${F.tr(lv[x.dataIndex][2])}`}}}}),
+      plugins:[hl([{v:be,c:css('--s8'),t:'Hoà vốn '+F.x(be),dash:[3,3]},...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[])],'x')]});
+    const ln=(lb,k,c,dash)=>({label:lb,data:bs.map(b=>ok(g(b)[k])?g(b)[k]:null),borderColor:css(c),backgroundColor:css(c),borderWidth:2.2,borderDash:dash||[],pointRadius:gran==='day'?0:3,pointHoverRadius:5,tension:.3,spanGaps:true});
+    chart('rlTr',{type:'line',data:{labels,datasets:[ln('Ads tự ghi','rAds','--s2'),ln('Ước tính','rEst','--s7',[5,4]),ln('Mức sàn','rFloor','--s3')]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[]),{v:be,c:css('--s8'),t:'Hoà vốn',dash:[3,3]}])]});
+    const st=(lb,f,c)=>({label:lb,data:bs.map(b=>f(g(b))||0),backgroundColor:css(c),borderColor:'#fff',borderWidth:1});
+    chart('rlMix',{type:'bar',data:{labels,datasets:[st('Google Ads (phiên GA4)',x=>x.ar,'--s2'),st('Nguồn khác trong GA4',x=>(x.gr||0)-(x.ar||0),'--s5'),st('Không có trong GA4',x=>x.mr,'--other')]},
+      options:opts(F.tr,'Web revenue (triệu đồng)',{scales:{x:{stacked:true,grid:{display:false},ticks:{color:css('--ink-2'),font:{size:11},maxRotation:0,autoSkip:true}},y:{stacked:true,beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}}}})});
+  });
+  const kp=(lb,v,ex,cls)=>`<div class="card kpi ${cls||''} ${A()}"><div class="lb"><span>${lb}</span></div><div class="v num">${v}</div><div class="d">${ex}</div></div>`;
+  const fl=realFind(h,a,rs);
+  return `${TO>thr?`<p class="note ${A()}">Booking engine có số đến ${dmy(thr)}, phần này tính đến ngày đó.</p>`:''}
+   <p class="note info ${A()}">Số thực lấy từ booking engine (booking xác nhận, doanh thu book date). Real ROAS có 3 mức. <b>Mức sàn</b>: chỉ booking thực có phiên GA4 đến từ Google Ads, bỏ sót booking GA4 không ghi được. <b>Ước tính</b>: mức sàn chia cho tỷ lệ doanh thu GA4 ghi được, giả định phần GA4 sót có cùng tỷ trọng nguồn (Ước tính). <b>Ads tự ghi</b>: số Google Ads tự ghi, gồm cả booking huỷ, đặt trên thiết bị khác, xem quảng cáo và ghi công DDA. Dùng mức Ước tính để đánh giá, mức sàn là phần chắc chắn. Web revenue / Cost là tỷ lệ tổng thể, tính cả booking không đến từ quảng cáo.</p>
+   <div class="kpis">
+     ${kp('Web revenue <span class="muted">(booking engine)</span>',F.tr(a.rev),`${F.int(a.n)} booking, Cost ${F.tr(a.cost)}, Web revenue / Cost ${F.x(a.rWeb)}`,'hero')}
+     ${kp('Real ROAS mức sàn',F.x(a.rFloor),`${F.tr(a.ar)} từ ${F.int(a.an)} booking có phiên Google Ads, CIR ${F.pct(div(a.cost,a.ar))}`,'hero')}
+     ${kp('Real ROAS ước tính',F.x(a.rEst),`bù ${F.pct0(1-(a.cov||0))} web revenue GA4 không ghi, CIR ${F.pct(div(a.cost,a.est))} (Ước tính)`,'hero')}
+     ${kp('Ads ROAS <span class="muted">(Google Ads tự ghi)</span>',F.x(a.rAds),`${F.tr(a.adsv)}, ${F.cv(a.ads)} booking, CIR ${F.pct(div(a.cost,a.adsv))}`,'hero')}
+   </div>
+   <div class="grid g12" style="margin-top:14px">
+     <div class="card ${A()}"><h3>4 cách tính ROAS trong kỳ</h3><p class="q">Kỳ ${dmy(FROM)} đến ${dmy(to)}. Mức sàn: booking thực có phiên Google Ads. Ước tính: bù phần GA4 không ghi. Ads tự ghi: số Google Ads tự ghi. Web / Cost: toàn bộ web revenue. Vạch đỏ: hoà vốn so với hoa hồng OTA${tr?'. Vạch đen: Target ROAS':''}.</p><div class="chartbox" style="height:240px"><canvas id="rlLv"></canvas></div></div>
+     <div class="card ${A()}"><h3>Phát hiện</h3><p class="q">Tự động tạo từ số trong kỳ. Nhận định nguyên nhân gắn nhãn Suy luận.</p><ul class="ins">${fl.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Tốt':x[0]==='b'?'Cần xem':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
+   </div>
+   <div class="grid g2" style="margin-top:14px">
+     <div class="card ${A()}"><h3>Real ROAS theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày'}</h3><p class="q">Đánh giá theo đường Ước tính. Ads tự ghi cách xa Ước tính là dấu hiệu Google Ads ghi thừa hoặc ghi công rộng.</p>
+       <div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Ads tự ghi</span><span><i class="dash" style="border-top-color:var(--s7)"></i>Ước tính</span><span><i class="ln" style="background:var(--s3)"></i>Mức sàn</span></div><div class="chartbox"><canvas id="rlTr"></canvas></div></div>
+     <div class="card ${A()}"><h3>Web revenue theo nguồn</h3><p class="q">Doanh thu book date trên booking engine, tách theo nguồn phiên GA4.</p>
+       <div class="legend"><span><i style="background:var(--s2)"></i>Google Ads (phiên GA4)</span><span><i style="background:var(--s5)"></i>Nguồn khác trong GA4</span><span><i style="background:var(--other)"></i>Không có trong GA4</span></div><div class="chartbox"><canvas id="rlMix"></canvas></div></div>
+   </div>
+   <h2 class="sec">Real ROAS từng chiến dịch <small>Real revenue là mức sàn: booking thực có phiên GA4 đến từ chiến dịch. Chiến dịch Display, Demand Gen thường có Ads / Real cao vì phần lớn chuyển đổi là xem quảng cáo hoặc đặt sau (Suy luận).</small></h2>
+   <div class="${A()}">${T('real_'+h,cols,rs,{sort:'cost',what:'chiến dịch',foot})}</div>`;
+}
+function secRealAll(){
+  IX=0;const R=M.recon;if(!R)return NO_RC;const thr=toIdx(R.through),to=Math.min(TO,thr);
+  const cards=MAIN.filter(h=>R.hotels.includes(h)).map(h=>{const {tot:a}=realAgg(h,FROM,to);const tr=S.targetRoas[h];
+    return `<div class="card hc ${A()}"><h3>${h}<button class="btn" data-goh="${h}" data-sec="real">Chi tiết</button></h3>
+      <div class="small muted">Web revenue (booking engine, doanh thu book date)</div><div class="big num">${F.tr(a.rev)}</div><div class="small muted">${F.int(a.n)} booking, Cost ${F.tr(a.cost)}</div>
+      <dl class="num"><dt>Real ROAS mức sàn</dt><dd><b>${F.x(a.rFloor)}</b></dd>
+      <dt>Real ROAS ước tính</dt><dd><b>${F.x(a.rEst)}</b>${tr&&ok(a.rEst)?` <span class="muted small">đạt ${F.pct0(a.rEst/tr)} Target ${F.x(tr)}</span>`:''}</dd>
+      <dt>Ads ROAS (Google Ads tự ghi)</dt><dd>${F.x(a.rAds)}</dd>
+      <dt>Web revenue / Cost</dt><dd>${F.x(a.rWeb)}</dd>
+      <dt>Web revenue từ Google Ads</dt><dd>${F.pct0(a.adsShare)} <span class="muted small">(mức sàn)</span></dd></dl></div>`}).join('');
+  return `<p class="note info ${A()}">Mỗi khách sạn đo trên booking engine và chi phí Google Ads của chính khách sạn đó. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Dùng Real ROAS ước tính để đánh giá, mức sàn là phần chắc chắn. Mở từng khách sạn để xem theo chiến dịch.</p>
+   <div class="hotelcards">${cards}</div>`;
+}
+
+/* ============ popovers ============ */
+let POP=null;function closePop(){if(POP){POP.remove();POP=null}}
+document.addEventListener('mousedown',e=>{if(POP&&!POP.contains(e.target)&&!e.target.closest('#pDate,#pCamp'))closePop()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePop()});
+function popAt(btn,html){closePop();const p=document.createElement('div');p.className='pop';p.innerHTML=html;document.body.appendChild(p);const r=btn.getBoundingClientRect();p.style.top=(r.bottom+window.scrollY+8)+'px';p.style.left=Math.max(10,Math.min(r.left,window.innerWidth-p.offsetWidth-14))+'px';POP=p;return p}
+$('#pDate').onclick=e=>{if(POP){closePop();return}
+  const p=popAt(e.currentTarget,`<div class="presets">${PRESETS.map(([k,t])=>`<button data-p="${k}" class="${PRE===k?'on':''}">${t}</button>`).join('')}</div>
+   <div class="row"><label>Từ ngày<input type="date" id="dF" value="${toStr(FROM)}" max="${toStr(M.lastDate)}"></label><label>Đến ngày<input type="date" id="dT" value="${toStr(TO)}" max="${toStr(M.lastDate)}"></label></div>
+   <div class="row" style="margin-top:10px"><label style="flex:1">So sánh với<select id="dC"><option value="yoy" ${CMP==='yoy'?'selected':''}>Cùng kỳ năm trước</option><option value="prev" ${CMP==='prev'?'selected':''}>Kỳ liền trước</option><option value="none" ${CMP==='none'?'selected':''}>Không so sánh</option></select></label></div>
+   <div class="small muted" style="margin-top:8px">Data có đến ${dmy(M.lastDate)}. Từ ${dmy(DSTART)}.</div>
+   <div class="ft"><button class="btn" id="dX">Huỷ</button><button class="btn dark" id="dOK">Áp dụng</button></div>`);
+  let pend=PRE;const sv=[FROM,TO,PRE];
+  p.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{applyPreset(b.dataset.p);pend=b.dataset.p;p.querySelector('#dF').value=toStr(FROM);p.querySelector('#dT').value=toStr(TO);FROM=sv[0];TO=sv[1];PRE=sv[2];p.querySelectorAll('[data-p]').forEach(x=>x.classList.toggle('on',x===b))});
+  ['#dF','#dT'].forEach(q=>p.querySelector(q).oninput=()=>{pend='custom';p.querySelectorAll('[data-p]').forEach(x=>x.classList.remove('on'))});
+  p.querySelector('#dX').onclick=closePop;
+  p.querySelector('#dOK').onclick=()=>{let f=toIdx(p.querySelector('#dF').value),t=toIdx(p.querySelector('#dT').value);if(isNaN(f)||isNaN(t))return;if(f>t)[f,t]=[t,f];
+    FROM=f;TO=t;PRE=pend;CMP=p.querySelector('#dC').value;closePop();render()}};
+$('#pCamp').onclick=e=>{if(POP){closePop();return}
+  const mkAll=campMask(HOTEL,false);const X=agg(mkAll,FROM,TO);
+  const list=M.camps.map((c,i)=>({c,i,a:X.byC.get(i)})).filter(x=>(HOTEL==='ALL'?MAIN.includes(x.c.hotel):x.c.hotel===HOTEL)).sort((a,b)=>((b.a?b.a.cost:0)-(a.a?a.a.cost:0))||a.c.name.localeCompare(b.c.name));
+  const sel=CSEL?new Set(CSEL):null;
+  const p=popAt(e.currentTarget,`<div class="row"><label style="flex:1">Loại chiến dịch<select id="cT"><option value="ALL">Tất cả</option><option value="SEARCH">Search</option><option value="PERFORMANCE_MAX">PMax</option><option value="DEMAND_GEN">Demand Gen</option><option value="OTHER">Khác</option></select></label><label style="flex:1">Trạng thái hiện tại<select id="cS"><option value="ALL">Tất cả</option><option value="ENABLED">Đang bật</option></select></label></div>
+   <input type="search" id="cQ" placeholder="Tìm chiến dịch" style="width:100%;margin-top:10px">
+   <div class="row" style="margin-top:8px"><button class="btn" id="cAll">Chọn tất cả</button><button class="btn" id="cNone">Bỏ chọn</button><button class="btn" id="cOn">Chỉ đang bật</button><button class="btn" id="cSpend">Chỉ có chi phí trong kỳ</button></div>
+   <div class="clist">${list.map(x=>`<label data-n="${esc(x.c.name.toLowerCase())}"><input type="checkbox" value="${esc(x.c.key)}" ${!sel||sel.has(x.c.key)?'checked':''} data-on="${x.c.status==='ENABLED'?1:0}" data-sp="${x.a&&x.a.cost>0?1:0}"><span>${esc(x.c.name)}${HOTEL==='ALL'?` <span class="muted">(${x.c.hotel})</span>`:''}</span><span class="meta">${x.c.status==='ENABLED'?'<span class="st on">Bật</span> ':''}${x.a?F.tr(x.a.cost):'0'}</span></label>`).join('')}</div>
+   <div class="ft"><button class="btn" id="cX">Huỷ</button><button class="btn dark" id="cOK">Áp dụng</button></div>`);
+  p.style.width='520px';p.querySelector('#cT').value=TYPE;p.querySelector('#cS').value=STATUS;
+  const boxes=[...p.querySelectorAll('.clist input')];
+  p.querySelector('#cQ').oninput=ev=>{const q=ev.target.value.toLowerCase();p.querySelectorAll('.clist label').forEach(l=>l.style.display=l.dataset.n.includes(q)?'':'none')};
+  p.querySelector('#cAll').onclick=()=>boxes.forEach(b=>b.checked=true);p.querySelector('#cNone').onclick=()=>boxes.forEach(b=>b.checked=false);
+  p.querySelector('#cOn').onclick=()=>boxes.forEach(b=>b.checked=b.dataset.on==='1');p.querySelector('#cSpend').onclick=()=>boxes.forEach(b=>b.checked=b.dataset.sp==='1');
+  p.querySelector('#cX').onclick=closePop;
+  p.querySelector('#cOK').onclick=()=>{TYPE=p.querySelector('#cT').value;STATUS=p.querySelector('#cS').value;const ch=boxes.filter(b=>b.checked).map(b=>b.value);CSEL=ch.length===boxes.length?null:new Set(ch);closePop();render()}};
+
+/* ============ dialogs ============ */
+$$('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+function openData(){$('#sheetUrl').value=S.sheetUrl||'';$('#dataState').textContent=`Đang dùng: ${M.stamp}. Data đến ${dmy(M.lastDate)}.`;$('#loadStatus').textContent='';$('#dlgData').showModal()}
+$('#btnData').onclick=openData;
+$('#btnSheet').onclick=async()=>{S.sheetUrl=$('#sheetUrl').value.trim();S.sheetOff=!S.sheetUrl;saveS();$('#loadStatus').textContent='Đang tải...';await refresh(true);$('#loadStatus').textContent=/Google Sheet/.test(M.stamp)?'Đã tải. '+M.stamp:'Chưa tải được, xem thông báo góc phải.'};
+$('#btnReset').onclick=()=>{S.sheetUrl='';S.sheetOff=true;saveS();M=scope(fromRaw(RAW));classify();DSTART=dstart();applyPreset(PRE);render();$('#dlgData').close();toast('Đã về snapshot gốc.')};
+$('#pRefresh').onclick=()=>refresh(true);
+const readFiles=async files=>{const T={};for(const f of files){const t=await f.text();const k=kindOf(t);if(k)T[k]=t}
+  try{const imp=importTables(T);M=merge(fromRaw(RAW),imp);M.stamp='File CSV nạp '+new Date().toLocaleString('vi-VN');classify();DSTART=dstart();applyPreset(PRE);render();$('#loadStatus').textContent=`Đã nạp ${imp.rows.length} dòng Data${T.dims?', có Dims':''}. Data đến ${dmy(M.lastDate)}.`}catch(e){$('#loadStatus').textContent='Lỗi: '+e.message}};
+$('#fileIn').onchange=e=>readFiles([...e.target.files]);
+const dz=$('#drop');dz.ondragover=e=>{e.preventDefault();dz.classList.add('over')};dz.ondragleave=()=>dz.classList.remove('over');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');readFiles([...e.dataTransfer.files])};
+function openSettings(){
+  const [y,m]=ymd(M.lastDate);const ms=new Set(Object.keys(S.budgets));for(let i=0;i<3;i++){const d=new Date(Date.UTC(y,m+i,1));ms.add(d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0'))}
+  const months=[...ms].sort();
+  const list=M.camps.map(c=>c).sort((a,b)=>((['Chưa phân loại','Nhiều khách sạn'].includes(a.hotel)?0:1)-(['Chưa phân loại','Nhiều khách sạn'].includes(b.hotel)?0:1))||a.name.localeCompare(b.name));
+  $('#setBody').innerHTML=`<h3 style="font-size:14px;margin:0 0 8px">Mốc hiệu quả</h3><div class="form"><label>Hoa hồng OTA (%)<input id="sCom" type="number" step="0.5" value="${S.otaCommission*100}"></label>${MAIN.map(h=>`<label>Target ROAS ${h}<input data-tr="${h}" type="number" step="0.5" value="${S.targetRoas[h]??''}" placeholder="bỏ trống nếu không có"></label>`).join('')}</div>
+   <p class="small muted">Mặc định: Target ROAS Sakyo 14 theo KPI kế hoạch 2H/2026 (Review 26/10/2026). The Myst chưa có Target ROAS, nhập ở đây nếu có.</p>
+   <h3 style="font-size:14px;margin:16px 0 8px">Ngân sách Google Ads theo tháng (triệu đồng)</h3>
+   <table><thead><tr><th class="l">Tháng</th>${MAIN.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${months.map(k=>`<tr><td class="l">${k.slice(5)}/${k.slice(0,4)}</td>${MAIN.map(h=>`<td><input data-bm="${k}" data-bh="${h}" type="number" step="0.1" style="width:90px" value="${(S.budgets[k]||{})[h]!=null?S.budgets[k][h]/1e6:''}"></td>`).join('')}</tr>`).join('')}</tbody></table>
+   <p class="small muted">Mặc định Sakyo T11, T12/2026 là mức trần khung ngân sách trong Review 27/10/2026. The Myst chưa có ngân sách, nhập ở đây để xem tiến độ chi.</p>
+   <h3 style="font-size:14px;margin:16px 0 8px">Quy tắc gán khách sạn theo tên chiến dịch</h3>
+   <p class="small muted">Mỗi dòng <code>Khách sạn = biểu thức</code> (regex, không phân biệt hoa thường). Khớp 2 khách sạn trở lên thì vào "Nhiều khách sạn". Dòng Bến Thành, Jolie, Yen, Sil, Mây giữ lại để chiến dịch gộp (ví dụ PM Sakyo & Sil) vào "Nhiều khách sạn", không tính hết cho Sakyo. Không khớp thì theo tài khoản: 396-544-2048 là Sakyo, 623-388-2444 là The Myst, 753-421-2327 là Chưa phân loại.</p>
+   <textarea id="sRules" rows="7">${esc(S.rules)}</textarea>
+   <h3 style="font-size:14px;margin:16px 0 8px">Gán chiến dịch bằng tay</h3><input id="sFind" placeholder="Tìm chiến dịch" style="width:100%;margin-bottom:6px">
+   <div class="tw" style="max-height:300px"><table id="sCamps"><thead><tr><th class="l">Chiến dịch</th><th class="l">TK</th><th class="l">Đang gán</th><th class="l">Gán tay</th></tr></thead><tbody>
+   ${list.map(c=>`<tr data-n="${esc(c.name.toLowerCase())}"><td class="l">${esc(c.name)}</td><td class="l">${c.acc}</td><td class="l">${c.hotel} <span class="muted small">(${esc(c.how)})</span></td><td class="l"><select data-ov="${esc(c.key)}"><option value="">Tự động</option>${HOTELS.map(h=>`<option ${S.overrides[c.key]===h?'selected':''}>${h}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>`;
+  $('#sFind').oninput=e=>{const q=e.target.value.toLowerCase();$$('#sCamps tbody tr').forEach(tr=>tr.style.display=tr.dataset.n.includes(q)?'':'none')};
+  $('#dlgSet').showModal();
+}
+$('#btnSettings').onclick=openSettings;
+$('#btnSetSave').onclick=()=>{const com=parseFloat($('#sCom').value);if(com>0&&com<100)S.otaCommission=com/100;
+  $$('[data-tr]').forEach(i=>{const v=parseFloat(i.value);S.targetRoas[i.dataset.tr]=ok(v)&&v>0?v:null});
+  $$('[data-bm]').forEach(i=>{const k=i.dataset.bm,h=i.dataset.bh,v=parseFloat(i.value);S.budgets[k]=S.budgets[k]||{};if(ok(v)&&v>0)S.budgets[k][h]=v*1e6;else delete S.budgets[k][h]});
+  S.rules=$('#sRules').value;$$('[data-ov]').forEach(s=>{if(s.value)S.overrides[s.dataset.ov]=s.value;else delete S.overrides[s.dataset.ov]});saveS();classify();$('#dlgSet').close();render()};
+$('#btnSetDefault').onclick=()=>{const u=S.sheetUrl;S=JSON.parse(JSON.stringify(DEF));S.sheetUrl=u;saveS();classify();$('#dlgSet').close();render()};
+
+/* ============ init ============ */
+function dstart(){let m=1e9;for(const r of M.rows)if(r.s<m)m=r.s;return m}
+(function init(){
+  if(window.Chart){Chart.defaults.font.family='"Be Vietnam Pro","Segoe UI",Arial,sans-serif';Chart.defaults.color='#55555a'}
+  M=scope(fromRaw(RAW));classify();DSTART=dstart();applyPreset('l30');render();
+  $('#srcLine').textContent='Nguồn snapshot: Google Ads API (TK 753-421-2327, chiến dịch Sakyo) và giao diện Google Ads (TK 396-544-2048 Sakyo, TK 623-388-2444 The Myst, số theo tháng). Dashboard chỉ lấy số Sakyo và The Myst, '+'lấy ngày '+RAW.generated.split('-').reverse().join('/')+'. Sau khi cài script: Google Sheet do Apps Script (runAds) ghi hằng ngày. Chuyển đổi và doanh thu là số tag Google Ads chính, chưa loại huỷ. Đối soát tracking dùng booking engine (sheet Data, file Booking Website SVL & The Myst), GA4 property 340245620 (Sakyo) và 340232784 (The Myst).';
+  if(S.sheetUrl)refresh(false);
+})();
+</script>
+</body>
+</html>
