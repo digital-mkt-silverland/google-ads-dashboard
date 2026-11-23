@@ -15,11 +15,11 @@
  * Các lần sau: lấy lại từ ngày 1 của tháng trước đến hôm qua (đủ cho chuyển đổi về trễ), giữ nguyên số cũ hơn.
  *
  * Cài một lần:
- *  1. Google Cloud project của script (Project Settings) phải bật "Google Ads API".
- *  2. Project Settings > Script Properties > Add: DEVELOPER_TOKEN = developer token của MCC
- *     (Google Ads MCC > Công cụ > Trung tâm API). Không dán token vào code.
- *  3. Chạy hàm runAds, bấm Continue để cấp thêm quyền Google Ads.
- *  4. Chạy installTrigger: runAds chạy 6 đến 7 giờ, runRecon chạy 8 đến 9 giờ mỗi ngày.
+ *  1. Google Cloud project của script (Project Settings) bật "Google Ads API" và có mức truy cập Explorer trở lên
+ *     (console.cloud.google.com/google/ads-apis/overview). Từ 09/09/2026 Google bỏ developer token,
+ *     quyền API gắn với Cloud project nên không cần nhập token.
+ *  2. Chạy hàm runAds, bấm Continue để cấp thêm quyền Google Ads.
+ *  3. Chạy installTrigger: runAds chạy 6 đến 7 giờ, runRecon chạy 8 đến 9 giờ mỗi ngày.
  *  Muốn lấy lại toàn bộ từ đầu: chạy runAdsFull.
  */
 
@@ -44,10 +44,15 @@ var AdsApiExport = (function () {
   var DIMS_HEADER = ['dim', 'start', 'end', 'account_id', 'campaign_id', 'k1', 'k2', 'cost', 'impressions', 'clicks', 'conversions', 'conv_value'];
   var TOKEN, SKIP = {}, KEEP = {};
 
+  function hdr() {
+    var h = { Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'login-customer-id': ADS_CONFIG.LOGIN_CUSTOMER_ID };
+    if (TOKEN) h['developer-token'] = TOKEN;   // không bắt buộc từ 09/09/2026
+    return h;
+  }
   function search(cid, q) {
     var res = UrlFetchApp.fetch('https://googleads.googleapis.com/' + ADS_CONFIG.API_VERSION + '/customers/' + cid + '/googleAds:searchStream', {
       method: 'post', contentType: 'application/json', payload: JSON.stringify({ query: q }), muteHttpExceptions: true,
-      headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'developer-token': TOKEN, 'login-customer-id': ADS_CONFIG.LOGIN_CUSTOMER_ID }
+      headers: hdr()
     });
     var code = res.getResponseCode(), body = res.getContentText();
     if (code !== 200) throw new Error('Google Ads API ' + code + ' (TK ' + cid + '): ' + body.slice(0, 600));
@@ -57,8 +62,7 @@ var AdsApiExport = (function () {
   }
 
   function run(full) {
-    TOKEN = PropertiesService.getScriptProperties().getProperty('DEVELOPER_TOKEN');
-    if (!TOKEN) throw new Error('Chưa có DEVELOPER_TOKEN trong Project Settings > Script Properties');
+    TOKEN = PropertiesService.getScriptProperties().getProperty('DEVELOPER_TOKEN') || '';
     var tz = 'Asia/Ho_Chi_Minh', ss = SpreadsheetApp.getActiveSpreadsheet();
     var END = Utilities.formatDate(new Date(Date.now() - 864e5), tz, 'yyyy-MM-dd');
     var y = +END.slice(0, 4), m = +END.slice(5, 7) - ADS_CONFIG.MONTHS_BACK;

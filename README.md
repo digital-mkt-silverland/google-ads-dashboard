@@ -17,11 +17,10 @@ Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Saky
 ## Cài đặt (làm 1 lần)
 1. Google Sheet của dashboard, chia sẻ "Bất kỳ ai có đường liên kết: Người xem".
 2. Tiện ích mở rộng, Apps Script: dán `Code_combined.gs` vào Code.gs và `appsscript.json` vào manifest. Dịch vụ (+): Google Analytics Data API.
-3. Project Settings: GCP project silverland-ga4-mcp (số 548318208693), đã bật Google Ads API, màn hình đồng ý OAuth ở trạng thái In production (quyền không hết hạn sau 7 ngày như chế độ Testing).
-4. Project Settings, Script Properties: `DEVELOPER_TOKEN` = developer token của MCC 140-788-0633 (Admin, API Center). Không dán token vào code.
-5. Chạy `runAds`, cấp quyền (màn hình "Google hasn't verified this app": Advanced, Go to, Continue). Chạy `runRecon`.
-6. Chạy `installTrigger` một lần: runAds 6 đến 7 giờ, runRecon 8 đến 9 giờ mỗi ngày.
-7. Dashboard, mục Nguồn data, dán link Sheet, Lưu và tải. Từ đó bấm Refresh là có data đến hôm qua.
+3. Project Settings: GCP project silverland-ga4-mcp (số 548318208693), đã bật Google Ads API mức Explorer (2.880 lượt gọi/ngày cho tài khoản thật), màn hình đồng ý OAuth ở trạng thái In production (quyền không hết hạn sau 7 ngày như chế độ Testing). Không cần developer token: Google bỏ developer token từ 09/09/2026, quyền gắn với Cloud project.
+4. Chạy `runAds`, cấp quyền (màn hình "Google hasn't verified this app": Advanced, Go to, Continue). Chạy `runRecon`.
+5. Chạy `installTrigger` một lần: runAds 6 đến 7 giờ, runRecon 8 đến 9 giờ mỗi ngày.
+6. Dashboard, mục Nguồn data, dán link Sheet, Lưu và tải. Từ đó bấm Refresh là có data đến hôm qua.
 
 Muốn lấy lại toàn bộ từ 01/01/2025: chạy `runAdsFull`.
 
