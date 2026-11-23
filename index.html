@@ -281,7 +281,8 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LS='svl_gads_dash_v2';
 const HOTELS=['Sakyo','The Myst','Nhiều khách sạn','Chưa phân loại'];
 const MAIN=['Sakyo','The Myst'];
-const CFGV=4;// 23/11/2026: dashboard chỉ còn Sakyo và The Myst
+const CFGV=4;
+const DEFAULT_SHEET=''/*__SHEET__*/;// bản gửi riêng có sẵn link Sheet, bản public để trống// 23/11/2026: dashboard chỉ còn Sakyo và The Myst
 const HIDDEN=['Nhiều khách sạn','Chưa phân loại'];
 const DEF={otaCommission:0.17,targetRoas:{'Sakyo':14,'The Myst':null},
   budgets:{'2026-11':{'Sakyo':27.5e6},'2026-12':{'Sakyo':37.4e6}},
@@ -290,6 +291,9 @@ const DEF={otaCommission:0.17,targetRoas:{'Sakyo':14,'The Myst':null},
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
 let S=Object.assign(JSON.parse(JSON.stringify(DEF)),lsGet(LS)||{});
+if(!S.sheetUrl&&!S.sheetOff&&DEFAULT_SHEET)S.sheetUrl=DEFAULT_SHEET;
+// Link cá nhân ?sheet=<ID Google Sheet>: tự nối và nhớ trên trình duyệt này, rồi xoá tham số khỏi thanh địa chỉ
+try{const q=new URLSearchParams(location.search).get('sheet');if(q&&/^[a-zA-Z0-9-_]{20,}$/.test(q)){S.sheetUrl='https://docs.google.com/spreadsheets/d/'+q+'/edit';S.sheetOff=false;localStorage.setItem(LS,JSON.stringify(Object.assign({},S,{cfgV:S.cfgV})));history.replaceState(null,'',location.pathname)}}catch(e){}
 if(S.cfgV!==CFGV){const keep={sheetUrl:S.sheetUrl||'',otaCommission:S.otaCommission,overrides:S.overrides||{}};S=Object.assign(JSON.parse(JSON.stringify(DEF)),keep);try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 S.accountDefault=Object.assign({},DEF.accountDefault,S.accountDefault);S.targetRoas=Object.assign({},DEF.targetRoas,S.targetRoas);
 const saveS=()=>lsSet(LS,S);
@@ -388,7 +392,16 @@ function merge0(base,imp){
   return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:Math.max(base.lastDate,imp.last),accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:monthly,noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
 }
 function sheetId(u){const m=String(u).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null}
-async function fetchTab(id,name){const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(/<html/i.test(t.slice(0,300)))throw new Error('Sheet chưa chia sẻ cho người có link');return t}
+// File mở từ máy (file://) bị chặn CORS khi fetch Google Sheet: đọc bằng thẻ script (gviz responseHandler), đổi về CSV cho bộ đọc sẵn có
+function jsonpTab(id,name){return new Promise((res,rej)=>{const cb='__gv'+Math.random().toString(36).slice(2),sc=document.createElement('script');
+  const done=()=>{clearTimeout(to);try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove()};const to=setTimeout(()=>{done();rej(new Error('Hết thời gian tải tab '+name))},90000);
+  window[cb]=o=>{done();if(!o||o.status==='error'){rej(new Error('Sheet báo lỗi khi đọc tab '+name+'. Kiểm tra quyền chia sẻ: Bất kỳ ai có link, Người xem'));return}
+    const t=o.table,q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',L=[t.cols.map(c=>q(c.label||'')).join(',')];
+    for(const r of t.rows)L.push(t.cols.map((c,i)=>{const x=r.c&&r.c[i];return q(x&&x.v!=null?x.v:'')}).join(','));res(L.join('\n'))};
+  sc.onerror=()=>{done();rej(new Error('Không tải được Sheet (kiểm tra mạng hoặc quyền chia sẻ)'))};
+  sc.src=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json;responseHandler:${cb}&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;document.head.appendChild(sc)})}
+async function fetchTab(id,name){if(location.protocol==='file:')return jsonpTab(id,name);try{return await fetchTab0(id,name)}catch(e){if(/chưa chia sẻ/.test(e.message))throw e;return jsonpTab(id,name)}}
+async function fetchTab0(id,name){const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(/<html/i.test(t.slice(0,300)))throw new Error('Sheet chưa chia sẻ cho người có link');return t}
 async function refresh(manual){
   if(!S.sheetUrl){if(manual){openData();toast('Chưa có link Google Sheet. Làm theo 6 bước cài script để Refresh tự lấy data đến hôm qua.')}return}
   const id=sheetId(S.sheetUrl);if(!id){toast('Link Sheet không hợp lệ',1);return}
@@ -987,8 +1000,8 @@ $('#pCamp').onclick=e=>{if(POP){closePop();return}
 $$('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 function openData(){$('#sheetUrl').value=S.sheetUrl||'';$('#dataState').textContent=`Đang dùng: ${M.stamp}. Data đến ${dmy(M.lastDate)}.`;$('#loadStatus').textContent='';$('#dlgData').showModal()}
 $('#btnData').onclick=openData;
-$('#btnSheet').onclick=async()=>{S.sheetUrl=$('#sheetUrl').value.trim();saveS();$('#loadStatus').textContent='Đang tải...';await refresh(true);$('#loadStatus').textContent=/Google Sheet/.test(M.stamp)?'Đã tải. '+M.stamp:'Chưa tải được, xem thông báo góc phải.'};
-$('#btnReset').onclick=()=>{S.sheetUrl='';saveS();M=scope(fromRaw(RAW));classify();DSTART=dstart();applyPreset(PRE);render();$('#dlgData').close();toast('Đã về snapshot gốc.')};
+$('#btnSheet').onclick=async()=>{S.sheetUrl=$('#sheetUrl').value.trim();S.sheetOff=!S.sheetUrl;saveS();$('#loadStatus').textContent='Đang tải...';await refresh(true);$('#loadStatus').textContent=/Google Sheet/.test(M.stamp)?'Đã tải. '+M.stamp:'Chưa tải được, xem thông báo góc phải.'};
+$('#btnReset').onclick=()=>{S.sheetUrl='';S.sheetOff=true;saveS();M=scope(fromRaw(RAW));classify();DSTART=dstart();applyPreset(PRE);render();$('#dlgData').close();toast('Đã về snapshot gốc.')};
 $('#pRefresh').onclick=()=>refresh(true);
 const readFiles=async files=>{const T={};for(const f of files){const t=await f.text();const k=kindOf(t);if(k)T[k]=t}
   try{const imp=importTables(T);M=merge(fromRaw(RAW),imp);M.stamp='File CSV nạp '+new Date().toLocaleString('vi-VN');classify();DSTART=dstart();applyPreset(PRE);render();$('#loadStatus').textContent=`Đã nạp ${imp.rows.length} dòng Data${T.dims?', có Dims':''}. Data đến ${dmy(M.lastDate)}.`}catch(e){$('#loadStatus').textContent='Lỗi: '+e.message}};
