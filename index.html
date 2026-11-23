@@ -281,11 +281,11 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LS='svl_gads_dash_v2';
 const HOTELS=['Sakyo','The Myst','Nhiều khách sạn','Chưa phân loại'];
 const MAIN=['Sakyo','The Myst'];
-const CFGV=3;// 23/11/2026: dashboard chỉ còn Sakyo và The Myst
+const CFGV=4;// 23/11/2026: dashboard chỉ còn Sakyo và The Myst
 const HIDDEN=['Nhiều khách sạn','Chưa phân loại'];
 const DEF={otaCommission:0.17,targetRoas:{'Sakyo':14,'The Myst':null},
   budgets:{'2026-11':{'Sakyo':27.5e6},'2026-12':{'Sakyo':37.4e6}},
-  rules:'Sakyo = sakyo|little tokyo\nThe Myst = myst',
+  rules:'Sakyo = sakyo|little tokyo\nThe Myst = myst\nBến Thành = bến thành|ben thanh|\\bbt\\b\nJolie = jolie\nYen = (^|[^a-z])yen([^a-z]|$)\nSil = (^|[^a-z])sil([^a-z]|$)\nMây = mây|(^|[^a-z])may([^a-z]|$)',
   accountDefault:{'3965442048':'Sakyo','7534212327':'Chưa phân loại','6233882444':'The Myst'},overrides:{},sheetUrl:'',cfgV:CFGV};
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
@@ -1002,7 +1002,7 @@ function openSettings(){
    <table><thead><tr><th class="l">Tháng</th>${MAIN.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${months.map(k=>`<tr><td class="l">${k.slice(5)}/${k.slice(0,4)}</td>${MAIN.map(h=>`<td><input data-bm="${k}" data-bh="${h}" type="number" step="0.1" style="width:90px" value="${(S.budgets[k]||{})[h]!=null?S.budgets[k][h]/1e6:''}"></td>`).join('')}</tr>`).join('')}</tbody></table>
    <p class="small muted">Mặc định Sakyo T11, T12/2026 là mức trần khung ngân sách trong Review 27/10/2026. The Myst chưa có ngân sách, nhập ở đây để xem tiến độ chi.</p>
    <h3 style="font-size:14px;margin:16px 0 8px">Quy tắc gán khách sạn theo tên chiến dịch</h3>
-   <p class="small muted">Mỗi dòng <code>Khách sạn = biểu thức</code> (regex, không phân biệt hoa thường). Khớp 2 khách sạn trở lên thì vào "Nhiều khách sạn". Không khớp thì theo tài khoản: 396-544-2048 là Sakyo, 623-388-2444 là The Myst, 753-421-2327 là Chưa phân loại.</p>
+   <p class="small muted">Mỗi dòng <code>Khách sạn = biểu thức</code> (regex, không phân biệt hoa thường). Khớp 2 khách sạn trở lên thì vào "Nhiều khách sạn". Dòng Bến Thành, Jolie, Yen, Sil, Mây giữ lại để chiến dịch gộp (ví dụ PM Sakyo & Sil) vào "Nhiều khách sạn", không tính hết cho Sakyo. Không khớp thì theo tài khoản: 396-544-2048 là Sakyo, 623-388-2444 là The Myst, 753-421-2327 là Chưa phân loại.</p>
    <textarea id="sRules" rows="7">${esc(S.rules)}</textarea>
    <h3 style="font-size:14px;margin:16px 0 8px">Gán chiến dịch bằng tay</h3><input id="sFind" placeholder="Tìm chiến dịch" style="width:100%;margin-bottom:6px">
    <div class="tw" style="max-height:300px"><table id="sCamps"><thead><tr><th class="l">Chiến dịch</th><th class="l">TK</th><th class="l">Đang gán</th><th class="l">Gán tay</th></tr></thead><tbody>
