@@ -28,7 +28,7 @@ var ADS_CONFIG = {
   LOGIN_CUSTOMER_ID: '1407880633',                         // MCC SILVERLAND HOSPITALITY
   ACCOUNT_IDS: ['3965442048', '7534212327', '6233882444'],  // Sakyo, TK chung (chỉ lấy Sakyo), The Myst
   ONLY_CAMPAIGN: { '7534212327': /sakyo|little tokyo/i },   // TK dùng chung: chỉ giữ chiến dịch khớp biểu thức
-  BACKFILL_FROM: '2025-01-01',
+  BACKFILL_FROM: '2024-01-01',
   MONTHS_BACK: 1,                                           // lần chạy thường: lấy từ ngày 1 của N tháng trước
   MAIN_PURCHASE: {},                                        // { 'cid': { name: 'Tên chuyển đổi', from: 'yyyy-MM-dd' } } nếu cần chỉ đếm 1 hành động
   GA4_IMPORT_SUFFIX: '(web) purchase'

@@ -18,7 +18,7 @@ var RC = {
   BOOKING_SHEET_ID: '1pgn8Ujr843USchxY9RV198jLoCt6Mg7ihq78tygiByk',
   BOOKING_TAB: 'Data',
   GA4_PROPERTY: 'properties/340245620',   // Silverland (www.silverlandhotels.com - GA4)
-  START_DATE: '2025-01-01',
+  START_DATE: '2024-01-01',
   OUT_TAB: 'Recon'
 };
 // Phạm vi 23/11/2026: đối soát Sakyo và The Myst Đồng Khởi.
