@@ -383,7 +383,9 @@ function merge0(base,imp){
       const f=(cut-r[0])/(r[1]-r[0]+1),o=r.slice();o[1]=cut-1;for(let j=4;j<9;j++)o[j]*=f;dims[k].push(o)}
     (imp.dims[k]||[]).forEach(r=>{const o=r.slice();o[2]=map[r[2]];dims[k].push(o)})}
   const noDim=new Set([...base.noDimAccs].filter(a=>!imp.dimAccs.has(a)));
-  return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:Math.max(base.lastDate,imp.last),accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:base.monthlyAccs,noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
+  let bmin=Infinity;for(const r of base.rows)if(r.s<bmin)bmin=r.s;
+  const monthly=new Set([...base.monthlyAccs].filter(x=>!(imp.accs.has(x)&&cut<=bmin)));
+  return {camps,rows,dims,geo:Object.assign({},base.geo,imp.geo),lastDate:Math.max(base.lastDate,imp.last),accounts:Object.assign({},base.accounts,imp.accNames),monthlyAccs:monthly,noDimAccs:noDim,recon:base.recon,source:'sheet',stamp:''};
 }
 function sheetId(u){const m=String(u).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null}
 async function fetchTab(id,name){const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(/<html/i.test(t.slice(0,300)))throw new Error('Sheet chưa chia sẻ cho người có link');return t}
