@@ -1000,14 +1000,14 @@ function realAgg(h,f,t,gran){
 function realLevels(a){return [
   ['Mức sàn',a.rFloor,a.ar,'--s3','booking thực có phiên Google Ads'],
   ['Ước tính',a.rEst,a.est,'--s7','bù phần GA4 không ghi'],
-  ['Mức trần',a.rAds,a.adsv,'--s2','Google Ads tự ghi'],
+  ['Ads tự ghi',a.rAds,a.adsv,'--s2','Google Ads tự ghi'],
   ['Web / Cost',a.rWeb,a.rev,'--other','toàn bộ web revenue']]}
 function realFind(h,a,rows){
   const L=[],tr=S.targetRoas[h],be=1/S.otaCommission;
   L.push(['',`Web revenue ${F.tr(a.rev)} từ ${F.int(a.n)} booking. Booking có phiên Google Ads chiếm ${F.pct0(a.adsShare)} web revenue (${F.tr(a.ar)}).`]);
   if(tr&&ok(a.rEst))L.push([a.rEst>=tr?'g':'w',`Real ROAS ước tính ${F.x(a.rEst)} đạt ${F.pct0(a.rEst/tr)} Target ROAS ${F.x(tr)}. Mức sàn ${F.x(a.rFloor)} đạt ${F.pct0(a.rFloor/tr)}, Google Ads tự ghi ${F.x(a.rAds)} đạt ${F.pct0(a.rAds/tr)}.`]);
   if(ok(a.rFloor))L.push([a.rFloor>=be?'g':'b',`Real ROAS mức sàn ${F.x(a.rFloor)} ${a.rFloor>=be?'cao hơn':'thấp hơn'} mức hoà vốn so với OTA ${F.x(be)} (hoa hồng ${F.pct0(S.otaCommission)}).`]);
-  if(ok(a.rAds)&&ok(a.rEst)&&a.rEst>0)L.push(['',`Google Ads tự ghi bằng ${nf1.format(a.rAds/a.rEst)} lần Real ROAS ước tính. Phần chênh gồm booking huỷ hoặc đổi, chuyển đổi xem quảng cáo, đặt trên thiết bị khác và cách ghi công DDA (Suy luận). Google Ads tính theo ngày click, booking engine theo ngày đặt.`]);
+  if(ok(a.rAds)&&ok(a.rEst)&&a.rEst>0){const q=a.rAds/a.rEst;L.push([q>1.3?'w':'g',q>1.3?`Google Ads tự ghi bằng ${nf1.format(q)} lần Real ROAS ước tính. Đánh giá chiến dịch theo số Google Ads sẽ thấy tốt hơn thực tế. Phần chênh có thể gồm booking huỷ hoặc đổi, chuyển đổi xem quảng cáo, đặt trên thiết bị khác, ghi công DDA, và tag mua hàng dùng chung nhiều khách sạn (Suy luận).`:`Google Ads tự ghi bằng ${nf1.format(q)} lần Real ROAS ước tính, sát với số thực. Số Google Ads dùng được để tối ưu hằng ngày.`])}
   const zero=rows.filter(r=>r.cost>=Math.max(500000,a.cost*0.05)&&!r.rn);
   if(zero.length)L.push(['b',`${zero.length} chiến dịch chi từ 5% Cost mà không có booking thực có phiên GA4: ${zero.slice(0,4).map(r=>`${esc(r.name)} (${F.tr(r.cost)})`).join(', ')}.`]);
   return L;
@@ -1038,7 +1038,7 @@ function secReal(){
         plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>lv[x[0].dataIndex][0]+': '+lv[x[0].dataIndex][4],label:x=>` ROAS ${F.x(x.parsed.x)}, CIR ${F.pct(div(1,x.parsed.x))}, doanh thu ${F.tr(lv[x.dataIndex][2])}`}}}}),
       plugins:[hl([{v:be,c:css('--s8'),t:'Hoà vốn '+F.x(be),dash:[3,3]},...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[])],'x')]});
     const ln=(lb,k,c,dash)=>({label:lb,data:bs.map(b=>ok(g(b)[k])?g(b)[k]:null),borderColor:css(c),backgroundColor:css(c),borderWidth:2.2,borderDash:dash||[],pointRadius:gran==='day'?0:3,pointHoverRadius:5,tension:.3,spanGaps:true});
-    chart('rlTr',{type:'line',data:{labels,datasets:[ln('Mức trần: Google Ads tự ghi','rAds','--s2'),ln('Ước tính','rEst','--s7',[5,4]),ln('Mức sàn','rFloor','--s3')]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[]),{v:be,c:css('--s8'),t:'Hoà vốn',dash:[3,3]}])]});
+    chart('rlTr',{type:'line',data:{labels,datasets:[ln('Ads tự ghi','rAds','--s2'),ln('Ước tính','rEst','--s7',[5,4]),ln('Mức sàn','rFloor','--s3')]},options:opts(F.x,'ROAS (lần)'),plugins:[hl([...(tr?[{v:tr,c:css('--ink'),t:'Target '+F.x(tr),dash:[6,3]}]:[]),{v:be,c:css('--s8'),t:'Hoà vốn',dash:[3,3]}])]});
     const st=(lb,f,c)=>({label:lb,data:bs.map(b=>f(g(b))||0),backgroundColor:css(c),borderColor:'#fff',borderWidth:1});
     chart('rlMix',{type:'bar',data:{labels,datasets:[st('Google Ads (phiên GA4)',x=>x.ar,'--s2'),st('Nguồn khác trong GA4',x=>(x.gr||0)-(x.ar||0),'--s5'),st('Không có trong GA4',x=>x.mr,'--other')]},
       options:opts(F.tr,'Web revenue (triệu đồng)',{scales:{x:{stacked:true,grid:{display:false},ticks:{color:css('--ink-2'),font:{size:11},maxRotation:0,autoSkip:true}},y:{stacked:true,beginAtZero:true,grid:{color:'#eeeae3'},ticks:{callback:v=>F.tr(v),color:css('--ink-2'),font:{size:11}}}}})});
@@ -1046,7 +1046,7 @@ function secReal(){
   const kp=(lb,v,ex,cls)=>`<div class="card kpi ${cls||''} ${A()}"><div class="lb"><span>${lb}</span></div><div class="v num">${v}</div><div class="d">${ex}</div></div>`;
   const fl=realFind(h,a,rs);
   return `${TO>thr?`<p class="note ${A()}">Booking engine có số đến ${dmy(thr)}, phần này tính đến ngày đó.</p>`:''}
-   <p class="note info ${A()}">Số thực lấy từ booking engine (booking xác nhận, doanh thu book date). Real ROAS có 3 mức. <b>Mức sàn</b>: chỉ booking thực có phiên GA4 đến từ Google Ads, bỏ sót booking GA4 không ghi được. <b>Ước tính</b>: mức sàn chia cho tỷ lệ doanh thu GA4 ghi được, giả định phần GA4 sót có cùng tỷ trọng nguồn (Ước tính). <b>Mức trần</b>: số Google Ads tự ghi, gồm cả booking huỷ, đặt trên thiết bị khác và ghi công DDA. Hiệu quả thực nằm trong khoảng mức sàn đến mức trần. Web revenue / Cost là tỷ lệ tổng thể, tính cả booking không đến từ quảng cáo.</p>
+   <p class="note info ${A()}">Số thực lấy từ booking engine (booking xác nhận, doanh thu book date). Real ROAS có 3 mức. <b>Mức sàn</b>: chỉ booking thực có phiên GA4 đến từ Google Ads, bỏ sót booking GA4 không ghi được. <b>Ước tính</b>: mức sàn chia cho tỷ lệ doanh thu GA4 ghi được, giả định phần GA4 sót có cùng tỷ trọng nguồn (Ước tính). <b>Ads tự ghi</b>: số Google Ads tự ghi, gồm cả booking huỷ, đặt trên thiết bị khác, xem quảng cáo và ghi công DDA. Dùng mức Ước tính để đánh giá, mức sàn là phần chắc chắn. Web revenue / Cost là tỷ lệ tổng thể, tính cả booking không đến từ quảng cáo.</p>
    <div class="kpis">
      ${kp('Web revenue <span class="muted">(booking engine)</span>',F.tr(a.rev),`${F.int(a.n)} booking, Cost ${F.tr(a.cost)}, Web revenue / Cost ${F.x(a.rWeb)}`,'hero')}
      ${kp('Real ROAS mức sàn',F.x(a.rFloor),`${F.tr(a.ar)} từ ${F.int(a.an)} booking có phiên Google Ads, CIR ${F.pct(div(a.cost,a.ar))}`,'hero')}
@@ -1054,12 +1054,12 @@ function secReal(){
      ${kp('Ads ROAS <span class="muted">(Google Ads tự ghi)</span>',F.x(a.rAds),`${F.tr(a.adsv)}, ${F.cv(a.ads)} booking, CIR ${F.pct(div(a.cost,a.adsv))}`,'hero')}
    </div>
    <div class="grid g12" style="margin-top:14px">
-     <div class="card ${A()}"><h3>4 cách tính ROAS trong kỳ</h3><p class="q">Kỳ ${dmy(FROM)} đến ${dmy(to)}. Mức sàn: booking thực có phiên Google Ads. Ước tính: bù phần GA4 không ghi. Mức trần: Google Ads tự ghi. Web / Cost: toàn bộ web revenue. Vạch đỏ: hoà vốn so với hoa hồng OTA${tr?'. Vạch đen: Target ROAS':''}.</p><div class="chartbox" style="height:240px"><canvas id="rlLv"></canvas></div></div>
+     <div class="card ${A()}"><h3>4 cách tính ROAS trong kỳ</h3><p class="q">Kỳ ${dmy(FROM)} đến ${dmy(to)}. Mức sàn: booking thực có phiên Google Ads. Ước tính: bù phần GA4 không ghi. Ads tự ghi: số Google Ads tự ghi. Web / Cost: toàn bộ web revenue. Vạch đỏ: hoà vốn so với hoa hồng OTA${tr?'. Vạch đen: Target ROAS':''}.</p><div class="chartbox" style="height:240px"><canvas id="rlLv"></canvas></div></div>
      <div class="card ${A()}"><h3>Phát hiện</h3><p class="q">Tự động tạo từ số trong kỳ. Nhận định nguyên nhân gắn nhãn Suy luận.</p><ul class="ins">${fl.map(x=>`<li><span class="tg ${x[0]}">${x[0]==='g'?'Tốt':x[0]==='b'?'Cần xem':x[0]==='w'?'Lưu ý':'Số chính'}</span><span>${x[1]}</span></li>`).join('')}</ul></div>
    </div>
    <div class="grid g2" style="margin-top:14px">
-     <div class="card ${A()}"><h3>Real ROAS theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày'}</h3><p class="q">Khoảng giữa mức sàn và mức trần là vùng hiệu quả thực.</p>
-       <div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Mức trần: Google Ads tự ghi</span><span><i class="dash" style="border-top-color:var(--s7)"></i>Ước tính</span><span><i class="ln" style="background:var(--s3)"></i>Mức sàn</span></div><div class="chartbox"><canvas id="rlTr"></canvas></div></div>
+     <div class="card ${A()}"><h3>Real ROAS theo ${gran==='month'?'tháng':gran==='week'?'tuần':'ngày'}</h3><p class="q">Đánh giá theo đường Ước tính. Ads tự ghi cách xa Ước tính là dấu hiệu Google Ads ghi thừa hoặc ghi công rộng.</p>
+       <div class="legend"><span><i class="ln" style="background:var(--s2)"></i>Ads tự ghi</span><span><i class="dash" style="border-top-color:var(--s7)"></i>Ước tính</span><span><i class="ln" style="background:var(--s3)"></i>Mức sàn</span></div><div class="chartbox"><canvas id="rlTr"></canvas></div></div>
      <div class="card ${A()}"><h3>Web revenue theo nguồn</h3><p class="q">Doanh thu book date trên booking engine, tách theo nguồn phiên GA4.</p>
        <div class="legend"><span><i style="background:var(--s2)"></i>Google Ads (phiên GA4)</span><span><i style="background:var(--s5)"></i>Nguồn khác trong GA4</span><span><i style="background:var(--other)"></i>Không có trong GA4</span></div><div class="chartbox"><canvas id="rlMix"></canvas></div></div>
    </div>
@@ -1076,7 +1076,7 @@ function secRealAll(){
       <dt>Ads ROAS (Google Ads tự ghi)</dt><dd>${F.x(a.rAds)}</dd>
       <dt>Web revenue / Cost</dt><dd>${F.x(a.rWeb)}</dd>
       <dt>Web revenue từ Google Ads</dt><dd>${F.pct0(a.adsShare)} <span class="muted small">(mức sàn)</span></dd></dl></div>`}).join('');
-  return `<p class="note info ${A()}">Mỗi khách sạn đo trên booking engine và chi phí Google Ads của chính khách sạn đó. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Real ROAS mức sàn đến mức trần là vùng hiệu quả thực. Mở từng khách sạn để xem theo chiến dịch.</p>
+  return `<p class="note info ${A()}">Mỗi khách sạn đo trên booking engine và chi phí Google Ads của chính khách sạn đó. Kỳ ${dmy(FROM)} đến ${dmy(to)}. Dùng Real ROAS ước tính để đánh giá, mức sàn là phần chắc chắn. Mở từng khách sạn để xem theo chiến dịch.</p>
    <div class="hotelcards">${cards}</div>`;
 }
 
