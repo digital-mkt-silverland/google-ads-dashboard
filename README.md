@@ -25,3 +25,9 @@ Dashboard theo dõi hiệu quả chiến dịch Google Ads của Silverland Saky
 Muốn lấy lại toàn bộ từ 01/01/2025: chạy `runAdsFull`.
 
 Lưu ý: repo public, ai có link đều xem được số chi phí và doanh thu book date. Trang có thẻ noindex để hạn chế công cụ tìm kiếm.
+
+## Sửa giao diện và build
+- Sửa `src/template.html` (không sửa thẳng index.html).
+- `python3 build.py`: ghi lại index.html (bản công khai, bỏ số booking engine).
+- `DASH_SHEET_URL=<link Sheet> python3 build.py --private <đường dẫn>.html`: bản gửi riêng có sẵn link Sheet. Không commit file này, không ghi link Sheet vào repo.
+- Link cá nhân thay cho file: link dashboard thêm `?sheet=<ID Sheet>` (mở 1 lần, trình duyệt nhớ).
