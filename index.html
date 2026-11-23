@@ -520,11 +520,23 @@ function table(id,cols,rows,o={}){
   const shown=rs.slice(0,st.lim);
   const head=cols.map(c=>`<th class="${c.l?'l':''}" data-k="${c.k}" title="${esc(c.tip||'')}">${c.t}${st.k===c.k?(st.dir>0?' ▲':' ▼'):''}</th>`).join('');
   const body=shown.map(r=>`<tr>${cols.map(c=>`<td class="${c.cls||(c.l?'l':'num')}">${c.f?c.f(r[c.k],r):esc(r[c.k])}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="empty">Không có dữ liệu trong kỳ và bộ lọc hiện tại</td></tr>`;
-  const foot=o.foot?`<tfoot><tr>${cols.map(c=>`<td class="${c.l?'l':'num'}">${o.foot[c.k]??''}</td>`).join('')}</tr></tfoot>`:'';
+  const ft=o.foot||(o.total!==false?autoFoot(cols,rs,st.q):null);
+  const foot=ft?`<tfoot><tr>${cols.map(c=>`<td class="${c.l?'l':'num'}">${ft[c.k]??''}</td>`).join('')}</tr></tfoot>`:'';
   return `<div class="tt">${o.search!==false?`<input type="search" data-tq="${id}" placeholder="Tìm ${o.what||''}" value="${esc(st.q)}">`:''}<span class="muted small">${rs.length} dòng${rs.length>st.lim?`, đang hiện ${st.lim}`:''}</span><span class="sp"></span>${rs.length>st.lim?`<button class="btn" data-tmore="${id}">Xem thêm</button>`:''}<button class="btn" data-tcsv="${id}">Tải CSV</button></div>
    <div class="tw"><table data-tid="${id}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${foot}</table></div>`;
 }
 const TBL={};// id -> {cols,rows}
+// Dòng tổng tự tính cho bảng có cột Cost: cộng các dòng đang lọc (theo ô tìm), chỉ số tỷ lệ tính lại từ tổng
+function autoFoot(cols,rs,q){
+  if(!cols.some(c=>c.k==='cost')||!rs.length)return null;
+  const S0=k=>rs.reduce((s,r)=>s+(ok(r[k])?r[k]:0),0);
+  const t={cost:S0('cost'),impr:S0('impr'),clk:S0('clk'),conv:S0('conv'),val:S0('val'),share:S0('share'),dshare:S0('dshare'),bk:S0('bk'),chk:S0('chk')};
+  t.ctr=div(t.clk,t.impr);t.cpc=div(t.cost,t.clk);t.cvr=div(t.conv,t.clk);t.cpa=div(t.cost,t.conv);t.roas=div(t.val,t.cost);t.cos=div(t.cost,t.val);
+  const fmt={cost:F.tr,share:F.pct,impr:F.int,clk:F.int,ctr:F.pct,cpc:F.k,conv:F.cv,cvr:F.pct,cpa:F.tr,val:F.tr,roas:F.x,cos:F.pct,bk:F.cv,chk:F.int,dshare:v=>(v>0?'+':'')+nf1.format(v*100)+' pp'};
+  const o={};cols.forEach(c=>{if(fmt[c.k])o[c.k]='<b>'+fmt[c.k](t[c.k])+'</b>'});
+  o[cols[0].k]=`<b>Tổng${q?' (theo ô tìm)':''}</b> <span class="muted small">${F.int(rs.length)} dòng</span>`;
+  return o;
+}
 function bindTables(){
   $$('table[data-tid] th').forEach(th=>th.onclick=()=>{const id=th.closest('table').dataset.tid,k=th.dataset.k,st=TS[id];st.dir=st.k===k?-st.dir:-1;st.k=k;renderMain(false)});
   $$('[data-tq]').forEach(i=>{i.oninput=()=>{TS[i.dataset.tq].q=i.value;clearTimeout(i._t);i._t=setTimeout(()=>{const pos=i.selectionStart;renderMain(false);const n=document.querySelector(`[data-tq="${i.dataset.tq}"]`);if(n){n.focus();n.setSelectionRange(pos,pos)}},250)}});
@@ -839,7 +851,7 @@ function secAsset(){
      <li><span class="tg">Kỳ</span><span>Theo tháng cho dữ liệu cũ, theo tuần cho 3 tháng gần nhất. Kỳ cắt ngang được chia đều theo ngày (Ước tính).</span></li></ul></div>
    <div class="card ${A()}"><h3>10 dòng chữ chuyển đổi tốt nhất trên 1.000 hiển thị</h3><p class="q">${src==='RSA'?'Search RSA':'PMax'}, ${ff==='ALL'?'mọi loại':FT[ff]}</p><div class="chartbox lg"><canvas id="asBar"></canvas></div></div></div>
    <h2 class="sec">Bảng ${src==='RSA'?'headline, description Search':'headline, description PMax'}</h2>
-   <div class="${A()}">${T('asset_'+src,[MC('text','Nội dung',esc,{l:1,cls:'t'}),MC('ft','Loại',esc,{l:1}),MC('impr','Hiển thị',F.int),MC('clk','Nhấp',F.int),MC('ctr','CTR',F.pct),MC('conv','Lượt chuyển đổi',F.cv),MC('cpm','Chuyển đổi / 1.000 hiển thị',v=>ok(v)?nf2.format(v):'-'),MC('val','Doanh thu book date',F.tr),MC('cost','Chi phí',F.tr),MC('ncamp','Số chiến dịch',F.int),MC('camps','Chiến dịch',v=>`<span class="small">${esc(v)}</span>`,{l:1,cls:'t'})],rows,{sort:'impr',what:'nội dung'})}</div>`;
+   <div class="${A()}">${T('asset_'+src,[MC('text','Nội dung',esc,{l:1,cls:'t'}),MC('ft','Loại',esc,{l:1}),MC('impr','Hiển thị',F.int),MC('clk','Nhấp',F.int),MC('ctr','CTR',F.pct),MC('conv','Lượt chuyển đổi',F.cv),MC('cpm','Chuyển đổi / 1.000 hiển thị',v=>ok(v)?nf2.format(v):'-'),MC('val','Doanh thu book date',F.tr),MC('cost','Chi phí',F.tr),MC('ncamp','Số chiến dịch',F.int),MC('camps','Chiến dịch',v=>`<span class="small">${esc(v)}</span>`,{l:1,cls:'t'})],rows,{sort:'impr',what:'nội dung',total:false})}</div>`;
 }
 
 
