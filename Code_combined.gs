@@ -53,7 +53,7 @@ function runRecon() {
     var dd = Number(VDd[i][0]), mm = Number(VDm[i][0]), yy = Number(VDy[i][0]);
     if (!dd || !mm || !yy) continue;
     var d = yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2); if (d < RC.START_DATE || d > END) continue;
-    var id = String(VN[i][0]).trim(); if (!id) continue;
+    var id = nid(VN[i][0]); if (!id) continue;
     var b = ibe[id] || (ibe[id] = { d: d, h: hotel, rev: 0 });
     b.rev += toNum(VR[i][0]); if (d > through) through = d;
   }
@@ -64,6 +64,8 @@ function runRecon() {
     var se = ga(src.property, ['date', 'transactionId', 'sessionSourceMedium', 'sessionCampaignId', 'hostName'], ['purchaseRevenue', 'transactions'], END);
     var at = ga(src.property, ['date', 'transactionId', 'sourceMedium', 'campaignId'], ['keyEvents:purchase', 'totalRevenue'], END);
     var br = ga(src.property, ['transactionId', 'itemBrand'], ['itemRevenue'], END), cnt = {};
+    // Sheet booking bỏ số 0 đầu mã (0525471 thành 525471): chuẩn hoá mã ở cả 2 phía trước khi khớp
+    se.forEach(function (r) { r[1] = nid(r[1]); }); at.forEach(function (r) { r[1] = nid(r[1]); }); br.forEach(function (r) { r[0] = nid(r[0]); });
     br.forEach(function (r) { var c = cnt[r[0]] || (cnt[r[0]] = {}); c[r[1]] = (c[r[1]] || 0) + 1; });
     function top(tid) { var c = cnt[tid]; if (!c) return null; var best = null; for (var k in c) if (!best || c[k] > c[best]) best = k; return best; }
     function hotelOf(tid) {
@@ -137,6 +139,7 @@ function toISO(x, tz) {
   var m = String(x).trim().match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
   return m ? m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2) : '';
 }
+function nid(x) { return String(x).trim().replace(/^0+(?=\d)/, ''); }
 function gaDate(s) { return s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8); }
 function toNum(x) { if (typeof x === 'number') return x; var n = Number(String(x).replace(/,/g, '')); return isFinite(n) ? n : 0; }
 function round(v, d) { var p = Math.pow(10, d); return Math.round(v * p) / p; }
